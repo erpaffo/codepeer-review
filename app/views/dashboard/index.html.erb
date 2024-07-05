@@ -1,0 +1,6 @@
+<!-- app/views/dashboard/index.html.erb -->
+
+<h1>Dashboard</h1>
+<p>Welcome, <%= current_user.first_name %>!</p>
+<%= link_to 'My Projects', projects_path %>
+<%= link_to 'New Project', new_project_path %>

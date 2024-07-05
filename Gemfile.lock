@@ -78,7 +78,10 @@ GEM
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     base64 (0.2.0)
+    bcrypt (3.1.20)
+    bcrypt (3.1.20-java)
     bigdecimal (3.1.8)
+    bigdecimal (3.1.8-java)
     bindex (0.8.1)
     bootsnap (1.18.3)
       msgpack (~> 1.2)
@@ -96,13 +99,30 @@ GEM
     connection_pool (2.4.1)
     crass (1.0.6)
     date (3.3.4)
+    date (3.3.4-java)
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    devise (4.9.4)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0)
+      responders
+      warden (~> 1.2.3)
+    dotenv (2.8.1)
+    dotenv-rails (2.8.1)
+      dotenv (= 2.8.1)
+      railties (>= 3.2)
     drb (2.2.1)
     erubi (1.13.0)
+    faraday (2.8.1)
+      base64
+      faraday-net_http (>= 2.0, < 3.1)
+      ruby2_keywords (>= 0.0.4)
+    faraday-net_http (3.0.2)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    hashie (5.0.0)
     i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.0.1)
@@ -116,6 +136,8 @@ GEM
     jbuilder (2.12.0)
       actionview (>= 5.0.0)
       activesupport (>= 5.0.0)
+    jwt (2.8.2)
+      base64
     loofah (2.22.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
@@ -130,6 +152,8 @@ GEM
     mini_portile2 (2.8.7)
     minitest (5.24.1)
     msgpack (1.7.2)
+    msgpack (1.7.2-java)
+    multi_xml (0.6.0)
     mutex_m (0.2.0)
     net-imap (0.3.7)
       date
@@ -141,18 +165,59 @@ GEM
     net-smtp (0.5.0)
       net-protocol
     nio4r (2.7.3)
+    nio4r (2.7.3-java)
     nokogiri (1.15.6)
       mini_portile2 (~> 2.8.2)
       racc (~> 1.4)
+    nokogiri (1.15.6-java)
+      racc (~> 1.4)
+    nokogiri (1.15.6-x64-mingw32)
+      racc (~> 1.4)
+    nokogiri (1.15.6-x86-mingw32)
+      racc (~> 1.4)
     nokogiri (1.15.6-x86_64-linux)
       racc (~> 1.4)
+    oauth2 (2.0.9)
+      faraday (>= 0.17.3, < 3.0)
+      jwt (>= 1.0, < 3.0)
+      multi_xml (~> 0.5)
+      rack (>= 1.2, < 4)
+      snaky_hash (~> 2.0)
+      version_gem (~> 1.1)
+    omniauth (2.1.2)
+      hashie (>= 3.4.6)
+      rack (>= 2.2.3)
+      rack-protection
+    omniauth-github (2.0.1)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.8)
+    omniauth-gitlab (4.1.0)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.8.0)
+    omniauth-google-oauth2 (1.1.2)
+      jwt (>= 2.0)
+      oauth2 (~> 2.0)
+      omniauth (~> 2.0)
+      omniauth-oauth2 (~> 1.8)
+    omniauth-oauth2 (1.8.0)
+      oauth2 (>= 1.4, < 3)
+      omniauth (~> 2.0)
+    omniauth-rails_csrf_protection (1.0.2)
+      actionpack (>= 4.2)
+      omniauth (~> 2.0)
+    orm_adapter (0.5.0)
     psych (5.1.2)
       stringio
     public_suffix (5.1.1)
     puma (6.4.2)
       nio4r (~> 2.0)
+    puma (6.4.2-java)
+      nio4r (~> 2.0)
     racc (1.8.0)
+    racc (1.8.0-java)
     rack (3.1.6)
+    rack-protection (3.0.6)
+      rack
     rack-session (2.0.0)
       rack (>= 3.0.0)
     rack-test (2.1.0)
@@ -195,13 +260,20 @@ GEM
     regexp_parser (2.9.2)
     reline (0.5.9)
       io-console (~> 0.5)
+    responders (3.1.1)
+      actionpack (>= 5.2)
+      railties (>= 5.2)
     rexml (3.3.1)
       strscan
+    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     selenium-webdriver (4.9.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
+    snaky_hash (2.0.1)
+      hashie
+      version_gem (~> 1.1, >= 1.1.1)
     sprockets (4.2.1)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -211,11 +283,13 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.6.9)
       mini_portile2 (~> 2.8.0)
+    sqlite3 (1.6.9-x64-mingw32)
     sqlite3 (1.6.9-x86_64-linux)
     stimulus-rails (1.3.3)
       railties (>= 6.0.0)
     stringio (3.1.1)
     strscan (3.1.0)
+    strscan (3.1.0-java)
     thor (1.3.1)
     timeout (0.4.1)
     turbo-rails (2.0.5)
@@ -224,6 +298,11 @@ GEM
       railties (>= 6.0.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
+    tzinfo-data (1.2024.1)
+      tzinfo (>= 1.0.0)
+    version_gem (1.1.4)
+    warden (1.2.9)
+      rack (>= 2.0.9)
     web-console (4.2.1)
       actionview (>= 6.0.0)
       activemodel (>= 6.0.0)
@@ -237,21 +316,34 @@ GEM
     websocket (1.2.10)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
+    websocket-driver (0.7.6-java)
+      websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
     zeitwerk (2.6.16)
 
 PLATFORMS
+  java
+  mswin64
   ruby
+  x64-mingw32
+  x86-mingw32
+  x86-mswin32
   x86_64-linux
 
 DEPENDENCIES
   bootsnap
   capybara
   debug
+  devise
+  dotenv-rails
   importmap-rails
   jbuilder
+  omniauth-github
+  omniauth-gitlab
+  omniauth-google-oauth2
+  omniauth-rails_csrf_protection
   puma (>= 5.0)
   rails (~> 7.1.3, >= 7.1.3.3)
   selenium-webdriver

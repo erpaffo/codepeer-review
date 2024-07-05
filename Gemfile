@@ -66,3 +66,14 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+
+
+gem 'devise'
+
+gem 'omniauth-google-oauth2'
+gem 'omniauth-github'
+gem 'omniauth-gitlab'
+
+gem 'dotenv-rails'
+
+gem 'omniauth-rails_csrf_protection'
