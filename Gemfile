@@ -14,9 +14,6 @@ gem "sqlite3", "~> 1.4"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 
-# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
-gem "importmap-rails"
-
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 
@@ -67,6 +64,7 @@ group :test do
   gem "webdrivers"
 end
 
+gem 'webpacker'
 
 gem 'devise'
 
@@ -77,3 +75,7 @@ gem 'omniauth-gitlab'
 gem 'dotenv-rails'
 
 gem 'omniauth-rails_csrf_protection'
+
+gem "pundit"
+
+gem 'aws-sdk-s3'

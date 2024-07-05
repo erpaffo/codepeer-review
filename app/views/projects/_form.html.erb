@@ -1,0 +1,39 @@
+<!-- app/views/projects/_form.html.erb -->
+
+<%= form_with(model: project, local: true, html: { multipart: true }) do |form| %>
+  <% if project.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(project.errors.count, "error") %> prohibited this project from being saved:</h2>
+
+      <ul>
+        <% project.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= form.label :title %>
+    <%= form.text_field :title, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :description %>
+    <%= form.text_area :description, class: "form-control" %>
+  </div>
+
+  <div class="form-group">
+    <%= form.label :files, "Upload Files" %>
+    <%= form.file_field :files, multiple: true, direct_upload: true, class: "form-control" %>
+  </div>
+
+  <div class="form-group form-check">
+    <%= form.check_box :create_readme, class: "form-check-input" %>
+    <%= form.label :create_readme, "Create README.md with title and description", class: "form-check-label" %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: "btn btn-primary" %>
+  </div>
+<% end %>
