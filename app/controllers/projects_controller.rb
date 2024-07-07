@@ -1,14 +1,13 @@
-# app/controllers/projects_controller.rb
-
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: %i[show edit update destroy]
+  before_action :set_project, only: %i[show edit update destroy edit_file update_file]
 
   def index
     @projects = Project.all
   end
 
   def show
+    # render project details and list of files
   end
 
   def new
@@ -19,7 +18,7 @@ class ProjectsController < ApplicationController
   end
 
   def create
-    @project = current_user.projects.new(project_params)  # Associare il progetto all'utente corrente
+    @project = Project.new(project_params)
     if @project.save
       create_readme_file(@project) if params[:project][:create_readme] == '1'
       redirect_to @project, notice: 'Project was successfully created.'
@@ -39,6 +38,27 @@ class ProjectsController < ApplicationController
   def destroy
     @project.destroy
     redirect_to projects_url, notice: 'Project was successfully destroyed.'
+  end
+
+  def edit_file
+    @file = @project.files.find(params[:file_id])
+    if ['.js', '.rb', '.py', '.md', '.c', '.cpp', '.rs', '.html', '.css', '.xml', '.txt'].include?(File.extname(@file.filename.to_s))
+      @file_content = @file.download.force_encoding("UTF-8")
+    else
+      redirect_to project_path(@project), alert: 'Unsupported file type.'
+    end
+  end
+
+  def update_file
+    @file = @project.files.find(params[:file_id])
+    if @file.present?
+      @file.open do |f|
+        f.write(params[:content])
+      end
+      redirect_to edit_file_project_path(@project, @file.id), notice: 'File was successfully updated.'
+    else
+      redirect_to project_path(@project), alert: 'File not found.'
+    end
   end
 
   private

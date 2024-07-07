@@ -1,0 +1,52 @@
+<div class="row">
+  <div class="col-12">
+    <h3>Editing File: <%= @file.filename %></h3>
+    <%= form_with(url: update_file_project_path(@project, @file.id), method: :patch, local: true) do %>
+      <div class="form-group">
+        <div id="monaco-editor" style="height: 600px;"></div>
+      </div>
+      <%= hidden_field_tag :content, '', id: 'editor-content' %>
+      <%= submit_tag 'Save File', class: 'btn btn-primary' %>
+    <% end %>
+  </div>
+</div>
+
+<%= link_to 'Back to Project', project_path(@project), class: "btn btn-secondary" %>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs/loader.js"></script>
+<script>
+  require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.33.0/min/vs' }});
+  require(['vs/editor/editor.main'], function() {
+    const editorElement = document.getElementById('monaco-editor');
+    const language = detectLanguage('<%= @file.filename %>');
+    const content = `<%= j @file_content %>`;
+
+    const editor = monaco.editor.create(editorElement, {
+      value: content,
+      language: language,
+      theme: 'vs-dark'
+    });
+
+    document.querySelector('form').addEventListener('submit', (e) => {
+      document.querySelector('#editor-content').value = editor.getValue();
+    });
+  });
+
+  function detectLanguage(filename) {
+    const extension = filename.split('.').pop();
+    switch (extension) {
+      case 'js': return 'javascript';
+      case 'rb': return 'ruby';
+      case 'py': return 'python';
+      case 'md': return 'markdown';
+      case 'c': return 'c';
+      case 'cpp': return 'cpp';
+      case 'rs': return 'rust';
+      case 'html': return 'html';
+      case 'css': return 'css';
+      case 'xml': return 'xml';
+      case 'txt': return 'plaintext';
+      default: return 'plaintext';
+    }
+  }
+</script>

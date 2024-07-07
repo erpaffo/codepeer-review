@@ -1,6 +1,15 @@
-<!-- app/views/dashboard/index.html.erb -->
-
 <h1>Dashboard</h1>
-<p>Welcome, <%= current_user.first_name %>!</p>
-<%= link_to 'My Projects', projects_path %>
-<%= link_to 'New Project', new_project_path %>
+<p>Welcome, <%= current_user.first_name %> <%= current_user.last_name %> (Nickname: <%= current_user.nickname %>)!</p>
+<p>Email: <%= current_user.email %></p>
+<p>Phone Number: <%= current_user.phone_number %></p>
+
+<%= link_to 'Edit Profile', edit_profile_path %><br>
+<% if current_user.otp_enabled %>
+  <p>Two-Factor Authentication is enabled.</p>
+  <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch %>
+<% else %>
+  <p>Two-Factor Authentication is disabled.</p>
+  <%= link_to 'Enable Two-Factor Authentication', enable_two_factor_auth_path, method: :patch %>
+<% end %>
+<br>
+<%= link_to 'Logout', destroy_user_session_path, method: :delete %>

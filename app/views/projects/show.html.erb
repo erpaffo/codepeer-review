@@ -1,17 +1,25 @@
-<!-- app/views/projects/show.html.erb -->
+<div class="row">
+  <div class="col-12">
+    <h3>Project: <%= @project.title %></h3>
+    <p><%= @project.description %></p>
+  </div>
+  <div class="col-12">
+    <h3>Files</h3>
+    <ul class="list-group">
+      <% @project.files.each do |file| %>
+        <% if ['.js', '.rb', '.py', '.md', '.c', '.cpp', '.rs', '.html', '.css', '.xml', '.txt'].include?(File.extname(file.filename.to_s)) %>
+          <li class="list-group-item">
+            <%= link_to file.filename.to_s, edit_file_project_path(@project, file.id) %>
+          </li>
+        <% else %>
+          <li class="list-group-item">
+            <%= file.filename.to_s %> (Not supported)
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+</div>
 
-<p id="notice"><%= notice %></p>
-
-<h1><%= @project.title %></h1>
-<p><%= @project.description %></p>
-
-<h2>Files</h2>
-<ul>
-  <% @project.files.each do |file| %>
-    <li><%= link_to file.filename.to_s, rails_blob_path(file, disposition: "attachment") %></li>
-  <% end %>
-</ul>
-
-<%= link_to 'Edit', edit_project_path(@project), class: "btn btn-warning" %> |
-<%= link_to 'Back', projects_path, class: "btn btn-secondary" %> |
-<%= link_to 'Delete', project_path(@project), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %>
+<%= link_to 'Edit Project', edit_project_path(@project), class: "btn btn-warning" %> |
+<%= link_to 'Back', projects_path, class: "btn btn-secondary" %>

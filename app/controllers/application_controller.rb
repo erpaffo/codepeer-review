@@ -1,11 +1,12 @@
-# app/controllers/application_controller.rb
-
 class ApplicationController < ActionController::Base
-  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :authenticate_user!
+  before_action :check_two_factor_auth
 
-  protected
+  private
 
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name])
+  def check_two_factor_auth
+    return if !current_user || session[:otp_verified] || !current_user.otp_enabled?
+
+    redirect_to new_two_factor_auth_path
   end
 end
