@@ -1,0 +1,7 @@
+<h1>Verify Email Code</h1>
+<p>We have sent a code to your email. Please enter it below:</p>
+<%= form_with url: verify_two_factor_auth_path, method: :post do %>
+  <%= label_tag :otp_attempt, 'Code' %>
+  <%= text_field_tag :otp_attempt %>
+  <%= submit_tag 'Verify' %>
+<% end %>

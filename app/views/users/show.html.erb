@@ -1,0 +1,28 @@
+<h1>My Profile</h1>
+
+<p>
+  <strong>First name:</strong>
+  <%= current_user.first_name %>
+</p>
+
+<p>
+  <strong>Last name:</strong>
+  <%= current_user.last_name %>
+</p>
+
+<p>
+  <strong>Nickname:</strong>
+  <%= current_user.nickname %>
+</p>
+
+<p>
+  <strong>Email:</strong>
+  <%= current_user.email %>
+</p>
+
+<p>
+  <strong>Phone number:</strong>
+  <%= current_user.phone_number %>
+</p>
+
+<%= link_to 'Edit Profile', edit_profile_path %>

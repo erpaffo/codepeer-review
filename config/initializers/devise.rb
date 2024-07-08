@@ -14,7 +14,7 @@ Devise.setup do |config|
   # confirmation, reset password and unlock tokens in the database.
   # Devise will use the `secret_key_base` as its `secret_key`
   # by default. You can change it below and use your own secret key.
-  # config.secret_key = 'fcdca686e700950e8de5e3432f7f49cc95ecbb48c4593f6f032e0fe3763c9f4ce865a881dff0c032cd3af39b93a2afe1da31860fc2902cf82f4ea36603284a58'
+  # config.secret_key = '65dd1fe0a8a896e56aea76986b2ec3446984968623601ac68a54054dd9076050579f0edf4d32c319a90f5f23d5e53885d1dca1d50a9aa96c50ef8112ed336cc0'
 
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.
@@ -126,7 +126,7 @@ Devise.setup do |config|
   config.stretches = Rails.env.test? ? 1 : 12
 
   # Set up a pepper to generate the hashed password.
-  # config.pepper = 'ab228f6b057fd4d96432d3fc2670ae875bce392250738c1869b03c5aa3f6b39835537f3000c3f2f38fc746214b44f5ef61443457fe719a6dfe409d642417eb2f'
+  # config.pepper = 'a375df1e9b5e29a4b38c9c7bf694e0e1677eaa5be3ab45ab544ff8af4c7b854b3b948c1369d0f738ab2ef4d2c35b5cc64e51f3c80c471cf801189fd640b0f243'
 
   # Send a notification to the original email when the user's email is changed.
   # config.send_email_changed_notification = false
@@ -273,9 +273,9 @@ Devise.setup do |config|
   # up on your models and hooks.
   config.omniauth :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], {}
   config.omniauth :github, ENV['GITHUB_CLIENT_ID'], ENV['GITHUB_CLIENT_SECRET'], scope: "user,public_repo"
-  config.omniauth :gitlab, ENV['GITLAB_CLIENT_ID'], ENV['GITLAB_CLIENT_SECRET'], scope: "read_user"
+  config.omniauth :gitlab, ENV['GITLAB_CLIENT_ID'], ENV['GITLAB_CLIENT_SECRET'], scope: "read_user", redirect_uri: "http://localhost:3000/users/auth/gitlab/callback"
 
-
+  config.mailer_sender = 'noreply.codepeer@gmail.com'
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or
   # change the failure app, you can configure them inside the config.warden block.

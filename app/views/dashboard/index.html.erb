@@ -1,6 +1,21 @@
-<!-- app/views/dashboard/index.html.erb -->
-
 <h1>Dashboard</h1>
-<p>Welcome, <%= current_user.first_name %>!</p>
-<%= link_to 'My Projects', projects_path %>
-<%= link_to 'New Project', new_project_path %>
+<p>Welcome, <%= current_user.first_name %> (Nickname: <%= current_user.nickname %>)!</p>
+
+<% if current_user.first_name.blank? || current_user.last_name.blank? || current_user.nickname.blank? %>
+  <div id="complete-profile-popup">
+    <p>Please complete your profile</p>
+    <%= link_to 'Complete Profile', complete_profile_path %>
+  </div>
+<% end %>
+
+<%= link_to 'My Profile', profile_path %><br>
+
+<% if current_user.otp_enabled %>
+  <p>Two-Factor Authentication is enabled.</p>
+  <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: "btn btn-danger" %>
+<% else %>
+  <p>Two-Factor Authentication is disabled.</p>
+  <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: "btn btn-primary" %>
+<% end %>
+
+<%= link_to 'Logout', destroy_user_session_path, method: :delete %>

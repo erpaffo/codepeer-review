@@ -1,5 +1,3 @@
-# app/controllers/users/omniauth_callbacks_controller.rb
-
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def google_oauth2
     handle_auth "Google"
@@ -17,11 +15,15 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.from_omniauth(request.env['omniauth.auth'])
 
     if @user.persisted?
-      flash[:notice] = I18n.t 'devise.omniauth_callbacks.success', kind: kind
       sign_in_and_redirect @user, event: :authentication
+      set_flash_message(:notice, :success, kind: kind) if is_navigational_format?
     else
-      session['devise.auth_data'] = request.env['omniauth.auth']
-      redirect_to new_user_registration_url, alert: @user.errors.full_messages.join("\n")
+      session["devise.#{kind.downcase}_data"] = request.env['omniauth.auth']
+      redirect_to new_user_registration_url
     end
+  end
+
+  def after_sign_in_path_for(resource)
+    authenticated_root_path
   end
 end

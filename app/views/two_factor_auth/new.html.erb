@@ -1,0 +1,12 @@
+<h1>Two-Factor Authentication</h1>
+
+<%= form_with url: two_factor_auth_path, method: :post, local: true do |f| %>
+  <div class="field">
+    <%= f.label :otp_code %><br />
+    <%= f.text_field :otp_code %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit "Verify" %>
+  </div>
+<% end %>

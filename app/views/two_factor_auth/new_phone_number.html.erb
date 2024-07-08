@@ -1,0 +1,7 @@
+<h2>Add Phone Number</h2>
+
+<%= form_for(current_user, url: save_phone_number_path, method: :patch) do |f| %>
+  <%= f.label :phone_number, 'Phone Number' %><br>
+  <%= f.telephone_field :phone_number %><br>
+  <%= f.submit 'Save Phone Number' %>
+<% end %>

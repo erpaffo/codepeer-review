@@ -21,12 +21,15 @@
   </div>
 
   <div class="actions">
+    <%= recaptcha_tags %>
     <%= f.submit "Log in" %>
   </div>
 <% end %>
 
-<%= link_to "Log in with Google", user_google_oauth2_omniauth_authorize_path %><br>
-<%= link_to "Log in with GitHub", user_github_omniauth_authorize_path %><br>
-<%= link_to "Log in with GitLab", user_gitlab_omniauth_authorize_path %><br>
+<%= link_to "Sign in with Google", user_google_oauth2_omniauth_authorize_path %><br>
+<%= link_to "Sign in with GitHub", user_github_omniauth_authorize_path %><br>
+<%= link_to "Sign in with GitLab", user_gitlab_omniauth_authorize_path %><br>
 
+
+<%= link_to "Forgot your password?", new_user_password_path %><br>
 <%= render "devise/shared/links" %>

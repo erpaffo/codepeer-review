@@ -1,0 +1,8 @@
+<h1>Scan QR Code</h1>
+<p>Scan this QR code with your Authenticator app and enter the code below:</p>
+<%= image_tag @qr_code %>
+<%= form_with url: verify_two_factor_auth_path, method: :post do %>
+  <%= label_tag :otp_attempt, 'Code' %>
+  <%= text_field_tag :otp_attempt %>
+  <%= submit_tag 'Verify' %>
+<% end %>

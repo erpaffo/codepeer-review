@@ -1,0 +1,17 @@
+<h1>Setup Two-Factor Authentication</h1>
+<p>Select a method:</p>
+<%= form_with url: choose_two_factor_auth_path, method: :post do %>
+  <div>
+    <%= radio_button_tag :method, 'sms' %>
+    <%= label_tag :method_sms, 'SMS' %>
+  </div>
+  <div>
+    <%= radio_button_tag :method, 'email' %>
+    <%= label_tag :method_email, 'Email' %>
+  </div>
+  <div>
+    <%= radio_button_tag :method, 'qr_code' %>
+    <%= label_tag :method_qr_code, 'Authenticator App' %>
+  </div>
+  <%= submit_tag 'Continue' %>
+<% end %>

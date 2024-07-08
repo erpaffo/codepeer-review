@@ -1,11 +1,20 @@
-# app/controllers/application_controller.rb
-
 class ApplicationController < ActionController::Base
-  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :authenticate_user!, unless: :devise_controller?
+  protect_from_forgery with: :exception 
 
-  protected
+  def after_sign_in_path_for(resource)
+    if resource.otp_enabled?
+      verify_otp_two_factor_auth_path
+    else
+      authenticated_root_path
+    end
+  end
 
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [:first_name, :last_name])
+  private
+
+  def check_two_factor_auth
+    return if !current_user || session[:otp_verified] || !current_user.otp_enabled?
+
+    redirect_to new_two_factor_auth_path
   end
 end
