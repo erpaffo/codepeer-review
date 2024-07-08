@@ -10,6 +10,10 @@
 
 <%= link_to 'My Profile', profile_path %><br>
 
+<% unless current_user.provider %>
+  <%= link_to 'Change Password', edit_password_path, class: "btn btn-primary" %><br>
+<% end %>
+
 <% if current_user.otp_enabled %>
   <p>Two-Factor Authentication is enabled.</p>
   <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: "btn btn-danger" %>

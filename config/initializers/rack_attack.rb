@@ -1,8 +1,11 @@
 class Rack::Attack
-  # Throttle login attempts for a given IP address to 5 requests per minute
-  throttle('logins/ip', limit: 5, period: 60.seconds) do |req|
+  throttle('req/ip', limit: 300, period: 5.minutes) do |req|
+    req.ip
+  end
+
+  throttle('logins/email', limit: 5, period: 20.minutes) do |req|
     if req.path == '/users/sign_in' && req.post?
-      req.ip
+      req.params['email'].presence
     end
   end
 end

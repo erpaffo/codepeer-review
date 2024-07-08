@@ -13,6 +13,10 @@ Rails.application.routes.draw do
     get 'profile/edit', to: 'users#edit', as: :edit_profile
     patch 'profile', to: 'users#update'
 
+    # Password Change Routes
+    get 'password/edit', to: 'passwords#edit', as: :edit_password
+    patch 'password', to: 'passwords#update', as: :password
+
     # 2FA Routes
     get 'two_factor_auth/setup', to: 'two_factor_auth#setup', as: :setup_two_factor_auth
     post 'two_factor_auth/choose', to: 'two_factor_auth#choose', as: :choose_two_factor_auth

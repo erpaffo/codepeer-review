@@ -3,7 +3,9 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
-  validates :phone_number, presence: true, if: -> { two_factor_method == 'sms' }
+  attr_accessor :otp_attempt
+
+  validate :password_complexity
 
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
@@ -59,5 +61,13 @@ class User < ApplicationRecord
     user.update(nickname: auth.info.nickname) if auth.provider == 'github' && user.nickname.blank?
     user.update(first_name: auth.info.name) if auth.provider == 'google_oauth2' && user.first_name.blank?
     user
+  end
+
+  private
+
+  def password_complexity
+    return if password.blank? || password =~ /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[[:^alnum:]])/
+
+    errors.add :password, 'must include at least one lowercase letter, one uppercase letter, one digit, and one special character'
   end
 end
