@@ -1,8 +1,13 @@
 Rails.application.routes.draw do
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations'
   }
+
+  devise_scope :user do
+    get 'users/auth/failure', to: 'users/omniauth_callbacks#failure'
+  end
 
   authenticated :user do
     root 'dashboard#index', as: :authenticated_root
