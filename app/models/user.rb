@@ -3,7 +3,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
-  attr_accessor :otp_attempt
+  validates :phone_number, presence: true, if: -> { two_factor_method == 'sms' }
 
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
@@ -14,15 +14,18 @@ class User < ApplicationRecord
     method ||= two_factor_method
     generate_otp_secret if otp_secret.nil?
     if method == 'sms'
-      # Inviare il codice via SMS
-      client = Twilio::REST::Client.new(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
-      client.messages.create(
-        from: ENV['TWILIO_PHONE_NUMBER'],
-        to: phone_number,
-        body: "Your verification code is: #{otp_code}"
-      )
+      if phone_number.present?
+        client = Twilio::REST::Client.new(ENV['TWILIO_ACCOUNT_SID'], ENV['TWILIO_AUTH_TOKEN'])
+        client.messages.create(
+          from: ENV['TWILIO_PHONE_NUMBER'],
+          to: phone_number,
+          body: "Your verification code is: #{otp_code}"
+        )
+      else
+        errors.add(:base, 'Phone number is missing')
+        throw(:abort)
+      end
     elsif method == 'email'
-      # Inviare il codice via email
       UserMailer.two_factor_auth_code(self).deliver_now
     end
   end
@@ -37,8 +40,9 @@ class User < ApplicationRecord
   end
 
   def otp_provisioning_uri(account = email, issuer = 'YourApp')
+    label = "#{issuer}:#{account}"
     totp = ROTP::TOTP.new(otp_secret, issuer: issuer)
-    totp.provisioning_uri(account)
+    totp.provisioning_uri(label)
   end
 
   def self.from_omniauth(auth)

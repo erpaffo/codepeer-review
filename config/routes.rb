@@ -1,7 +1,8 @@
 Rails.application.routes.draw do
 
   devise_for :users, controllers: {
-    omniauth_callbacks: 'users/omniauth_callbacks'
+    omniauth_callbacks: 'users/omniauth_callbacks',
+    registrations: 'registrations'
   }
 
   authenticated :user do
@@ -21,6 +22,8 @@ Rails.application.routes.draw do
     get 'two_factor_auth/verify_otp', to: 'two_factor_auth#verify_otp', as: :verify_otp_two_factor_auth
     post 'two_factor_auth/verify', to: 'two_factor_auth#verify', as: :verify_two_factor_auth
     post 'two_factor_auth/send_backup_email', to: 'two_factor_auth#send_backup_email', as: :send_backup_email_two_factor_auth
+    get 'two_factor_auth/new_phone_number', to: 'two_factor_auth#new_phone_number', as: :new_phone_number
+    patch 'two_factor_auth/save_phone_number', to: 'two_factor_auth#save_phone_number', as: :save_phone_number
 
     patch 'enable_two_factor_auth', to: 'users#enable_two_factor_auth', as: :enable_two_factor_auth
     patch 'disable_two_factor_auth', to: 'users#disable_two_factor_auth', as: :disable_two_factor_auth

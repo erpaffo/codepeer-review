@@ -90,3 +90,9 @@ gem 'rqrcode' # Generate QR codes
 
 # Save session store in the database (active record) instead of cookies
 gem 'activerecord-session_store'
+
+# Use the secure_headers gem to set security headers
+gem 'secure_headers'
+
+# Use the rails-html-sanitizer gem to sanitize HTML
+gem 'rails-html-sanitizer'

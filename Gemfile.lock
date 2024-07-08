@@ -289,6 +289,7 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    secure_headers (6.5.0)
     selenium-webdriver (4.9.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
@@ -376,10 +377,12 @@ DEPENDENCIES
   rack-attack
   rack-mini-profiler (~> 2.0)
   rails (~> 6.1.7, >= 6.1.7.8)
+  rails-html-sanitizer
   recaptcha
   rotp
   rqrcode
   sass-rails (>= 6)
+  secure_headers
   selenium-webdriver (>= 4.0.0.rc1)
   spring
   sqlite3 (= 1.4.0)

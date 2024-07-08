@@ -1,5 +1,5 @@
 {
-  "name": "p",
+  "name": "codepeer-review",
   "private": true,
   "dependencies": {
     "@rails/actioncable": "^6.0.0",

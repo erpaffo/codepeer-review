@@ -1,5 +1,5 @@
 <h1>Dashboard</h1>
-<p>Welcome, <%= current_user.first_name %> <%= current_user.last_name %> (Nickname: <%= current_user.nickname %>)!</p>
+<p>Welcome, <%= current_user.first_name %> (Nickname: <%= current_user.nickname %>)!</p>
 
 <% if current_user.first_name.blank? || current_user.last_name.blank? || current_user.nickname.blank? %>
   <div id="complete-profile-popup">
