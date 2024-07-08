@@ -96,3 +96,9 @@ gem 'secure_headers'
 
 # Use the rails-html-sanitizer gem to sanitize HTML
 gem 'rails-html-sanitizer'
+
+# Use carrierwave for file uploads
+gem 'carrierwave', '~> 2.0'
+
+# Use fog-aws to connect to AWS
+gem 'fog-aws'

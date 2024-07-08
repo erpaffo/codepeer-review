@@ -1,8 +1,8 @@
 class Project < ApplicationRecord
   belongs_to :user
-  has_many_attached :files
+  has_many :project_files, dependent: :destroy
+  accepts_nested_attributes_for :project_files
 
   validates :title, presence: true
   validates :description, presence: true
-  validates :user, presence: true
 end

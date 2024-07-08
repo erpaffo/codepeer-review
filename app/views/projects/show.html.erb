@@ -1,25 +1,15 @@
-<div class="row">
-  <div class="col-12">
-    <h3>Project: <%= @project.title %></h3>
-    <p><%= @project.description %></p>
-  </div>
-  <div class="col-12">
-    <h3>Files</h3>
-    <ul class="list-group">
-      <% @project.files.each do |file| %>
-        <% if ['.js', '.rb', '.py', '.md', '.c', '.cpp', '.rs', '.html', '.css', '.xml', '.txt'].include?(File.extname(file.filename.to_s)) %>
-          <li class="list-group-item">
-            <%= link_to file.filename.to_s, edit_file_project_path(@project, file.id) %>
-          </li>
-        <% else %>
-          <li class="list-group-item">
-            <%= file.filename.to_s %> (Not supported)
-          </li>
-        <% end %>
-      <% end %>
-    </ul>
-  </div>
-</div>
+<h1><%= @project.title %></h1>
 
-<%= link_to 'Edit Project', edit_project_path(@project), class: "btn btn-warning" %> |
-<%= link_to 'Back', projects_path, class: "btn btn-secondary" %>
+<p><%= @project.description %></p>
+
+<h3>Files</h3>
+<ul>
+  <% @project.project_files.each do |file| %>
+    <li>
+      <%= link_to file.file_identifier, show_file_project_path(@project, file_id: file.id) %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Edit', edit_project_path(@project), class: "btn btn-secondary" %>
+<%= link_to 'Back to Projects', projects_path, class: "btn btn-primary" %>

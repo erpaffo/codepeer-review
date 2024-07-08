@@ -1,0 +1,6 @@
+<h1><%= @file.file_identifier %></h1>
+
+<pre><%= @file_content %></pre>
+
+<%= link_to 'Edit File', edit_file_project_path(@project, file_id: @file.id), class: "btn btn-secondary" %>
+<%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>

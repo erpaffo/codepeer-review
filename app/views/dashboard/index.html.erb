@@ -1,3 +1,4 @@
+<!-- app/views/dashboard/index.html.erb -->
 <h1>Dashboard</h1>
 <p>Welcome, <%= current_user.first_name %> (Nickname: <%= current_user.nickname %>)!</p>
 
@@ -8,10 +9,10 @@
   </div>
 <% end %>
 
-<%= link_to 'My Profile', profile_path %><br>
+<%= link_to 'My Profile', profile_path, class: "btn btn-primary" %><br><br>
 
 <% unless current_user.provider %>
-  <%= link_to 'Change Password', edit_password_path, class: "btn btn-primary" %><br>
+  <%= link_to 'Change Password', edit_password_path, class: "btn btn-secondary" %><br><br>
 <% end %>
 
 <% if current_user.otp_enabled %>
@@ -22,4 +23,8 @@
   <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: "btn btn-primary" %>
 <% end %>
 
-<%= link_to 'Logout', destroy_user_session_path, method: :delete %>
+<br><br>
+<%= link_to 'New Project', new_project_path, class: "btn btn-success" %><br><br>
+<%= link_to 'View All Projects', projects_path, class: "btn btn-info" %>
+
+<%= link_to 'Logout', destroy_user_session_path, method: :delete, class: "btn btn-warning" %>

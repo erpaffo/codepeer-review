@@ -6,7 +6,7 @@ class User < ApplicationRecord
   attr_accessor :otp_attempt
 
   validate :password_complexity
-
+  has_many :projects, dependent: :destroy
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
     save!

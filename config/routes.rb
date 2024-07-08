@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations'
@@ -31,10 +30,18 @@ Rails.application.routes.draw do
 
     patch 'enable_two_factor_auth', to: 'users#enable_two_factor_auth', as: :enable_two_factor_auth
     patch 'disable_two_factor_auth', to: 'users#disable_two_factor_auth', as: :disable_two_factor_auth
+
+    # Project Routes
+    resources :projects do
+      member do
+        get 'show_file/:file_id', to: 'projects#show_file', as: 'show_file'
+        get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
+        patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
+      end
+    end
   end
 
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
-
 end

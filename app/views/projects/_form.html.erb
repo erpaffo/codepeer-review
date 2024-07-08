@@ -1,37 +1,33 @@
-<%= form_with(model: project, local: true, html: { multipart: true }) do |form| %>
-  <% if project.errors.any? %>
+<%= form_for(@project) do |f| %>
+  <% if @project.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(project.errors.count, "error") %> prohibited this project from being saved:</h2>
+      <h2><%= pluralize(@project.errors.count, "error") %> prohibited this project from being saved:</h2>
 
       <ul>
-        <% project.errors.full_messages.each do |message| %>
+        <% @project.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div class="form-group">
-    <%= form.label :title %>
-    <%= form.text_field :title, class: "form-control" %>
+  <div class="field">
+    <%= f.label :title, 'Title' %>
+    <%= f.text_field :title %>
   </div>
 
-  <div class="form-group">
-    <%= form.label :description %>
-    <%= form.text_area :description, class: "form-control" %>
+  <div class="field">
+    <%= f.label :description %>
+    <%= f.text_area :description %>
   </div>
 
-  <div class="form-group">
-    <%= form.label :files, "Upload Files" %>
-    <%= form.file_field :files, multiple: true, direct_upload: true, class: "form-control" %>
-  </div>
-
-  <div class="form-group form-check">
-    <%= form.check_box :create_readme, class: "form-check-input" %>
-    <%= form.label :create_readme, "Create README.md with title and description", class: "form-check-label" %>
-  </div>
+  <h3>Files</h3>
+  <%= f.fields_for :project_files do |ff| %>
+    <%= render 'project_file_fields', f: ff %>
+  <% end %>
+  <%= link_to_add_fields "Add File", f, :project_files %>
 
   <div class="actions">
-    <%= form.submit class: "btn btn-primary" %>
+    <%= f.submit %>
   </div>
 <% end %>
