@@ -1,15 +1,21 @@
 <h1>Dashboard</h1>
 <p>Welcome, <%= current_user.first_name %> <%= current_user.last_name %> (Nickname: <%= current_user.nickname %>)!</p>
-<p>Email: <%= current_user.email %></p>
-<p>Phone Number: <%= current_user.phone_number %></p>
 
-<%= link_to 'Edit Profile', edit_profile_path %><br>
+<% if current_user.first_name.blank? || current_user.last_name.blank? || current_user.nickname.blank? %>
+  <div id="complete-profile-popup">
+    <p>Please complete your profile</p>
+    <%= link_to 'Complete Profile', complete_profile_path %>
+  </div>
+<% end %>
+
+<%= link_to 'My Profile', profile_path %><br>
+
 <% if current_user.otp_enabled %>
   <p>Two-Factor Authentication is enabled.</p>
-  <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch %>
+  <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: "btn btn-danger" %>
 <% else %>
   <p>Two-Factor Authentication is disabled.</p>
-  <%= link_to 'Enable Two-Factor Authentication', enable_two_factor_auth_path, method: :patch %>
+  <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: "btn btn-primary" %>
 <% end %>
-<br>
+
 <%= link_to 'Logout', destroy_user_session_path, method: :delete %>

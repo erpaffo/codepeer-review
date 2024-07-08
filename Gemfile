@@ -59,18 +59,22 @@ end
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
+# Use devise for authentication and User creation
 gem 'devise'
 
+# Omniauth for social login
 gem 'omniauth-google-oauth2'
 gem 'omniauth-github'
 gem 'omniauth-gitlab'
-
-gem 'dotenv-rails'
-
 gem 'omniauth-rails_csrf_protection'
 
+# Use .env file to store credentials
+gem 'dotenv-rails'
+
+# Use pundit for authorization
 gem "pundit"
 
+# Use AWS to store files
 gem 'aws-sdk-s3'
 
 # Prevents brute force attacks
@@ -82,6 +86,7 @@ gem 'recaptcha', require: 'recaptcha/rails'
 # Two-factor authentication
 gem 'twilio-ruby' # Send SMS
 gem 'rotp' # Generate OTP codes
+gem 'rqrcode' # Generate QR codes
 
 # Save session store in the database (active record) instead of cookies
 gem 'activerecord-session_store'

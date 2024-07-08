@@ -1,6 +1,13 @@
 class ApplicationController < ActionController::Base
-  before_action :authenticate_user!
-  before_action :check_two_factor_auth
+  before_action :authenticate_user!, unless: :devise_controller?
+
+  def after_sign_in_path_for(resource)
+    if resource.otp_enabled?
+      verify_otp_two_factor_auth_path
+    else
+      authenticated_root_path
+    end
+  end
 
   private
 
