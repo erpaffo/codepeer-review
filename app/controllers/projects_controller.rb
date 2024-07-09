@@ -41,20 +41,30 @@ class ProjectsController < ApplicationController
 
   def show_file
     @file = @project.project_files.find(params[:file_id])
-    @file_content = @file.file_content
+    @file_content = @file.file.read.force_encoding('UTF-8')
   end
 
   def edit_file
     @file = @project.project_files.find(params[:file_id])
+    @file_content = @file.file.read.force_encoding('UTF-8')
   end
 
   def update_file
     @file = @project.project_files.find(params[:file_id])
-    if @file.update(file_params)
+    if @file.update(file: params[:project_file][:file])
       redirect_to project_path(@project), notice: 'File was successfully updated.'
     else
       render :edit_file
     end
+  end
+
+  def run_code
+    code = params[:code]
+    language = params[:language]
+
+    output = execute_code_in_docker(code, language)
+
+    render json: { output: output }
   end
 
   private
@@ -69,5 +79,19 @@ class ProjectsController < ApplicationController
 
   def file_params
     params.require(:project_file).permit(:file)
+  end
+
+  def execute_code_in_docker(code, language)
+    docker_image = case language
+                   when 'python'
+                     'python:3.8'
+                   # Aggiungere altri linguaggi se necessario
+                   else
+                     'python:3.8'
+                   end
+
+    command = "docker run --rm -i #{docker_image} python3 -c \"#{code}\""
+    output = `#{command}`
+    output
   end
 end

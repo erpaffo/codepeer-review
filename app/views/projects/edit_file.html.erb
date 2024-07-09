@@ -1,14 +1,88 @@
-<h1>Edit <%= @file.file_identifier %></h1>
+<!-- app/views/projects/edit_file.html.erb -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit <%= @file.file_identifier %></title>
+  <meta name="csrf-token" content="<%= form_authenticity_token %>">
+  <style>
+    #code-editor {
+      height: 500px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Edit <%= @file.file_identifier %></h1>
 
-<%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch do |f| %>
-  <div class="field">
-    <%= f.label :file %><br>
-    <%= f.file_field :file %>
+  <div>
+    <button id="save-file" class="btn btn-primary">Save File</button>
+    <button id="run-code" class="btn btn-secondary">Run Code</button>
   </div>
 
-  <div class="actions">
-    <%= f.submit "Update File" %>
-  </div>
-<% end %>
+  <div id="code-editor" data-content="<%= j @file_content %>"></div>
 
-<%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+  <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
+    <%= f.hidden_field :file, value: @file.file.url %>
+  <% end %>
+
+  <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+
+  <!-- Load Monaco Editor from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
+  <script>
+    document.addEventListener('turbolinks:load', function() {
+      if (typeof require !== 'undefined') {
+        window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
+        window.require(['vs/editor/editor.main'], function() {
+          const editorElement = document.getElementById('code-editor');
+          const content = editorElement.dataset.content.replace(/\\n/g, '\n');
+          const editor = monaco.editor.create(editorElement, {
+            value: content,
+            language: 'python', // Puoi cambiare la modalità in base al linguaggio
+            theme: 'vs-dark'
+          });
+
+          // Salva l'istanza dell'editor per poterla usare nei pulsanti
+          window.monacoEditor = editor;
+
+          // Formatta il contenuto automaticamente
+          const model = editor.getModel();
+          monaco.editor.action.formatDocument.run({ model });
+        });
+      }
+
+      const saveButton = document.getElementById('save-file');
+      if (saveButton) {
+        saveButton.addEventListener('click', () => {
+          const form = document.getElementById('edit-file-form');
+          const hiddenField = form.querySelector('input[type=hidden][name="project_file[file]"]');
+          hiddenField.value = window.monacoEditor.getValue();
+
+          form.submit();
+        });
+      }
+
+      const runButton = document.getElementById('run-code');
+      if (runButton) {
+        runButton.addEventListener('click', () => {
+          const code = window.monacoEditor.getValue();
+          // Chiamata AJAX per eseguire il codice (implementare nel backend)
+          fetch('/run_code', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ code: code, language: 'python' }) // Cambia il linguaggio se necessario
+          })
+          .then(response => response.json())
+          .then(data => {
+            // Mostra l'output del codice (implementare nel backend)
+            console.log(data.output);
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>

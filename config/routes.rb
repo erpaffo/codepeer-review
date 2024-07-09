@@ -39,6 +39,8 @@ Rails.application.routes.draw do
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
       end
     end
+
+    post 'run_code', to: 'projects#run_code'
   end
 
   unauthenticated do
