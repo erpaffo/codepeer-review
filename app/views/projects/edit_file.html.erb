@@ -30,26 +30,37 @@
   <!-- Load Monaco Editor from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
   <script>
-    document.addEventListener('turbolinks:load', function() {
-      if (typeof require !== 'undefined') {
+    function initializeMonacoEditor() {
+      if (typeof window.require !== 'undefined') {
+        if (window.monacoEditor) {
+          window.monacoEditor.dispose();
+        }
+
         window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
         window.require(['vs/editor/editor.main'], function() {
           const editorElement = document.getElementById('code-editor');
           const content = editorElement.dataset.content.replace(/\\n/g, '\n');
-          const editor = monaco.editor.create(editorElement, {
+          window.monacoEditor = monaco.editor.create(editorElement, {
             value: content,
             language: 'python', // Puoi cambiare la modalità in base al linguaggio
             theme: 'vs-dark'
           });
-
-          // Salva l'istanza dell'editor per poterla usare nei pulsanti
-          window.monacoEditor = editor;
-
-          // Formatta il contenuto automaticamente
-          const model = editor.getModel();
-          monaco.editor.action.formatDocument.run({ model });
         });
+      } else {
+        console.error('Monaco Editor not loaded. Please ensure the CDN is accessible.');
       }
+    }
+
+    function checkAndInitializeMonaco() {
+      if (typeof window.require !== 'undefined') {
+        initializeMonacoEditor();
+      } else {
+        setTimeout(checkAndInitializeMonaco, 50);
+      }
+    }
+
+    document.addEventListener('turbolinks:load', function() {
+      checkAndInitializeMonaco();
 
       const saveButton = document.getElementById('save-file');
       if (saveButton) {
@@ -82,6 +93,10 @@
           });
         });
       }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAndInitializeMonaco();
     });
   </script>
 </body>
