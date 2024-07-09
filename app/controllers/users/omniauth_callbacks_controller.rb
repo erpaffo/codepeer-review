@@ -1,4 +1,5 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  skip_before_action :verify_authenticity_token, only: [:github, :google_oauth2, :gitlab]
   def google_oauth2
     handle_auth "Google"
   end
@@ -25,5 +26,9 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
   def after_sign_in_path_for(resource)
     authenticated_root_path
+  end
+
+  def failure
+    redirect_to root_path, alert: "Authentication failed, please try again."
   end
 end

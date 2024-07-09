@@ -1,6 +1,5 @@
 class ApplicationController < ActionController::Base
   before_action :authenticate_user!, unless: :devise_controller?
-  protect_from_forgery with: :exception 
 
   def after_sign_in_path_for(resource)
     if resource.otp_enabled?
@@ -17,4 +16,5 @@ class ApplicationController < ActionController::Base
 
     redirect_to new_two_factor_auth_path
   end
+
 end
