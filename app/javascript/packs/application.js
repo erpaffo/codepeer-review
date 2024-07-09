@@ -6,7 +6,7 @@ import 'jquery';
 import 'bootstrap';
 
 Rails.start()
+Turbolinks.start()
 ActiveStorage.start()
-
 
 console.log("Javascript loaded!")
