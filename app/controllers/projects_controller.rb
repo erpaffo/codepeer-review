@@ -51,11 +51,14 @@ class ProjectsController < ApplicationController
 
   def update_file
     @file = @project.project_files.find(params[:file_id])
-    if @file.update(file: params[:project_file][:file])
-      redirect_to project_path(@project), notice: 'File was successfully updated.'
-    else
-      render :edit_file
-    end
+    new_file_content = params[:project_file][:file]
+
+    # Sovrascrivi il file su S3
+    s3 = Aws::S3::Resource.new
+    obj = s3.bucket(ENV['AWS_BUCKET']).object(@file.file.path)
+    obj.put(body: new_file_content)
+
+    redirect_to project_path(@project), notice: 'File was successfully updated.'
   end
 
   def run_code
@@ -93,5 +96,11 @@ class ProjectsController < ApplicationController
     command = "docker run --rm -i #{docker_image} python3 -c \"#{code}\""
     output = `#{command}`
     output
+  end
+
+  def read_and_format_file(file_path)
+    content = File.read(file_path).force_encoding('UTF-8')
+    formatted_content = content.gsub(/(?<!\\n)\n/, "\n")
+    formatted_content
   end
 end
