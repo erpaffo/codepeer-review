@@ -70,7 +70,7 @@ class ProjectsController < ApplicationController
       end
     end
   end
-  
+
   def update_file
     @file = @project.project_files.find(params[:file_id])
     new_file_content = params[:project_file][:file]
