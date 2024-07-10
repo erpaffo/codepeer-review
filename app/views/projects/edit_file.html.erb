@@ -8,6 +8,14 @@
       height: 500px;
       border: 1px solid #ccc;
     }
+    #output {
+      height: 200px;
+      border: 1px solid #ccc;
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f7f7f7;
+      white-space: pre-wrap;
+    }
   </style>
 </head>
 <body>
@@ -18,11 +26,13 @@
     <button id="run-code" class="btn btn-secondary">Run Code</button>
   </div>
 
-  <div id="code-editor" data-content="<%= j @file_content %>"></div>
+  <div id="code-editor" data-content="<%= json_escape(@file_content) %>" style="height:500px; border:1px solid grey;"></div>
 
   <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
     <%= f.hidden_field :file, id: 'file-content' %>
   <% end %>
+
+  <div id="output"></div>
 
   <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
 
@@ -38,7 +48,7 @@
         window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
         window.require(['vs/editor/editor.main'], function() {
           const editorElement = document.getElementById('code-editor');
-          const content = editorElement.dataset.content.replace(/\\n/g, '\n');
+          const content = editorElement.dataset.content;
           window.monacoEditor = monaco.editor.create(editorElement, {
             value: content,
             language: 'python', // Puoi cambiare la modalità in base al linguaggio
@@ -76,6 +86,8 @@
       if (runButton) {
         runButton.addEventListener('click', () => {
           const code = window.monacoEditor.getValue();
+          const language = 'python'; // Change this as necessary
+
           // Chiamata AJAX per eseguire il codice (implementare nel backend)
           fetch('/run_code', {
             method: 'POST',
@@ -83,12 +95,12 @@
               'Content-Type': 'application/json',
               'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ code: code, language: 'python' }) // Cambia il linguaggio se necessario
+            body: JSON.stringify({ code: code, language: language }) // Cambia il linguaggio se necessario
           })
           .then(response => response.json())
           .then(data => {
             // Mostra l'output del codice (implementare nel backend)
-            console.log(data.output);
+            document.getElementById('output').textContent = data.output;
           });
         });
       }
@@ -98,5 +110,6 @@
       checkAndInitializeMonaco();
     });
   </script>
+
 </body>
 </html>

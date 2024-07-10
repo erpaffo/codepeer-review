@@ -1,0 +1,71 @@
+
+services:
+  python:
+    build:
+      context: ./docker-images/python
+    volumes:
+      - ./code:/app
+    command: ["python3", "main.py"]
+
+  c:
+    build:
+      context: ./docker-images/c
+    volumes:
+      - ./code:/app
+    command: ["./main"]
+
+  java:
+    build:
+      context: ./docker-images/java
+    volumes:
+      - ./code:/app
+    command: ["java", "Main"]
+
+  javascript:
+    build:
+      context: ./docker-images/javascript
+    volumes:
+      - ./code:/app
+    command: ["node", "main.js"]
+
+  ruby:
+    build:
+      context: ./docker-images/ruby
+    volumes:
+      - ./code:/app
+    command: ["ruby", "main.rb"]
+
+  go:
+    build:
+      context: ./docker-images/go
+    volumes:
+      - ./code:/app
+    command: ["./main"]
+
+  php:
+    build:
+      context: ./docker-images/php
+    volumes:
+      - ./code:/app
+    command: ["php", "main.php"]
+
+  swift:
+    build:
+      context: ./docker-images/swift
+    volumes:
+      - ./code:/app
+    command: ["./main"]
+
+  kotlin:
+    build:
+      context: ./docker-images/kotlin
+    volumes:
+      - ./code:/app
+    command: ["java", "-jar", "main.jar"]
+
+  rust:
+    build:
+      context: ./docker-images/rust
+    volumes:
+      - ./code:/app
+    command: ["./main"]
