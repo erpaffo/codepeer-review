@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_08_115845) do
+ActiveRecord::Schema.define(version: 2024_07_10_172518) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -66,6 +66,14 @@ ActiveRecord::Schema.define(version: 2024_07_08_115845) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
+  create_table "snippets", force: :cascade do |t|
+    t.integer "project_file_id", null: false
+    t.text "content"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
+  end
+
   create_table "user_sessions", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -102,4 +110,5 @@ ActiveRecord::Schema.define(version: 2024_07_08_115845) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "project_files", "projects"
   add_foreign_key "projects", "users"
+  add_foreign_key "snippets", "project_files"
 end

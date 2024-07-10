@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations'
@@ -42,6 +41,10 @@ Rails.application.routes.draw do
         get 'show_file/:file_id', to: 'projects#show_file', as: 'show_file'
         get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
+      end
+
+      resources :project_files, only: [] do
+        resources :snippets, only: [:show]
       end
     end
 

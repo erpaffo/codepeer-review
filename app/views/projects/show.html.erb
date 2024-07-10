@@ -13,3 +13,14 @@
 
 <%= link_to 'Edit', edit_project_path(@project), class: "btn btn-secondary" %>
 <%= link_to 'Back to Projects', projects_path, class: "btn btn-primary" %>
+
+<h2>Snippets</h2>
+<ul>
+  <% @project.project_files.each do |file| %>
+    <% file.snippets.each do |snippet| %>
+      <li>
+        <%= link_to snippet.content.truncate(50), project_project_file_snippet_path(@project, file, snippet) %>
+      </li>
+    <% end %>
+  <% end %>
+</ul>

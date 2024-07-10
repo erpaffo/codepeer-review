@@ -44,14 +44,10 @@ class ProjectsController < ApplicationController
     local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
     download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
     @file_content = read_file_content(local_path)
-    Rails.logger.debug "show_file: File content read from S3 - #{@file_content}"
 
     respond_to do |format|
       format.html
-      format.json do
-        Rails.logger.debug "show_file: File content sent as JSON - #{@file_content}"
-        render json: { file_content: @file_content }
-      end
+      format.json { render json: { file_content: @file_content } }
     end
   end
 
@@ -60,25 +56,30 @@ class ProjectsController < ApplicationController
     local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
     download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
     @file_content = read_file_content(local_path)
-    Rails.logger.debug "edit_file: File content read from S3 - #{@file_content}"
 
     respond_to do |format|
       format.html
-      format.json do
-        Rails.logger.debug "edit_file: File content sent as JSON - #{@file_content}"
-        render json: { file_content: @file_content }
-      end
+      format.json { render json: { file_content: @file_content } }
     end
   end
 
   def update_file
     @file = @project.project_files.find(params[:file_id])
     new_file_content = params[:project_file][:file]
-    Rails.logger.debug "update_file: New file content received from form - #{new_file_content}"
 
     # Converti il contenuto del file in UTF-8
     new_file_content_utf8 = new_file_content.encode('UTF-8')
-    Rails.logger.debug "update_file: New file content encoded in UTF-8 - #{new_file_content_utf8}"
+
+    # Ottieni il contenuto originale del file
+    local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
+    download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
+    original_file_content = read_file_content(local_path)
+
+    # Calcola la differenza tra il contenuto originale e quello nuovo
+    snippet_content = calculate_diff(original_file_content, new_file_content_utf8)
+
+    # Crea un nuovo snippet con la differenza
+    @file.snippets.create(content: snippet_content)
 
     # Sovrascrivi il file su S3
     s3 = Aws::S3::Resource.new
@@ -209,13 +210,19 @@ class ProjectsController < ApplicationController
         file.write(chunk)
       end
     end
-    Rails.logger.debug "download_file_from_s3: File downloaded to local path - #{local_path}"
     local_path
   end
 
   def read_file_content(file_path)
     content = File.read(file_path, encoding: 'UTF-8')
-    Rails.logger.debug "read_file_content: File content read - #{content}"
     content
+  end
+
+  def calculate_diff(original_content, new_content)
+    original_lines = original_content.split("\n")
+    new_lines = new_content.split("\n")
+
+    diff_lines = new_lines - original_lines
+    diff_lines.join("\n")
   end
 end
