@@ -3,10 +3,14 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
-  attr_accessor :otp_attempt
+  attr_accessor :otp_attempt, :remove_profile_image
 
   validate :password_complexity
   has_many :projects, dependent: :destroy
+  has_one_attached :profile_image
+
+  before_save :check_remove_profile_image
+
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
     save!
@@ -51,19 +55,39 @@ class User < ApplicationRecord
     user = where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
       user.email = auth.info.email
       user.password = Devise.friendly_token[0, 20]
-      user.first_name = auth.info.first_name || auth.info.name
-      user.last_name = auth.info.last_name
-      user.nickname = auth.info.nickname
       user.skip_confirmation!
       user.confirmed_at = Time.current # Conferma automatica dell'utente
     end
 
-    user.update(nickname: auth.info.nickname) if auth.provider == 'github' && user.nickname.blank?
-    user.update(first_name: auth.info.name) if auth.provider == 'google_oauth2' && user.first_name.blank?
+    if auth.info
+      user.update(
+        nickname: auth.info.nickname,
+        first_name: auth.info.first_name || auth.info.name,
+        profile_image_url: auth.info.image
+      )
+    end
+
     user
   end
 
+  def profile_image_url
+    if profile_image.attached?
+      Rails.application.routes.url_helpers.url_for(profile_image.variant(resize_to_limit: [100, 100]))
+    elsif profile_image_url.present?
+      profile_image_url
+    else
+      # Default image URL or placeholder
+      # Replace with your default image URL if available
+      # Example: ActionController::Base.helpers.asset_url('default_profile_image.png')
+      ''
+    end
+  end
+
   private
+
+  def check_remove_profile_image
+    profile_image.purge if remove_profile_image == '1' && profile_image.attached?
+  end
 
   def password_complexity
     return if password.blank? || password =~ /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[[:^alnum:]])/

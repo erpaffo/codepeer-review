@@ -1,3 +1,83 @@
-// Place all the styles related to the Users controller here.
-// They will automatically be included in application.css.
-// You can use Sass (SCSS) here: https://sass-lang.com/
+/* app/assets/stylesheets/users.css */
+
+.profile-form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .profile-form h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .profile-form .field {
+    margin-bottom: 15px;
+  }
+  
+  .profile-form .field label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+  }
+  
+  .profile-form .field input[type="text"],
+  .profile-form .field input[type="tel"],
+  .profile-form .field input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .profile-form .field input[type="checkbox"] {
+    margin-right: 5px;
+  }
+  
+  .profile-form .actions {
+    text-align: center;
+  }
+  
+  .profile-form .actions input[type="submit"] {
+    padding: 10px 20px;
+    background: #5cb85c;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .profile-form .actions input[type="submit"]:hover {
+    background: #4cae4c;
+  }
+  
+  .profile-form .back-link {
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    color: #337ab7;
+    text-decoration: none;
+  }
+  
+  .profile-form .back-link:hover {
+    text-decoration: underline;
+  }
+  
+  .profile-form .image-preview {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  .profile-form .image-preview img {
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+  }
+  
