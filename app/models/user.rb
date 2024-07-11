@@ -48,7 +48,7 @@ class User < ApplicationRecord
   end
 
   def self.from_omniauth(auth)
-    user = where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
+    user = where(provider: auth.provider, uid: auth.uid).first_or_initialize do |user|
       user.email = auth.info.email
       user.password = Devise.friendly_token[0, 20]
       user.first_name = auth.info.first_name || auth.info.name
@@ -58,8 +58,19 @@ class User < ApplicationRecord
       user.confirmed_at = Time.current # Conferma automatica dell'utente
     end
 
+    # Controlla se esiste un utente con la stessa email ma un diverso provider
+    if user.new_record?
+      existing_user = find_by(email: auth.info.email)
+      if existing_user
+        # Collega il nuovo provider all'utente esistente
+        existing_user.update(provider: auth.provider, uid: auth.uid)
+        return existing_user
+      end
+    end
+
     user.update(nickname: auth.info.nickname) if auth.provider == 'github' && user.nickname.blank?
     user.update(first_name: auth.info.name) if auth.provider == 'google_oauth2' && user.first_name.blank?
+    user.save!
     user
   end
 
