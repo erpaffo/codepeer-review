@@ -273,7 +273,7 @@ Devise.setup do |config|
   # up on your models and hooks.
   config.omniauth :google_oauth2, ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'], {}
   config.omniauth :github, ENV['GITHUB_CLIENT_ID'], ENV['GITHUB_CLIENT_SECRET'], scope: "user,public_repo"
-  config.omniauth :gitlab, ENV['GITLAB_CLIENT_ID'], ENV['GITLAB_CLIENT_SECRET'], scope: "read_user", redirect_uri: "http://localhost:3000/users/auth/gitlab/callback"
+  config.omniauth :gitlab, ENV['GITLAB_CLIENT_ID'], ENV['GITLAB_CLIENT_SECRET'], scope: "read_user"
 
   config.mailer_sender = 'noreply.codepeer@gmail.com'
   # ==> Warden configuration
