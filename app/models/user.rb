@@ -1,15 +1,15 @@
+# app/models/user.rb
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :confirmable,
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
-  attr_accessor :otp_attempt, :remove_profile_image
-
   validate :password_complexity
   has_many :projects, dependent: :destroy
-  has_one_attached :profile_image
+  attribute :profile_image_url, :string
+  attr_accessor :remove_profile_image
 
-  before_save :check_remove_profile_image
+  has_one_attached :profile_image
 
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
@@ -52,42 +52,35 @@ class User < ApplicationRecord
   end
 
   def self.from_omniauth(auth)
-    user = where(provider: auth.provider, uid: auth.uid).first_or_create do |user|
-      user.email = auth.info.email
-      user.password = Devise.friendly_token[0, 20]
-      user.skip_confirmation!
-      user.confirmed_at = Time.current # Conferma automatica dell'utente
+    user = where(provider: auth.provider, uid: auth.uid).first_or_initialize do |u|
+      u.email = auth.info.email
+      u.skip_confirmation!
+      u.confirmed_at = Time.current # Conferma automatica dell'utente
+    end
+
+    unless user.persisted?
+      user.password = Devise.friendly_token[0, 20] unless user.encrypted_password.present?
     end
 
     if auth.info
-      user.update(
-        nickname: auth.info.nickname,
-        first_name: auth.info.first_name || auth.info.name,
-        profile_image_url: auth.info.image
-      )
+      user.nickname = auth.info.nickname
+      user.first_name = auth.info.first_name || auth.info.name
+      user.profile_image_url = auth.info.image # Assicurati che 'image' sia il campo corretto per l'URL dell'immagine
     end
 
+    user.save!
     user
   end
 
   def profile_image_url
-    if profile_image.attached?
-      Rails.application.routes.url_helpers.url_for(profile_image.variant(resize_to_limit: [100, 100]))
-    elsif profile_image_url.present?
-      profile_image_url
+    if super.present?
+      super
     else
-      # Default image URL or placeholder
-      # Replace with your default image URL if available
-      # Example: ActionController::Base.helpers.asset_url('default_profile_image.png')
-      ''
+      ActionController::Base.helpers.asset_url('white_image.png')
     end
   end
 
   private
-
-  def check_remove_profile_image
-    profile_image.purge if remove_profile_image == '1' && profile_image.attached?
-  end
 
   def password_complexity
     return if password.blank? || password =~ /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[[:^alnum:]])/
