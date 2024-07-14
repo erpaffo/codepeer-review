@@ -11,7 +11,7 @@ Rails.application.routes.draw do
   authenticated :user do
     root 'dashboard#index', as: :authenticated_root
     get 'complete_profile', to: 'users#complete_profile', as: :complete_profile
-    patch 'update_profile', to: 'users#update_profile'
+    patch 'update_profile', to: 'users#update_profile', as: :update_profile
     get 'profile', to: 'users#show', as: :profile
     get 'profile/edit', to: 'users#edit', as: :edit_profile
     patch 'profile', to: 'users#update'

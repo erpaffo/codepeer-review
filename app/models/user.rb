@@ -1,12 +1,16 @@
+# app/models/user.rb
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :confirmable,
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
-  attr_accessor :otp_attempt
-
   validate :password_complexity
   has_many :projects, dependent: :destroy
+  attribute :profile_image_url, :string
+  attr_accessor :remove_profile_image
+
+  has_one_attached :profile_image
+
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
     save!
@@ -48,6 +52,7 @@ class User < ApplicationRecord
   end
 
   def self.from_omniauth(auth)
+
     user = where(provider: auth.provider, uid: auth.uid).first_or_initialize do |user|
       user.email = auth.info.email
       user.password = Devise.friendly_token[0, 20]
@@ -56,6 +61,7 @@ class User < ApplicationRecord
       user.nickname = auth.info.nickname
       user.skip_confirmation!
       user.confirmed_at = Time.current # Conferma automatica dell'utente
+      user.profile_image_url = auth.info.image
     end
 
     # Controlla se esiste un utente con la stessa email ma un diverso provider
@@ -70,8 +76,17 @@ class User < ApplicationRecord
 
     user.update(nickname: auth.info.nickname) if auth.provider == 'github' && user.nickname.blank?
     user.update(first_name: auth.info.name) if auth.provider == 'google_oauth2' && user.first_name.blank?
+
     user.save!
     user
+  end
+
+  def profile_image_url
+    if super.present?
+      super
+    else
+      ActionController::Base.helpers.asset_url('white_image.png')
+    end
   end
 
   private

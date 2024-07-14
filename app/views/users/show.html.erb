@@ -1,3 +1,4 @@
+<!-- app/views/users/show.html.erb -->
 <h1>My Profile</h1>
 
 <p>
@@ -24,5 +25,17 @@
   <strong>Phone number:</strong>
   <%= current_user.phone_number %>
 </p>
+
+<% if current_user.profile_image.attached? %>
+  <p>
+    <strong>Profile Image:</strong><br />
+    <%= image_tag current_user.profile_image.variant(resize: '200x200') %>
+  </p>
+<% elsif current_user.profile_image_url.present? %>
+  <p>profile
+    <strong>Profile Image:</strong><br />
+    <%= image_tag current_user.profile_image_url, size: '200x200' %>
+  </p>
+<% end %>
 
 <%= link_to 'Edit Profile', edit_profile_path %>
