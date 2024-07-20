@@ -1,0 +1,12 @@
+<h1>My Favorite Snippets</h1>
+
+<ul>
+  <% current_user.snippets.where(favorite: true).each do |snippet| %>
+    <li id="snippet-<%= snippet.id %>">
+      <%= link_to snippet.title, snippet_path(snippet) %>
+      <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Back to My Profile', profile_path, class: 'btn btn-secondary' %>

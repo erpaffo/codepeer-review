@@ -1,0 +1,41 @@
+<!-- app/views/snippets/edit.html.erb -->
+
+<h1>Edit Snippet</h1>
+
+<%= form_with(model: @snippet, local: true) do |form| %>
+  <% if @snippet.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@snippet.errors.count, "error") %> prohibited this snippet from being saved:</h2>
+      <ul>
+        <% @snippet.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div class="field">
+    <%= form.label :content %>
+    <%= form.text_area :content %>
+  </div>
+
+  <div class="field">
+    <%= form.label :comment %>
+    <%= form.text_area :comment %>
+  </div>
+
+  <div class="field">
+    <%= form.label :favorite %>
+    <%= form.check_box :favorite %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Update Snippet', class: 'btn btn-primary' %>
+    <%= link_to 'Cancel', authenticated_root_path, class: 'btn btn-secondary' %>
+  </div>
+<% end %>

@@ -1,18 +1,15 @@
-<h1>Snippet</h1>
+<!-- app/views/snippets/show.html.erb -->
+<h1><%= @snippet.title %></h1>
 
-<div id="full-content">
-  <% full_content = @project_file.file.read.force_encoding('UTF-8') %>
-  <% snippet_content = @snippet.content %>
-  <% full_content_lines = full_content.split("\n") %>
-  <% snippet_lines = snippet_content.split("\n") %>
-
-  <% full_content_lines.each do |line| %>
-    <% if snippet_lines.include?(line) %>
-      <p style="opacity: 1;"><%= line %></p>
-    <% else %>
-      <p style="opacity: 0.5;"><%= line %></p>
-    <% end %>
-  <% end %>
+<div>
+  <h2>Content</h2>
+  <textarea readonly><%= @snippet.content %></textarea>
 </div>
 
-<%= link_to 'Back to Project', project_path(@project_file.project) %>
+<div>
+  <h2>Comment</h2>
+  <p><%= @snippet.comment %></p>
+</div>
+
+<%= link_to 'Edit', edit_snippet_path(@snippet), class: 'btn btn-primary' %>
+<%= link_to 'Back to My Snippets', my_snippets_path, class: 'btn btn-secondary' %>

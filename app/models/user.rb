@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   validate :password_complexity
   has_many :projects, dependent: :destroy
+  has_many :snippets, dependent: :destroy
   attribute :profile_image_url, :string
   attr_accessor :remove_profile_image
 

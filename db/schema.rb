@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_07_10_172518) do
+ActiveRecord::Schema.define(version: 2024_07_17_121531) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -54,6 +54,7 @@ ActiveRecord::Schema.define(version: 2024_07_10_172518) do
     t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.boolean "public"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
@@ -67,11 +68,15 @@ ActiveRecord::Schema.define(version: 2024_07_10_172518) do
   end
 
   create_table "snippets", force: :cascade do |t|
-    t.integer "project_file_id", null: false
+    t.string "title"
     t.text "content"
+    t.text "comment"
+    t.integer "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
+    t.boolean "favorite"
+    t.string "language"
+    t.index ["user_id"], name: "index_snippets_on_user_id"
   end
 
   create_table "user_sessions", force: :cascade do |t|
@@ -112,5 +117,4 @@ ActiveRecord::Schema.define(version: 2024_07_10_172518) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "project_files", "projects"
   add_foreign_key "projects", "users"
-  add_foreign_key "snippets", "project_files"
 end

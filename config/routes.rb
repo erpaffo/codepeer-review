@@ -10,8 +10,10 @@ Rails.application.routes.draw do
 
   authenticated :user do
     root 'dashboard#index', as: :authenticated_root
+
     get 'complete_profile', to: 'users#complete_profile', as: :complete_profile
     patch 'update_profile', to: 'users#update_profile', as: :update_profile
+
     get 'profile', to: 'users#show', as: :profile
     get 'profile/edit', to: 'users#edit', as: :edit_profile
     patch 'profile', to: 'users#update'
@@ -20,17 +22,19 @@ Rails.application.routes.draw do
     get 'password/edit', to: 'passwords#edit', as: :edit_password
     patch 'password', to: 'passwords#update', as: :password
 
-    # 2FA Routes
-    get 'two_factor_auth/setup', to: 'two_factor_auth#setup', as: :setup_two_factor_auth
-    post 'two_factor_auth/choose', to: 'two_factor_auth#choose', as: :choose_two_factor_auth
-    get 'two_factor_auth/sms', to: 'two_factor_auth#sms', as: :sms_two_factor_auth
-    get 'two_factor_auth/email', to: 'two_factor_auth#email', as: :email_two_factor_auth
-    get 'two_factor_auth/qr_code', to: 'two_factor_auth#qr_code', as: :qr_code_two_factor_auth
-    get 'two_factor_auth/verify_otp', to: 'two_factor_auth#verify_otp', as: :verify_otp_two_factor_auth
-    post 'two_factor_auth/verify', to: 'two_factor_auth#verify', as: :verify_two_factor_auth
-    post 'two_factor_auth/send_backup_email', to: 'two_factor_auth#send_backup_email', as: :send_backup_email_two_factor_auth
-    get 'two_factor_auth/new_phone_number', to: 'two_factor_auth#new_phone_number', as: :new_phone_number
-    patch 'two_factor_auth/save_phone_number', to: 'two_factor_auth#save_phone_number', as: :save_phone_number
+    # Two-Factor Authentication Routes
+    scope 'two_factor_auth', controller: 'two_factor_auth' do
+      get 'setup', as: :setup_two_factor_auth
+      post 'choose', as: :choose_two_factor_auth
+      get 'sms', as: :sms_two_factor_auth
+      get 'email', as: :email_two_factor_auth
+      get 'qr_code', as: :qr_code_two_factor_auth
+      get 'verify_otp', as: :verify_otp_two_factor_auth
+      post 'verify', as: :verify_two_factor_auth
+      post 'send_backup_email', as: :send_backup_email_two_factor_auth
+      get 'new_phone_number', as: :new_phone_number
+      patch 'save_phone_number', as: :save_phone_number
+    end
 
     patch 'enable_two_factor_auth', to: 'users#enable_two_factor_auth', as: :enable_two_factor_auth
     patch 'disable_two_factor_auth', to: 'users#disable_two_factor_auth', as: :disable_two_factor_auth
@@ -42,13 +46,24 @@ Rails.application.routes.draw do
         get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
       end
-
-      resources :project_files, only: [] do
-        resources :snippets, only: [:show]
-      end
     end
 
     post 'run_code', to: 'projects#run_code'
+
+    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+
+    resources :snippets do
+      member do
+        post 'toggle_favorite'
+      end
+    end
+
+    # User's Snippets Routes
+    get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
+    get 'favorite_snippets', to: 'users#favorite_snippets', as: :favorite_snippets
+
+    # Logout Route
+    delete 'logout', to: 'devise/sessions#destroy', as: :logout
   end
 
   unauthenticated do

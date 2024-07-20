@@ -48,6 +48,42 @@ class UsersController < ApplicationController
     redirect_to authenticated_root_path, notice: 'Two-Factor Authentication disabled'
   end
 
+  def my_profile
+    @snippets = current_user.snippets
+  end
+
+  def show
+    @snippets = current_user.snippets
+    @favorite_snippets = current_user.snippets.where(favorite: true)
+  end
+
+  def my_snippets
+    # Recupera tutti i linguaggi disponibili per i filtri
+    @languages = Snippet.languages
+
+    # Recupera gli snippet dell'utente, applica i filtri e l'ordinamento come necessario
+    @snippets = current_user.snippets
+
+    if params[:order_by] == 'most_recent'
+      @snippets = @snippets.order(created_at: :desc)
+    elsif params[:order_by] == 'least_recent'
+      @snippets = @snippets.order(created_at: :asc)
+    elsif params[:order_by] == 'favorites'
+      @snippets = @snippets.order(favorite: :desc, created_at: :desc)
+    end
+
+    if params[:language] == 'other'
+      # Filtra gli snippets che non hanno un linguaggio incluso nei linguaggi conosciuti
+      @snippets = @snippets.where.not(language: Snippet.languages)
+    elsif params[:language].present?
+      # Filtra gli snippet per linguaggio specifico
+      @snippets = @snippets.where(language: params[:language])
+    end
+
+    # Rendi la vista con i dati impostati
+  end
+
+
   private
 
   def user_params

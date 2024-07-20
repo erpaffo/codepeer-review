@@ -1,0 +1,8 @@
+<ul>
+  <% snippets.each do |snippet| %>
+    <li>
+      <%= link_to snippet.title, snippet_path(snippet) %>
+      <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
+    </li>
+  <% end %>
+</ul>
