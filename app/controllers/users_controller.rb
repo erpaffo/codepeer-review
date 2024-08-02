@@ -17,7 +17,31 @@ class UsersController < ApplicationController
   end
 
   def show
-    @user = current_user
+    if params[:id].present?
+      @user = User.find(params[:id])
+      redirect_to authenticated_root_path, alert: 'User not found.' if @user.nil?
+    else
+      @user = current_user
+    end
+    @snippets = @user.snippets.includes(:feedbacks)
+    @feedbacks = @user.received_feedbacks
+  end
+
+  def leave_feedback
+    @user = User.find(params[:id])
+    @feedback = Feedback.new
+  end
+
+  def create_feedback
+    @user = User.find(params[:id])
+    @feedback = @user.received_feedbacks.new(feedback_params)
+    @feedback.user = current_user
+
+    if @feedback.save
+      redirect_to user_path(@user), notice: 'Feedback sent successfully'
+    else
+      render :leave_feedback
+    end
   end
 
   def edit
@@ -92,6 +116,10 @@ class UsersController < ApplicationController
 
   def remove_profile_image
     @user.profile_image.purge if @user.profile_image.attached?
+  end
+
+  def feedback_params
+    params.require(:feedback).permit(:content)
   end
 
   def handle_profile_image_update

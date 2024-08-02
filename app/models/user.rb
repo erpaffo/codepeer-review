@@ -7,6 +7,8 @@ class User < ApplicationRecord
   validate :password_complexity
   has_many :projects, dependent: :destroy
   has_many :snippets, dependent: :destroy
+  has_many :feedbacks, dependent: :destroy
+  has_many :received_feedbacks, class_name: 'Feedback', foreign_key: 'user_profile_id'
   attribute :profile_image_url, :string
   attr_accessor :remove_profile_image
 

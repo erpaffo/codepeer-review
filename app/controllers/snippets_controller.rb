@@ -56,13 +56,13 @@ class SnippetsController < ApplicationController
   private
 
   def set_snippet
-    @snippet = current_user.snippets.find(params[:id])
+    @snippet = Snippet.find(params[:id])
   end
 
   def snippet_params
     params.require(:snippet).permit(:title, :content, :comment, :favorite)
   end
 
-# app/controllers/snippets_controller.rb
+
 
 end
