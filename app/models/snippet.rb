@@ -1,6 +1,8 @@
 # app/models/snippet.rb
 class Snippet < ApplicationRecord
   belongs_to :user
+  
+  has_many :feedbacks, dependent: :destroy
 
   # Definisci i linguaggi supportati come costante
   SUPPORTED_LANGUAGES = {

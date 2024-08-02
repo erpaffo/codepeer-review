@@ -1,0 +1,9 @@
+<h1><%= @snippet.title %></h1>
+
+<p><%= @snippet.content %></p>
+
+<p>By: <%= @snippet.user.first_name %> <%= @snippet.user.last_name %></p>
+
+<%= link_to 'Send Feedback', feedback_community_activity_path(@snippet), class: "btn btn-primary" %>
+<%= link_to 'Condividi via email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
+<%= link_to 'Back to Community Snippets', community_activity_index_path, class: "btn btn-secondary" %>

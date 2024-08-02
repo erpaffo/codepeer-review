@@ -18,6 +18,14 @@ Rails.application.routes.draw do
     get 'profile/edit', to: 'users#edit', as: :edit_profile
     patch 'profile', to: 'users#update'
 
+    resources :community_activity, only: [:index, :show] do
+      member do
+        get 'feedback'
+        post 'create_feedback'
+      end
+    end
+
+
     # Password Change Routes
     get 'password/edit', to: 'passwords#edit', as: :edit_password
     patch 'password', to: 'passwords#update', as: :password
@@ -50,13 +58,31 @@ Rails.application.routes.draw do
 
     post 'run_code', to: 'projects#run_code'
 
-    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+    
 
-    resources :snippets do
+resources :snippets do
       member do
+        get 'share', to: 'shares#new', as: :new_share
+        post 'share', to: 'shares#create'
         post 'toggle_favorite'
+        get 'feedback'
+        post 'create_feedback'
+        delete 'feedback/:feedback_id', to: 'community_activity#destroy_feedback', as: 'destroy_feedback'
       end
     end
+
+    resources :users, only: [:show] do
+      member do
+        get 'leave_feedback'
+        post 'create_feedback'
+      end
+    end
+
+
+
+    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+
+
 
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets

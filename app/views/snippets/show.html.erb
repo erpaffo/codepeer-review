@@ -11,5 +11,9 @@
   <p><%= @snippet.comment %></p>
 </div>
 
-<%= link_to 'Edit', edit_snippet_path(@snippet), class: 'btn btn-primary' %>
+<% if @snippet.user == current_user %>
+  <%= link_to 'Edit', edit_snippet_path(@snippet), class: 'btn btn-primary' %>
+<% end %>
+
+<%= link_to 'Condividi via email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
 <%= link_to 'Back to My Snippets', my_snippets_path, class: 'btn btn-secondary' %>
