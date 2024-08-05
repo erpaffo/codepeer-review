@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #F9FAFB;
+    color: #1F2937;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.bg-white {
+    background-color: #FFFFFF;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 24rem;
+}
+
+.text-2xl {
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.block {
+    display: block;
+}
+
+.text-gray-700 {
+    color: #4B5563;
+}
+
+.mt-1 {
+    margin-top: 0.25rem;
+}
+
+.p-2 {
+    padding: 0.5rem;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.border {
+    border: 1px solid #D1D5DB;
+}
+
+.rounded {
+    border-radius: 0.375rem;
+}
+
+.mb-4 {
+    margin-bottom: 1rem;
+}
+
+.mr-2 {
+    margin-right: 0.5rem;
+}
+
+.leading-tight {
+    line-height: 1.25;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.bg-blue-500 {
+    background-color: #3B82F6;
+}
+
+.text-white {
+    color: #FFFFFF;
+}
+
+.py-2 {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.rounded-lg {
+    border-radius: 0.5rem;
+}
+
+.text-blue-500 {
+    color: #3B82F6;
+}
+
+.flex {
+    display: flex;
+    align-items: center;
+}

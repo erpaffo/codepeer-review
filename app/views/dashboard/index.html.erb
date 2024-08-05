@@ -1,35 +1,77 @@
-<!-- app/views/dashboard/index.html.erb -->
-<h1>Dashboard</h1>
-<p>Welcome, <%= current_user.first_name %> (Nickname: <%= current_user.nickname %>)!</p>
-
-<% if current_user.first_name.blank? || current_user.last_name.blank? || current_user.nickname.blank? %>
-  <div id="complete-profile-popup">
-    <p>Please complete your profile</p>
-    <%= link_to 'Complete Profile', complete_profile_path %>
+<div class="flex">
+  <div class="flex flex-col">
+    <div class="sidebar bg-zinc-800 text-white w-64 h-screen p-4 fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 z-10">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold">Dashboard Menu</h2>
+        <div class="sidebar-toggle bg-zinc-800 text-white w-8 h-8 flex items-center justify-center cursor-pointer">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+      </div>
+      <ul>
+        <li class="mb-2"><a href="<%= profile_path %>" class="hover:underline">My Profile</a></li>
+        <li class="mb-2"><a href="<%= snippets_path %>" class="hover:underline">My Snippets</a></li>
+        <li class="mb-2"><a href="<%= projects_path %>" class="hover:underline">Projects</a></li>
+        <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:underline">Community Activity</a></li>
+        <li class="mb-2"><a href="<%= settings_path %>" class="hover:underline">Settings</a></li>
+        <li><a href="<%= logout_path %>" class="hover:underline">Logout</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-toggle bg-zinc-800 text-white w-16 h-16 flex items-center justify-center cursor-pointer fixed top-0 left-0 z-20">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </div>
   </div>
-<% end %>
+  <div class="flex-1 p-6 transition-all duration-300 ml-16 md:ml-64">
+    <div class="bg-white shadow-lg p-4 rounded-lg mb-6">
+      <div class="flex justify-between items-center flex-wrap">
+        <h1 class="text-2xl font-semibold">CodePeer Review</h1>
+        <div class="flex space-x-4 mt-4 md:mt-0">
+          <a href="<%= profile_path %>" class="text-zinc-600 hover:underline">Profile</a>
+          <a href="<%= snippets_path %>" class="text-zinc-600 hover:underline">Snippets</a>
+          <a href="<%= projects_path %>" class="text-zinc-600 hover:underline">Projects</a>
+        </div>
+      </div>
+    </div>
+    <h2 class="text-xl font-semibold mb-4">Dashboard</h2>
+    <p class="mb-4">Welcome, <%= current_user.nickname %>!</p>
+    <div class="bg-yellow-200 p-4 rounded-lg mb-6">
+      <p class="mb-2">Please complete your profile</p>
+      <a href="<%= complete_profile_path %>" class="text-blue-600 hover:underline">Complete Profile</a>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h3 class="font-semibold">My Snippets</h3>
+        <p>Create and manage your code snippets.</p>
+        <a href="<%= snippets_path %>" class="text-blue-600 hover:underline">View Snippets</a>
+      </div>
+      <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h3 class="font-semibold">Projects</h3>
+        <p>Create and manage your projects.</p>
+        <a href="<%= projects_path %>" class="text-blue-600 hover:underline">View Projects</a>
+      </div>
+      <div class="bg-white shadow-lg p-4 rounded-lg">
+        <h3 class="font-semibold">Community Activity</h3>
+        <p>Check your community activity.</p>
+        <a href="<%= community_activity_index_path %>" class="text-blue-600 hover:underline">View Activity</a>
+      </div>
+    </div>
+  </div>
+</div>
 
-<%= link_to 'My Profile', profile_path, class: "btn btn-primary" %><br><br>
+<script>
+  // JavaScript to handle sidebar toggle
+  const sidebarToggle = document.querySelectorAll('.sidebar-toggle');
+  const sidebar = document.querySelector('.sidebar');
+  const content = document.querySelector('.flex-1');
 
-<% unless current_user.provider %>
-  <%= link_to 'Change Password', edit_password_path, class: "btn btn-secondary" %><br><br>
-<% end %>
-
-<% if current_user.otp_enabled %>
-  <p>Two-Factor Authentication is enabled.</p>
-  <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: "btn btn-danger" %>
-<% else %>
-  <p>Two-Factor Authentication is disabled.</p>
-  <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: "btn btn-primary" %>
-<% end %>
-
-<br><br>
-<%= link_to 'New Project', new_project_path, class: "btn btn-success" %><br><br>
-<%= link_to 'View All Projects', projects_path, class: "btn btn-info" %><br><br>
-
-<!-- New Snippet Form -->
-<%= link_to 'Create Snippet', new_snippet_path, class: "btn btn-primary" %><br><br>
-
-<%= link_to 'Community Activity', community_activity_index_path, class: "btn btn-warning" %><br><br>
-
-<%= link_to 'Logout', destroy_user_session_path, method: :delete, class: "btn btn-warning" %>
+  sidebarToggle.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.toggle('-translate-x-full');
+      content.classList.toggle('ml-16');
+      content.classList.toggle('ml-64');
+    });
+  });
+</script>

@@ -16,14 +16,13 @@
  
 /* app/assets/stylesheets/application.css */
 .snippet-info {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-  }
-  
-  .snippet-info .language {
-    font-size: 14px;
-    color: #888;
-  }
-  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.snippet-info .language {
+  font-size: 14px;
+  color: #888;
+}
