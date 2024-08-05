@@ -30,6 +30,9 @@ Rails.application.routes.draw do
     get 'password/edit', to: 'passwords#edit', as: :edit_password
     patch 'password', to: 'passwords#update', as: :password
 
+    #Settings
+    get 'settings', to: 'users#settings', as: :settings
+
     # Two-Factor Authentication Routes
     scope 'two_factor_auth', controller: 'two_factor_auth' do
       get 'setup', as: :setup_two_factor_auth
@@ -58,7 +61,7 @@ Rails.application.routes.draw do
 
     post 'run_code', to: 'projects#run_code'
 
-    
+
 
 resources :snippets do
       member do

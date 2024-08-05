@@ -1,0 +1,10 @@
+<h1>Settings</h1>
+
+<p>Welcome to the settings page!</p>
+
+<% if current_user.two_factor_enabled? %>
+    <p>Two-factor authentication is enabled.</p>
+<% else %>
+    <p>Two-factor authentication is disabled.</p>
+    <%= link_to "Enable Two-Factor Authentication", enable_two_factor_path %>
+<% end %>
