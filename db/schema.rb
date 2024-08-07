@@ -84,10 +84,12 @@ ActiveRecord::Schema.define(version: 2024_07_23_181246) do
     t.text "content"
     t.text "comment"
     t.integer "user_id", null: false
+    t.integer "project_file_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "favorite"
     t.string "language"
+    t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
     t.index ["user_id"], name: "index_snippets_on_user_id"
   end
 
@@ -132,4 +134,5 @@ ActiveRecord::Schema.define(version: 2024_07_23_181246) do
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
   add_foreign_key "project_files", "projects"
   add_foreign_key "projects", "users"
+  add_foreign_key "snippets", "project_files"
 end
