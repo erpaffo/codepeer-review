@@ -3,6 +3,8 @@
 <head>
   <title>Edit <%= @file.file_identifier %></title>
   <meta name="csrf-token" content="<%= form_authenticity_token %>">
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'dashboard', media: 'all', 'data-turbolinks-track': 'reload' %>
   <style>
     #code-editor {
       height: 500px;
@@ -18,128 +20,162 @@
     }
   </style>
 </head>
-<body>
-  <h1>Edit <%= @file.file_identifier %></h1>
+<body class="font-Inter bg-gray-50 text-gray-800">
 
-  <div>
-    <button id="save-file" class="btn btn-primary">Save File</button>
-    <button id="run-code" class="btn btn-secondary">Run Code</button>
+<div class="flex">
+  <div class="flex flex-col">
+    <div class="sidebar bg-zinc-800 text-white w-64 h-screen p-4 fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 z-10">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-bold">Dashboard Menu</h2>
+        <div class="sidebar-toggle bg-zinc-800 text-white w-8 h-8 flex items-center justify-center cursor-pointer">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </div>
+      </div>
+      <ul>
+        <li class="mb-2"><a href="<%= profile_path %>" class="hover:underline">My Profile</a></li>
+        <li class="mb-2"><a href="<%= snippets_path %>" class="hover:underline">My Snippets</a></li>
+        <li class="mb-2"><a href="<%= projects_path %>" class="hover:underline">Projects</a></li>
+        <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:underline">Community Activity</a></li>
+        <li class="mb-2"><a href="<%= settings_path %>" class="hover:underline">Settings</a></li>
+        <li><a href="<%= logout_path %>" class="hover:underline">Logout</a></li>
+      </ul>
+    </div>
+    <div class="sidebar-toggle bg-zinc-800 text-white w-16 h-16 flex items-center justify-center cursor-pointer fixed top-0 left-0 z-20">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+      </svg>
+    </div>
   </div>
+  <div class="flex-1 p-6 transition-all duration-300 ml-16 md:ml-64">
+    <div class="bg-white shadow-lg p-4 rounded-lg mb-6">
+      <div class="flex justify-between items-center flex-wrap">
+        <h1 class="text-2xl font-semibold">Edit <%= @file.file_identifier %></h1>
+      </div>
+    </div>
 
-  <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
-    <%= f.hidden_field :file, id: 'file-content' %>
-  <% end %>
+    <div>
+      <button id="save-file" class="btn btn-primary">Save File</button>
+      <button id="run-code" class="btn btn-secondary">Run Code</button>
+    </div>
 
-  <div id="code-editor" data-content="<%= json_escape(@file_content) %>" style="height:500px; border:1px solid grey;"></div>
+    <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
+      <%= f.hidden_field :file, id: 'file-content' %>
+    <% end %>
 
-  <div id="output"></div>
+    <div id="code-editor" data-content="<%= json_escape(@file_content) %>" style="height:500px; border:1px solid grey;"></div>
 
-  <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+    <div id="output"></div>
 
-  <!-- Load Monaco Editor from CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
-  <script>
-    (function() {
-      let monacoEditor;
+    <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+  </div>
+</div>
 
-      function initializeMonacoEditor() {
-        console.log('Initializing Monaco Editor');
-        const editorElement = document.getElementById('code-editor');
-        if (editorElement && !monacoEditor) {
-          const content = editorElement.dataset.content.replace(/\\n/g, '\n');
-          monacoEditor = monaco.editor.create(editorElement, {
-            value: content,
-            language: 'python',
-            theme: 'vs-dark'
-          });
-          console.log('Monaco Editor initialized');
-        } else if (!editorElement) {
-          console.error('code-editor element not found');
-        } else {
-          console.log('Monaco Editor already initialized');
-        }
+<!-- Load Monaco Editor from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
+<script>
+  (function() {
+    let monacoEditor;
+
+    function initializeMonacoEditor() {
+      console.log('Initializing Monaco Editor');
+      const editorElement = document.getElementById('code-editor');
+      if (editorElement && !monacoEditor) {
+        const content = editorElement.dataset.content.replace(/\\n/g, '\n');
+        monacoEditor = monaco.editor.create(editorElement, {
+          value: content,
+          language: 'python',
+          theme: 'vs-dark'
+        });
+        console.log('Monaco Editor initialized');
+      } else if (!editorElement) {
+        console.error('code-editor element not found');
+      } else {
+        console.log('Monaco Editor already initialized');
       }
+    }
 
-      function disposeMonacoEditor() {
-        console.log('Disposing Monaco Editor');
-        if (monacoEditor) {
-          monacoEditor.dispose();
-          monacoEditor = null;
-          console.log('Monaco Editor disposed');
-        }
+    function disposeMonacoEditor() {
+      console.log('Disposing Monaco Editor');
+      if (monacoEditor) {
+        monacoEditor.dispose();
+        monacoEditor = null;
+        console.log('Monaco Editor disposed');
       }
+    }
 
-      function loadMonacoEditor() {
-        if (typeof window.require !== 'undefined') {
-          if (!window.require.monacoConfigured) {
-            window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
-            window.require.monacoConfigured = true;
+    function loadMonacoEditor() {
+      if (typeof window.require !== 'undefined') {
+        if (!window.require.monacoConfigured) {
+          window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
+          window.require.monacoConfigured = true;
+        }
+        window.require(['vs/editor/editor.main'], function() {
+          if (document.getElementById('code-editor')) {
+            initializeMonacoEditor();
           }
-          window.require(['vs/editor/editor.main'], function() {
-            if (document.getElementById('code-editor')) {
-              initializeMonacoEditor();
-            }
-          });
-        } else {
-          setTimeout(loadMonacoEditor, 50); // Retry if RequireJS is not yet loaded
-        }
+        });
+      } else {
+        setTimeout(loadMonacoEditor, 50); // Retry if RequireJS is not yet loaded
+      }
+    }
+
+    function setupButtons() {
+      const saveButton = document.getElementById('save-file');
+      if (saveButton) {
+        saveButton.addEventListener('click', () => {
+          const form = document.getElementById('edit-file-form');
+          const hiddenField = form.querySelector('#file-content');
+          if (monacoEditor) {
+            hiddenField.value = monacoEditor.getValue();
+          }
+          form.submit();
+        });
       }
 
-      function setupButtons() {
-        const saveButton = document.getElementById('save-file');
-        if (saveButton) {
-          saveButton.addEventListener('click', () => {
-            const form = document.getElementById('edit-file-form');
-            const hiddenField = form.querySelector('#file-content');
-            if (monacoEditor) {
-              hiddenField.value = monacoEditor.getValue();
-            }
-            form.submit();
-          });
-        }
+      const runButton = document.getElementById('run-code');
+      if (runButton) {
+        runButton.addEventListener('click', () => {
+          if (monacoEditor) {
+            const code = monacoEditor.getValue();
+            const language = 'python'; // Cambia il linguaggio se necessario
 
-        const runButton = document.getElementById('run-code');
-        if (runButton) {
-          runButton.addEventListener('click', () => {
-            if (monacoEditor) {
-              const code = monacoEditor.getValue();
-              const language = 'python'; // Cambia il linguaggio se necessario
-
-              // Chiamata AJAX per eseguire il codice (implementare nel backend)
-              fetch('/run_code', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ code: code, language: language }) // Cambia il linguaggio se necessario
-              })
-              .then(response => response.json())
-              .then(data => {
-                // Mostra l'output del codice (implementare nel backend)
-                document.getElementById('output').textContent = data.output;
-              });
-            }
-          });
-        }
+            // Chiamata AJAX per eseguire il codice (implementare nel backend)
+            fetch('/run_code', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+              },
+              body: JSON.stringify({ code: code, language: language }) // Cambia il linguaggio se necessario
+            })
+            .then(response => response.json())
+            .then(data => {
+              // Mostra l'output del codice (implementare nel backend)
+              document.getElementById('output').textContent = data.output;
+            });
+          }
+        });
       }
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOMContentLoaded event');
-        setupButtons();
-        loadMonacoEditor();
-      });
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOMContentLoaded event');
+      setupButtons();
+      loadMonacoEditor();
+    });
 
-      window.addEventListener('popstate', function(event) {
-        console.log('popstate event');
-        window.location.reload();
-      });
+    window.addEventListener('popstate', function(event) {
+      console.log('popstate event');
+      window.location.reload();
+    });
 
-      window.addEventListener('beforeunload', () => {
-        console.log('beforeunload event');
-        disposeMonacoEditor();
-      });
-    })();
-  </script>
+    window.addEventListener('beforeunload', () => {
+      console.log('beforeunload event');
+      disposeMonacoEditor();
+    });
+  })();
+</script>
 </body>
 </html>

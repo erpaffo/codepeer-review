@@ -1,0 +1,129 @@
+.sidebar {
+    background-color: #1c1c1e;
+    color: white;
+    width: 16rem;
+    height: 100vh;
+    padding: 1rem;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 10;
+  }
+  
+  .sidebar-toggle {
+    background-color: #1c1c1e;
+    color: white;
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 20;
+    transition: left 0.3s ease-in-out;
+  }
+  
+  .sidebar h2 {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  
+  .sidebar ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .sidebar li {
+    margin-bottom: 0.5rem;
+  }
+  
+  .sidebar a {
+    color: white;
+    text-decoration: none;
+  }
+  
+  .sidebar a:hover {
+    text-decoration: underline;
+  }
+  
+  .flex-1 {
+    padding: 1.5rem;
+    margin-left: 4rem; /* Space for the sidebar toggle */
+    transition: margin-left 0.3s ease-in-out;
+  }
+  
+  .flex-1.ml-64 {
+    margin-left: 16rem; /* Adjust when sidebar is open */
+  }
+  
+  .bg-white {
+    background-color: white;
+  }
+  
+  .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+  
+  .p-4 {
+    padding: 1rem;
+  }
+  
+  .rounded-lg {
+    border-radius: 0.5rem;
+  }
+  
+  .mb-6 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+  
+  .font-semibold {
+    font-weight: 600;
+  }
+  
+  .text-zinc-600 {
+    color: #4a5568;
+  }
+  
+  .text-blue-600 {
+    color: #3182ce;
+  }
+  
+  .text-blue-600:hover {
+    text-decoration: underline;
+  }
+  
+  .bg-yellow-200 {
+    background-color: #fefcbf;
+  }
+  
+  .grid {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  
+  .md\\:grid-cols-2 {
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  .lg\\:grid-cols-3 {
+    @media (min-width: 1024px) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  
