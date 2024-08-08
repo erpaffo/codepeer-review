@@ -5,4 +5,5 @@ class Project < ApplicationRecord
 
   validates :title, presence: true
   validates :description, presence: true
+  validates :visibility, inclusion: { in: %w[private public] }
 end

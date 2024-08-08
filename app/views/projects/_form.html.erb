@@ -21,6 +21,11 @@
     <%= f.text_area :description %>
   </div>
 
+  <div class="field">
+    <%= f.label :visibility, 'Visibility' %>
+    <%= f.select :visibility, options_for_select([['Private', 'private'], ['Public', 'public']], @project.visibility) %>
+  </div>
+
   <h3>Files</h3>
   <%= f.fields_for :project_files do |ff| %>
     <%= render 'project_file_fields', f: ff %>

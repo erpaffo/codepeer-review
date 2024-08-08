@@ -3,10 +3,13 @@ class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
 
   def index
-    @projects = current_user.projects
+    @projects = Project.where("visibility = ? OR user_id = ?", 'public', current_user.id)
   end
 
   def show
+    if @project.visibility == 'private' && @project.user != current_user
+      redirect_to projects_path, alert: 'You are not authorized to view this project.'
+    end
   end
 
   def new
@@ -25,19 +28,30 @@ class ProjectsController < ApplicationController
   end
 
   def edit
+    if @project.user != current_user
+      redirect_to projects_path, alert: 'You are not authorized to edit this project.'
+    end
   end
 
   def update
-    if @project.update(project_params)
-      redirect_to @project, notice: 'Project was successfully updated.'
+    if @project.user != current_user
+      redirect_to projects_path, alert: 'You are not authorized to update this project.'
     else
-      render :edit
+      if @project.update(project_params)
+        redirect_to @project, notice: 'Project was successfully updated.'
+      else
+        render :edit
+      end
     end
   end
 
   def destroy
-    @project.destroy
-    redirect_to projects_url, notice: 'Project was successfully destroyed.'
+    if @project.user != current_user
+      redirect_to projects_path, alert: 'You are not authorized to delete this project.'
+    else
+      @project.destroy
+      redirect_to projects_url, notice: 'Project was successfully destroyed.'
+    end
   end
 
   def show_file
@@ -128,6 +142,47 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def public_view
+    @project = Project.find(params[:id])
+    @files = @project.project_files
+  end
+
+  def download_project
+    project = Project.find(params[:id])
+    user_folder_name = project.user.email.split('@').first
+    project_folder_name = project.title.parameterize
+
+    s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+    bucket = s3.bucket(ENV['AWS_BUCKET'])
+    zipfile_name = "#{project_folder_name}.zip"
+
+    Tempfile.open(zipfile_name) do |tempfile|
+      Zip::OutputStream.open(tempfile.path) do |zos|
+        project.project_files.each do |file|
+          file_path = "uploads/#{user_folder_name}/#{project_folder_name}/#{file.file_identifier}"
+          obj = bucket.object(file_path)
+          zos.put_next_entry(file.file_identifier)
+          zos.print obj.get.body.read
+        end
+      end
+
+      send_file tempfile.path, type: 'application/zip', disposition: 'attachment', filename: zipfile_name
+    end
+  end
+
+  def download_file
+    file = ProjectFile.find(params[:id])
+    user_folder_name = file.project.user.email.split('@').first
+    project_folder_name = file.project.title.parameterize
+    file_path = "uploads/#{user_folder_name}/#{project_folder_name}/#{file.file_identifier}"
+
+    s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+    obj = s3.bucket(ENV['AWS_BUCKET']).object(file_path)
+
+    send_data obj.get.body.read, filename: file.file_identifier, type: obj.content_type, disposition: 'attachment'
+  end
+
+
   private
 
   def set_project
@@ -135,7 +190,7 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    params.require(:project).permit(:title, :description, project_files_attributes: [:id, :file, :_destroy])
+    params.require(:project).permit(:title, :description, :visibility, project_files_attributes: [:id, :file, :_destroy])
   end
 
   def file_params

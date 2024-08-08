@@ -15,7 +15,8 @@
         <li class="mb-2"><a href="<%= projects_path %>" class="hover:underline">Projects</a></li>
         <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:underline">Community Activity</a></li>
         <li class="mb-2"><a href="<%= settings_path %>" class="hover:underline">Settings</a></li>
-        <li><a href="<%= logout_path %>" class="hover:underline">Logout</a></li>
+        <li class="mb-2"><%= link_to 'Search', search_path, class: 'hover:underline' %></li>
+        <li><%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'hover:underline' %></li>
       </ul>
     </div>
     <div class="sidebar-toggle bg-zinc-800 text-white w-16 h-16 flex items-center justify-center cursor-pointer fixed top-0 left-0 z-20">
@@ -32,6 +33,8 @@
           <a href="<%= profile_path %>" class="text-zinc-600 hover:underline">Profile</a>
           <a href="<%= snippets_path %>" class="text-zinc-600 hover:underline">Snippets</a>
           <a href="<%= projects_path %>" class="text-zinc-600 hover:underline">Projects</a>
+          <a href="<%= search_path %>" class="text-zinc-600 hover:underline">Search</a>
+          <%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'text-zinc-600 hover:underline' %>
         </div>
       </div>
     </div>

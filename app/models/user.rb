@@ -12,7 +12,7 @@ class User < ApplicationRecord
   attribute :profile_image_url, :string
   attr_accessor :remove_profile_image
 
-    after_create :create_user_directory
+  after_create :create_user_directory
 
   has_one_attached :profile_image
 

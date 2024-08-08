@@ -1,4 +1,3 @@
-# app/controllers/users_controller.rb
 class UsersController < ApplicationController
   before_action :authenticate_user!
 
@@ -25,6 +24,11 @@ class UsersController < ApplicationController
     end
     @snippets = @user.snippets.includes(:feedbacks)
     @feedbacks = @user.received_feedbacks
+  end
+
+  def profile
+    @user = User.find(params[:id])
+    @projects = @user.projects.where(visibility: 'public')
   end
 
   def leave_feedback
@@ -107,7 +111,6 @@ class UsersController < ApplicationController
     # Rendi la vista con i dati impostati
   end
 
-
   private
 
   def user_params
@@ -136,5 +139,4 @@ class UsersController < ApplicationController
       @user.update(profile_image_url: nil)  # Rimuove l'URL esterno se è stato sostituito con un file caricato
     end
   end
-
 end

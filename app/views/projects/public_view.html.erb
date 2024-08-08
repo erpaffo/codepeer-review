@@ -1,0 +1,13 @@
+<h1><%= @project.title %></h1>
+<p><%= @project.description %></p>
+
+<h2>Files</h2>
+<ul>
+  <% @files.each do |file| %>
+    <li>
+      <%= link_to file.file_identifier, download_file_path(file) %> <!-- Implementa download_file_path per il download -->
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Download Project', download_project_path(@project), class: 'btn btn-primary' %> <!-- Implementa download_project_path per il download del progetto -->

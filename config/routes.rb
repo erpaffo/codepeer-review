@@ -6,6 +6,7 @@ Rails.application.routes.draw do
 
   devise_scope :user do
     get 'users/auth/failure', to: 'users/omniauth_callbacks#failure'
+    delete 'logout', to: 'devise/sessions#destroy', as: :logout
   end
 
   authenticated :user do
@@ -80,14 +81,19 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
-
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
     get 'favorite_snippets', to: 'users#favorite_snippets', as: :favorite_snippets
 
-    # Logout Route
-    delete 'logout', to: 'devise/sessions#destroy', as: :logout
+    # Search Route
+    get 'search', to: 'search#index'
+    post 'search', to: 'search#results'
+
+    # User Profile and Project Public Routes
+    get 'user_profile/:id', to: 'users#profile', as: :user_profile
+    get 'project_public/:id', to: 'projects#public_view', as: :project_public
+    get 'download_project/:id', to: 'projects#download_project', as: :download_project
+    get 'download_file/:id', to: 'projects#download_file', as: :download_file
   end
 
   unauthenticated do

@@ -1,0 +1,15 @@
+<h1>Search Results</h1>
+
+<h2>Users</h2>
+<% @users.each do |user| %>
+  <div>
+    <%= link_to user.nickname, user_profile_path(user) %>
+  </div>
+<% end %>
+
+<h2>Projects</h2>
+<% @projects.each do |project| %>
+  <div>
+    <%= link_to project.title, project_public_path(project) %>
+  </div>
+<% end %>
