@@ -1,12 +1,8 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
 
   def index
-    @projects = Project.where("visibility = ? OR user_id = ?", 'public', current_user.id)
-  end
-
-  def my_projects
     @projects = current_user.projects
   end
 
@@ -50,11 +46,12 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    if @project.user != current_user
-      redirect_to projects_path, alert: 'You are not authorized to delete this project.'
-    else
+    confirmation = "#{current_user.nickname}/#{@project.title}"
+    if params[:confirmation] == confirmation
       @project.destroy
       redirect_to projects_url, notice: 'Project was successfully destroyed.'
+    else
+      redirect_to edit_project_path(@project), alert: 'Confirmation does not match. Project was not destroyed.'
     end
   end
 
@@ -189,10 +186,7 @@ class ProjectsController < ApplicationController
   private
 
   def set_project
-    @project = Project.find_by(id: params[:id], user_id: current_user.id)
-    unless @project
-      redirect_to projects_path, alert: 'Project not found or you do not have access to it.'
-    end
+    @project = current_user.projects.find(params[:id])
   end
 
   def project_params
