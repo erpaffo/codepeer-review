@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
 
   def index
     @projects = current_user.projects
@@ -17,6 +17,7 @@ class ProjectsController < ApplicationController
   def create
     @project = current_user.projects.build(project_params)
     if @project.save
+      create_project_directory(@project)  # Creare la cartella del progetto su AWS S3
       redirect_to @project, notice: 'Project was successfully created.'
     else
       render :new
@@ -100,6 +101,33 @@ class ProjectsController < ApplicationController
     render json: { output: output }
   end
 
+  def new_file
+    @project_file = @project.project_files.build
+  end
+
+  def create_file
+    file_name = params[:file_name]
+    extension = params[:extension]
+
+    if file_name.blank? || extension.blank?
+      flash[:alert] = "File name and extension can't be blank."
+      render :new_file and return
+    end
+
+    full_file_name = "#{file_name}.#{extension}"
+    file_path = "#{Rails.root}/tmp/#{full_file_name}"
+
+    File.open(file_path, "w") {} # Crea un file vuoto
+
+    @project_file = @project.project_files.build(file: File.open(file_path))
+
+    if @project_file.save
+      redirect_to edit_file_project_path(@project, file_id: @project_file.id), notice: 'File was successfully created.'
+    else
+      render :new_file
+    end
+  end
+
   private
 
   def set_project
@@ -112,6 +140,15 @@ class ProjectsController < ApplicationController
 
   def file_params
     params.require(:project_file).permit(:file)
+  end
+
+  def create_project_directory(project)
+    s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+    bucket = s3.bucket(ENV['AWS_BUCKET'])
+    user_folder_name = project.user.email.split('@').first
+    project_folder_name = project.title.parameterize
+    # Creare una cartella vuota (un oggetto con un '/' finale)
+    bucket.object("uploads/#{user_folder_name}/#{project_folder_name}/").put(body: "")
   end
 
   def execute_code_in_docker(code, language)

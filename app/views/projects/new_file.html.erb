@@ -1,0 +1,30 @@
+<h1>New File</h1>
+
+<%= form_with(url: create_file_project_path(@project), method: :post, local: true) do |form| %>
+  <% if @project_file.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@project_file.errors.count, "error") %> prohibited this file from being saved:</h2>
+      <ul>
+        <% @project_file.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :file_name, 'File Name' %>
+    <%= form.text_field :file_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :extension, 'Extension' %>
+    <%= form.select :extension, options_for_select(['txt', 'py', 'c', 'rb', 'cpp', 'css', 'html']) %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit 'Create File' %>
+  </div>
+<% end %>
+
+<%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>

@@ -12,6 +12,8 @@ class User < ApplicationRecord
   attribute :profile_image_url, :string
   attr_accessor :remove_profile_image
 
+    after_create :create_user_directory
+
   has_one_attached :profile_image
 
   def generate_otp_secret
@@ -98,5 +100,13 @@ class User < ApplicationRecord
     return if password.blank? || password =~ /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[[:^alnum:]])/
 
     errors.add :password, 'must include at least one lowercase letter, one uppercase letter, one digit, and one special character'
+  end
+
+  def create_user_directory
+    s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+    bucket = s3.bucket(ENV['AWS_BUCKET'])
+    user_folder_name = email.split('@').first
+    # Creare una cartella vuota (un oggetto con un '/' finale)
+    bucket.object("uploads/#{user_folder_name}/").put(body: "")
   end
 end

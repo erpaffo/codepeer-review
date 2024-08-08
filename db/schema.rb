@@ -131,8 +131,4 @@ ActiveRecord::Schema.define(version: 2024_07_23_181246) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
-  add_foreign_key "feedbacks", "users", column: "user_profile_id"
-  add_foreign_key "project_files", "projects"
-  add_foreign_key "projects", "users"
-  add_foreign_key "snippets", "project_files"
-end
+  add_foreign_key "feedbacks", "us

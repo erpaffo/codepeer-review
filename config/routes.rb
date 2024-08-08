@@ -25,12 +25,11 @@ Rails.application.routes.draw do
       end
     end
 
-
     # Password Change Routes
     get 'password/edit', to: 'passwords#edit', as: :edit_password
     patch 'password', to: 'passwords#update', as: :password
 
-    #Settings
+    # Settings
     get 'settings', to: 'users#settings', as: :settings
 
     # Two-Factor Authentication Routes
@@ -56,14 +55,14 @@ Rails.application.routes.draw do
         get 'show_file/:file_id', to: 'projects#show_file', as: 'show_file'
         get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
+        get 'new_file', to: 'projects#new_file', as: 'new_file'
+        post 'create_file', to: 'projects#create_file', as: 'create_file'
       end
     end
 
     post 'run_code', to: 'projects#run_code'
 
-
-
-resources :snippets do
+    resources :snippets do
       member do
         get 'share', to: 'shares#new', as: :new_share
         post 'share', to: 'shares#create'
@@ -81,11 +80,7 @@ resources :snippets do
       end
     end
 
-
-
     resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
-
-
 
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
