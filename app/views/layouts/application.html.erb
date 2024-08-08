@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= content_for?(:title) ? yield(:title) : "MyWebsite" %></title>
+  <title><%= content_for?(:title) ? yield(:title) : "CodePeer Review" %></title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
@@ -15,8 +15,42 @@
 <body class="font-Inter bg-gray-50 text-gray-800">
 
   <div class="min-h-screen flex flex-col">
+    <header class="bg-white shadow">
+      <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+        <h1 class="text-xl font-semibold">
+          <%= link_to "CodePeer Review", user_signed_in? ? authenticated_root_path : unauthenticated_root_path %>
+        </h1>
+        <nav class="flex space-x-4">
+          <% if user_signed_in? %>
+            <%= link_to "Dashboard", authenticated_root_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "Profile", profile_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "My Snippets", my_snippets_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "My Projects", my_projects_projects_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "Logout", logout_path, method: :delete, class: "text-red-600 hover:underline" %>
+          <% else %>
+            <%= link_to "Sign In", new_user_session_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "Sign Up", new_user_registration_path, class: "text-gray-600 hover:underline" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
     <%= yield %>
   </div>
 
+  <script>
+    // JavaScript to handle sidebar toggle
+    const sidebarToggle = document.querySelectorAll('.sidebar-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.flex-1');
+
+    sidebarToggle.forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+        content.classList.toggle('ml-16');
+        content.classList.toggle('ml-64');
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,9 +1,13 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file]
 
   def index
     @projects = Project.where("visibility = ? OR user_id = ?", 'public', current_user.id)
+  end
+
+  def my_projects
+    @projects = current_user.projects
   end
 
   def show
@@ -182,11 +186,13 @@ class ProjectsController < ApplicationController
     send_data obj.get.body.read, filename: file.file_identifier, type: obj.content_type, disposition: 'attachment'
   end
 
-
   private
 
   def set_project
-    @project = current_user.projects.find(params[:id])
+    @project = Project.find_by(id: params[:id], user_id: current_user.id)
+    unless @project
+      redirect_to projects_path, alert: 'Project not found or you do not have access to it.'
+    end
   end
 
   def project_params

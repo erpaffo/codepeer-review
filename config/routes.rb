@@ -52,6 +52,10 @@ Rails.application.routes.draw do
 
     # Project Routes
     resources :projects do
+      collection do
+        get 'my_projects'
+      end
+
       member do
         get 'show_file/:file_id', to: 'projects#show_file', as: 'show_file'
         get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
@@ -81,6 +85,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
     get 'favorite_snippets', to: 'users#favorite_snippets', as: :favorite_snippets
@@ -89,7 +95,6 @@ Rails.application.routes.draw do
     get 'search', to: 'search#index'
     post 'search', to: 'search#results'
 
-    # User Profile and Project Public Routes
     get 'user_profile/:id', to: 'users#profile', as: :user_profile
     get 'project_public/:id', to: 'projects#public_view', as: :project_public
     get 'download_project/:id', to: 'projects#download_project', as: :download_project
