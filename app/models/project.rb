@@ -4,6 +4,7 @@ class Project < ApplicationRecord
   has_many :collaborators, dependent: :destroy
   has_many :collaborating_users, through: :collaborators, source: :user
   has_many :collaborator_invitations, dependent: :destroy
+  has_many :commit_logs, dependent: :destroy
 
   accepts_nested_attributes_for :project_files
 

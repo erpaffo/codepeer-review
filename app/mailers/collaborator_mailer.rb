@@ -6,4 +6,4 @@ class CollaboratorMailer < ApplicationMailer
 
     mail(to: @invitation.email, subject: "You've been invited to collaborate on #{@project.title}")
   end
-en
+end

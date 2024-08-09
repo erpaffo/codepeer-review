@@ -96,3 +96,5 @@ gem 'carrierwave', '~> 2.0'
 
 # Use fog-aws to connect to AWS
 gem 'fog-aws'
+
+gem 'diffy'

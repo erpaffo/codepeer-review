@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  project: one
+  user: one
+  message: MyText
+  created_at: 2024-08-09 19:39:38
+
+two:
+  project: two
+  user: two
+  message: MyText
+  created_at: 2024-08-09 19:39:38

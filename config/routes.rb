@@ -63,6 +63,7 @@ Rails.application.routes.draw do
         get 'new_file', to: 'projects#new_file', as: 'new_file'
         post 'create_file', to: 'projects#create_file', as: 'create_file'
         post 'invite_collaborator', to: 'projects#invite_collaborator', as: 'invite_collaborator'
+        get 'commit_logs', to: 'projects#commit_logs', as: 'commit_logs' # Aggiunta della rotta per i commit logs
       end
     end
 

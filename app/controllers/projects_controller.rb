@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -218,6 +218,10 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def commit_logs
+    @commit_logs = @project.commit_logs.order(created_at: :desc)
+  end
+
   private
 
   def set_project
@@ -301,4 +305,71 @@ class ProjectsController < ApplicationController
                 when 'ruby'
                   "docker run --rm -v #{dir}:/app -w /app #{docker_image} ruby #{file_name}"
                 when 'go'
- 
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'go build -o main main.go && ./main'"
+                when 'php'
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} php #{file_name}"
+                when 'swift'
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'swiftc -o main main.swift && ./main'"
+                when 'kotlin'
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'kotlinc main.kt -include-runtime -d main.jar && java -jar main.jar'"
+                when 'rust'
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'rustc main.rs && ./main'"
+                else
+                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} python3 #{file_name}"
+                end
+
+      output = `#{command}`
+      output
+    end
+  end
+
+  def language_extension(language)
+    case language
+    when 'python'
+      'py'
+    when 'c'
+      'c'
+    when 'java'
+      'java'
+    when 'javascript'
+      'js'
+    when 'ruby'
+      'rb'
+    when 'go'
+      'go'
+    when 'php'
+      'php'
+    when 'swift'
+      'swift'
+    when 'kotlin'
+      'kt'
+    when 'rust'
+      'rs'
+    else
+      'txt'
+    end
+  end
+
+  def download_file_from_s3(bucket, key, local_path)
+    s3 = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+    File.open(local_path, 'wb') do |file|
+      s3.get_object(bucket: bucket, key: key) do |chunk|
+        file.write(chunk)
+      end
+    end
+    local_path
+  end
+
+  def read_file_content(file_path)
+    content = File.read(file_path, encoding: 'UTF-8')
+    content
+  end
+
+  def calculate_diff(original_content, new_content)
+    original_lines = original_content.split("\n")
+    new_lines = new_content.split("\n")
+
+    diff_lines = new_lines - original_lines
+    diff_lines.join("\n")
+  end
+end

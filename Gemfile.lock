@@ -123,6 +123,7 @@ GEM
       railties (>= 4.1.0)
       responders
       warden (~> 1.2.3)
+    diffy (3.4.2)
     dotenv (2.8.1)
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
@@ -399,6 +400,7 @@ DEPENDENCIES
   capybara (>= 3.26)
   carrierwave (~> 2.0)
   devise
+  diffy
   dotenv-rails
   ffi (= 1.16.3)
   fog-aws
