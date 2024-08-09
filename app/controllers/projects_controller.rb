@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -36,8 +36,6 @@ class ProjectsController < ApplicationController
       render :new
     end
   end
-
-
 
   def edit
     if @project.user != current_user && !@project.collaborating_users.include?(current_user)
@@ -94,21 +92,16 @@ class ProjectsController < ApplicationController
     @file = @project.project_files.find(params[:file_id])
     new_file_content = params[:project_file][:file]
 
-    # Converti il contenuto del file in UTF-8
     new_file_content_utf8 = new_file_content.encode('UTF-8')
 
-    # Ottieni il contenuto originale del file
     local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
     download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
     original_file_content = read_file_content(local_path)
 
-    # Calcola la differenza tra il contenuto originale e quello nuovo
     snippet_content = calculate_diff(original_file_content, new_file_content_utf8)
 
-    # Crea un nuovo snippet con la differenza
     @file.snippets.create(content: snippet_content)
 
-    # Sovrascrivi il file su S3
     s3 = Aws::S3::Resource.new
     obj = s3.bucket(ENV['AWS_BUCKET']).object(@file.file.path)
     obj.put(body: new_file_content_utf8)
@@ -119,8 +112,6 @@ class ProjectsController < ApplicationController
   def run_code
     code = params[:code]
     language = params[:language]
-    bucket = ENV['AWS_BUCKET']
-    key = params[:file_key]
 
     output = execute_code_in_docker(code, language)
 
@@ -143,7 +134,7 @@ class ProjectsController < ApplicationController
     full_file_name = "#{file_name}.#{extension}"
     file_path = "#{Rails.root}/tmp/#{full_file_name}"
 
-    File.open(file_path, "w") {} # Crea un file vuoto
+    File.open(file_path, "w") {}
 
     @project_file = @project.project_files.build(file: File.open(file_path))
 
@@ -157,6 +148,9 @@ class ProjectsController < ApplicationController
   def public_view
     @project = Project.find(params[:id])
     @files = @project.project_files
+    if @project.visibility != 'public'
+      redirect_to root_path, alert: "This project is not public."
+    end
   end
 
   def download_project
@@ -222,11 +216,32 @@ class ProjectsController < ApplicationController
     @commit_logs = @project.commit_logs.order(created_at: :desc)
   end
 
+  def toggle_favorite
+    favorite = current_user.favorites.find_by(project: @project)
+
+    if favorite
+      favorite.destroy
+      message = 'Project was removed from your favorites.'
+    else
+      current_user.favorites.create(project: @project)
+      message = 'Project was added to your favorites.'
+    end
+
+    respond_to do |format|
+      format.html { redirect_back(fallback_location: projects_path, notice: message) }
+      format.js   # Questo permette l'esecuzione di toggle_favorite.js.erb
+    end
+  end
+
+  def favorite_projects
+    @favorite_projects = current_user.favorite_projects.includes(:user)
+  end
+
   private
 
   def set_project
     @project = Project.find(params[:id])
-    unless @project.user == current_user || @project.collaborating_users.include?(current_user)
+    unless @project.visibility == 'public' || @project.user == current_user || @project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to access this project.'
     end
   end
@@ -244,7 +259,6 @@ class ProjectsController < ApplicationController
     bucket = s3.bucket(ENV['AWS_BUCKET'])
     user_folder_name = project.user.email.split('@').first
     project_folder_name = project.title.parameterize
-    # Creare una cartella vuota (un oggetto con un '/' finale)
     bucket.object("uploads/#{user_folder_name}/#{project_folder_name}/").put(body: "")
   end
 

@@ -2,6 +2,14 @@
 
 <p><%= @project.description %></p>
 
+<div id="favorite-button">
+  <% if current_user.favorites.exists?(project: @project) %>
+    <%= button_to 'Remove from Favorites', toggle_favorite_project_path(@project), method: :post, remote: true, class: "btn btn-danger" %>
+  <% else %>
+    <%= button_to 'Add to Favorites', toggle_favorite_project_path(@project), method: :post, remote: true, class: "btn btn-primary" %>
+  <% end %>
+</div>
+
 <h3>Files</h3>
 <ul>
   <% @project.project_files.each do |file| %>
@@ -13,7 +21,7 @@
 
 <%= link_to 'Edit', edit_project_path(@project), class: "btn btn-secondary" %>
 <%= link_to 'Back to Projects', projects_path, class: "btn btn-primary" %>
-<%= link_to 'Create File', new_file_project_path(@project), class: "btn btn-success" %> <!-- Corretto il pulsante "Crea File" -->
+<%= link_to 'Create File', new_file_project_path(@project), class: "btn btn-success" %>
 
 <h2>Snippets</h2>
 <ul>

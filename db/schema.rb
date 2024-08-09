@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_09_173938) do
+ActiveRecord::Schema.define(version: 2024_08_09_194229) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -73,6 +73,15 @@ ActiveRecord::Schema.define(version: 2024_08_09_173938) do
     t.index ["user_id"], name: "index_commit_logs_on_user_id"
   end
 
+  create_table "favorites", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_favorites_on_project_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
   create_table "feedbacks", force: :cascade do |t|
     t.text "content"
     t.integer "user_id", null: false
@@ -101,6 +110,7 @@ ActiveRecord::Schema.define(version: 2024_08_09_173938) do
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "public"
     t.string "visibility", default: "private"
+    t.boolean "favorite"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
@@ -168,6 +178,8 @@ ActiveRecord::Schema.define(version: 2024_08_09_173938) do
   add_foreign_key "collaborators", "users"
   add_foreign_key "commit_logs", "projects"
   add_foreign_key "commit_logs", "users"
+  add_foreign_key "favorites", "projects"
+  add_foreign_key "favorites", "users"
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"

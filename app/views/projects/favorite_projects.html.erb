@@ -1,0 +1,13 @@
+<h1>My Favorite Projects</h1>
+
+<ul>
+  <% @favorite_projects.each do |project| %>
+    <li>
+      <%= link_to project.title, project_path(project) %>
+      <p><strong>Author:</strong> <%= project.user.email %></p>
+      <%= link_to 'Remove from Favorites', toggle_favorite_project_path(project), method: :post, class: "btn btn-danger" %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Back to My Projects', projects_path, class: 'btn btn-secondary' %>

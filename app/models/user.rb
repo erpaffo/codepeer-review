@@ -13,6 +13,10 @@ class User < ApplicationRecord
   has_many :feedbacks, dependent: :destroy
   has_many :received_feedbacks, class_name: 'Feedback', foreign_key: 'user_profile_id'
   attribute :profile_image_url, :string
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_projects, through: :favorites, source: :project
+
+  
   attr_accessor :remove_profile_image
 
   after_create :create_user_directory
