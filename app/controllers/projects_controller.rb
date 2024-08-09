@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -10,7 +10,9 @@ class ProjectsController < ApplicationController
     if @project.visibility == 'private' && @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to view this project.'
     end
+    record_view
   end
+
 
   def new
     @project = current_user.projects.build
@@ -229,12 +231,22 @@ class ProjectsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_back(fallback_location: projects_path, notice: message) }
-      format.js   # Questo permette l'esecuzione di toggle_favorite.js.erb
+      format.js
     end
   end
 
   def favorite_projects
     @favorite_projects = current_user.favorite_projects.includes(:user)
+  end
+
+  def stats
+    @unique_views = @project.unique_view_count
+    @favorite_count = @project.favorite_count
+  end
+
+  def track_view
+    return if ProjectView.exists?(project: @project, user: current_user)
+    @project.project_views.create(user: current_user)
   end
 
   private
@@ -385,5 +397,10 @@ class ProjectsController < ApplicationController
 
     diff_lines = new_lines - original_lines
     diff_lines.join("\n")
+  end
+
+  def record_view
+    return if ProjectView.exists?(project: @project, user: current_user)
+    @project.project_views.create(user: current_user)
   end
 end

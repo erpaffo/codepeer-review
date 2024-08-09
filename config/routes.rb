@@ -66,6 +66,7 @@ Rails.application.routes.draw do
         post 'invite_collaborator', to: 'projects#invite_collaborator', as: 'invite_collaborator'
         get 'commit_logs', to: 'projects#commit_logs', as: 'commit_logs'
         post 'toggle_favorite', to: 'projects#toggle_favorite'
+        get 'stats'
       end
     end
 

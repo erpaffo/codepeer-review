@@ -7,6 +7,7 @@ class Project < ApplicationRecord
   has_many :commit_logs, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_by_users, through: :favorites, source: :user
+  has_many :project_views, dependent: :destroy
 
   accepts_nested_attributes_for :project_files
 
@@ -15,6 +16,18 @@ class Project < ApplicationRecord
   validates :visibility, inclusion: { in: %w[private public] }
 
   validate :at_least_one_file
+
+  def unique_view_count
+    view_count = project_views.select(:user_id).distinct.count
+    view_count += 1 unless project_views.exists?(user: user)
+    view_count
+  end
+
+  def favorite_count
+    favorite_count = favorites.count
+    favorite_count += 1 unless favorites.exists?(user: user)
+    favorite_count
+  end
 
   private
 

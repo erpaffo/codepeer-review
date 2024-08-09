@@ -1,0 +1,6 @@
+<h1>Project Statistics: <%= @project.title %></h1>
+
+<p><strong>Unique Views:</strong> <%= @unique_views %></p>
+<p><strong>Favorites:</strong> <%= @favorite_count %></p>
+
+<%= link_to 'Back to Project', project_path(@project), class: "btn btn-secondary" %>

@@ -1,13 +1,16 @@
+<!-- app/views/projects/public_view.html.erb -->
 <h1><%= @project.title %></h1>
 <p><strong>Author:</strong> <%= @project.user.email %></p>
 
 <div id="favorite-button">
-  <% if current_user.favorites.exists?(project: @project) %>
-    <%= button_to 'Remove from Favorites', toggle_favorite_project_path(@project), method: :post, remote: true, class: "btn btn-danger" %>
-  <% else %>
-    <%= button_to 'Add to Favorites', toggle_favorite_project_path(@project), method: :post, remote: true, class: "btn btn-primary" %>
-  <% end %>
+  <%= render partial: 'projects/favorite_button', locals: { project: @project } %>
 </div>
+
+<h3>Statistics</h3>
+<ul>
+  <li><strong>Unique Views:</strong> <%= @project.unique_view_count %></li>
+  <li><strong>Favorites:</strong> <%= @project.favorite_count %></li>
+</ul>
 
 <p><strong>Description:</strong> <%= @project.description %></p>
 

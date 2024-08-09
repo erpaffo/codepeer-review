@@ -1,5 +1,4 @@
-class CommitLog < ApplicationRecord
+class ProjectView < ApplicationRecord
   belongs_to :project
   belongs_to :user
-
 end

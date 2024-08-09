@@ -1,1 +1,1 @@
-document.getElementById('favorite-button').innerHTML = "<%= j(render 'favorite_button', project: @project) %>";
+document.getElementById('favorite-button').innerHTML = "<%= j(render partial: 'projects/favorite_button', locals: { project: @project }) %>";
