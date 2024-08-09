@@ -114,7 +114,6 @@ ActiveRecord::Schema.define(version: 2024_08_09_091514) do
     t.boolean "favorite"
     t.string "language"
     t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
-    t.index ["user_id"], name: "index_snippets_on_user_id"
   end
 
   create_table "user_sessions", force: :cascade do |t|
@@ -163,4 +162,5 @@ ActiveRecord::Schema.define(version: 2024_08_09_091514) do
   add_foreign_key "project_files", "projects"
   add_foreign_key "projects", "users"
   add_foreign_key "snippets", "project_files"
+  add_foreign_key "snippets", "users"
 end
