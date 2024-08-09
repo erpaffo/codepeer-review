@@ -3,11 +3,11 @@ class ProjectsController < ApplicationController
   before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file]
 
   def index
-    @projects = current_user.projects
+    @projects = current_user.projects + current_user.collaborated_projects
   end
 
   def show
-    if @project.visibility == 'private' && @project.user != current_user
+    if @project.visibility == 'private' && @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to view this project.'
     end
   end
@@ -19,22 +19,34 @@ class ProjectsController < ApplicationController
 
   def create
     @project = current_user.projects.build(project_params)
+
     if @project.save
-      create_project_directory(@project)  # Creare la cartella del progetto su AWS S3
-      redirect_to @project, notice: 'Project was successfully created.'
+      begin
+        ActiveRecord::Base.transaction do
+          send_collaborator_invitations if params[:collaborator_emails].present?
+        end
+        redirect_to @project, notice: 'Project was successfully created.'
+      rescue => e
+        Rails.logger.error "Failed to create project: #{e.message}"
+        @project.destroy  # Elimina il progetto se c'è un errore
+        @project.errors.add(:base, e.message)
+        render :new
+      end
     else
       render :new
     end
   end
 
+
+
   def edit
-    if @project.user != current_user
+    if @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to edit this project.'
     end
   end
 
   def update
-    if @project.user != current_user
+    if @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to update this project.'
     else
       if @project.update(project_params)
@@ -46,12 +58,11 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    confirmation = "#{current_user.nickname}/#{@project.title}"
-    if params[:confirmation] == confirmation
+    if @project.user != current_user
+      redirect_to projects_path, alert: 'You are not authorized to delete this project.'
+    else
       @project.destroy
       redirect_to projects_url, notice: 'Project was successfully destroyed.'
-    else
-      redirect_to edit_project_path(@project), alert: 'Confirmation does not match. Project was not destroyed.'
     end
   end
 
@@ -183,14 +194,41 @@ class ProjectsController < ApplicationController
     send_data obj.get.body.read, filename: file.file_identifier, type: obj.content_type, disposition: 'attachment'
   end
 
+  def invite_collaborator
+    email = params[:email]
+    collaborator_user = User.find_by(email: email)
+
+    if collaborator_user
+      @invitation = @project.collaborator_invitations.build(email: email, user: collaborator_user)
+
+      if @invitation.save
+        begin
+          CollaboratorMailer.invite_email(@invitation).deliver_now
+          redirect_to @project, notice: "Invitation sent to #{email}."
+        rescue StandardError => e
+          @project.errors.add(:base, "Failed to send the invitation. Error: #{e.message}")
+          render :edit
+        end
+      else
+        render :edit
+      end
+    else
+      @project.errors.add(:base, "The email #{email} does not belong to any registered user.")
+      render :edit
+    end
+  end
+
   private
 
   def set_project
-    @project = current_user.projects.find(params[:id])
+    @project = Project.find(params[:id])
+    unless @project.user == current_user || @project.collaborating_users.include?(current_user)
+      redirect_to projects_path, alert: 'You are not authorized to access this project.'
+    end
   end
 
   def project_params
-    params.require(:project).permit(:title, :description, :visibility, project_files_attributes: [:id, :file, :_destroy])
+    params.require(:project).permit(:title, :description, :visibility, project_files_attributes: [:id, :file, :_destroy], collaborator_ids: [])
   end
 
   def file_params
@@ -204,6 +242,19 @@ class ProjectsController < ApplicationController
     project_folder_name = project.title.parameterize
     # Creare una cartella vuota (un oggetto con un '/' finale)
     bucket.object("uploads/#{user_folder_name}/#{project_folder_name}/").put(body: "")
+  end
+
+  def send_collaborator_invitations
+    emails = params[:collaborator_emails].split(',')
+    emails.each do |email|
+      collaborator_user = User.find_by(email: email.strip)
+      if collaborator_user
+        @project.collaborator_invitations.create(email: email.strip, user: collaborator_user)
+      else
+        @project.errors.add(:base, "The email #{email.strip} does not belong to any registered user.")
+        raise ActiveRecord::Rollback
+      end
+    end
   end
 
   def execute_code_in_docker(code, language)

@@ -62,6 +62,7 @@ Rails.application.routes.draw do
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
         get 'new_file', to: 'projects#new_file', as: 'new_file'
         post 'create_file', to: 'projects#create_file', as: 'create_file'
+        post 'invite_collaborator', to: 'projects#invite_collaborator', as: 'invite_collaborator'
       end
     end
 
@@ -99,6 +100,7 @@ Rails.application.routes.draw do
     get 'project_public/:id', to: 'projects#public_view', as: :project_public
     get 'download_project/:id', to: 'projects#download_project', as: :download_project
     get 'download_file/:id', to: 'projects#download_file', as: :download_file
+    get 'accept_invitation/:token', to: 'collaborator_invitations#accept', as: :accept_invitation
   end
 
   unauthenticated do

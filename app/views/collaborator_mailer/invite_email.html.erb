@@ -1,0 +1,7 @@
+<h1>You've been invited to collaborate on <%= @project.title %></h1>
+
+<p><%= @inviter.email %> has invited you to collaborate on the project "<%= @project.title %>."</p>
+
+<p>To accept the invitation, click the link below:</p>
+
+<%= link_to 'Accept Invitation', accept_invitation_url(@invitation.token) %>

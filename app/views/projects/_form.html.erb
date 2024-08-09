@@ -2,7 +2,6 @@
   <% if @project.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@project.errors.count, "error") %> prohibited this project from being saved:</h2>
-
       <ul>
         <% @project.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -17,13 +16,18 @@
   </div>
 
   <div class="field">
-    <%= f.label :description %>
+    <%= f.label :description, 'Description' %>
     <%= f.text_area :description %>
   </div>
 
   <div class="field">
     <%= f.label :visibility, 'Visibility' %>
-    <%= f.select :visibility, options_for_select([['Private', 'private'], ['Public', 'public']], @project.visibility) %>
+    <%= f.select :visibility, [['Public', 'public'], ['Private', 'private']] %>
+  </div>
+
+  <div class="field">
+    <%= label_tag :collaborator_emails, 'Collaborators (emails separated by commas)' %>
+    <%= text_field_tag :collaborator_emails, params[:collaborator_emails], placeholder: 'Enter collaborator emails' %>
   </div>
 
   <h3>Files</h3>

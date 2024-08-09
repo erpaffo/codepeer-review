@@ -5,7 +5,10 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
   validate :password_complexity
+  validates :email, presence: true, uniqueness: true
   has_many :projects, dependent: :destroy
+  has_many :collaborators, dependent: :destroy
+  has_many :collaborated_projects, through: :collaborators, source: :project
   has_many :snippets, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
   has_many :received_feedbacks, class_name: 'Feedback', foreign_key: 'user_profile_id'

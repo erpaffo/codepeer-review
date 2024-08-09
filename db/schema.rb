@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_08_151226) do
+ActiveRecord::Schema.define(version: 2024_08_09_091514) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -38,6 +38,29 @@ ActiveRecord::Schema.define(version: 2024_08_08_151226) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "collaborator_invitations", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "user_id"
+    t.string "email", null: false
+    t.string "token", null: false
+    t.boolean "accepted", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_collaborator_invitations_on_project_id"
+    t.index ["token"], name: "index_collaborator_invitations_on_token", unique: true
+    t.index ["user_id"], name: "index_collaborator_invitations_on_user_id"
+  end
+
+  create_table "collaborators", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_collaborators_on_project_id"
+    t.index ["user_id", "project_id"], name: "index_collaborators_on_user_id_and_project_id", unique: true
+    t.index ["user_id"], name: "index_collaborators_on_user_id"
   end
 
   create_table "feedbacks", force: :cascade do |t|
@@ -130,6 +153,10 @@ ActiveRecord::Schema.define(version: 2024_08_08_151226) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "collaborator_invitations", "projects"
+  add_foreign_key "collaborator_invitations", "users"
+  add_foreign_key "collaborators", "projects"
+  add_foreign_key "collaborators", "users"
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
