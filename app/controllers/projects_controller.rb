@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -246,6 +246,20 @@ class ProjectsController < ApplicationController
   def track_view
     return if ProjectView.exists?(project: @project, user: current_user)
     @project.project_views.create(user: current_user)
+  end
+
+  def update_permissions
+    collaborator = Collaborator.find(params[:collaborator_id])
+
+    if current_user == @project.user
+      if collaborator.update(permissions: params[:permissions])
+        redirect_to @project, notice: 'Collaborator permissions updated successfully.'
+      else
+        redirect_to @project, alert: 'Failed to update collaborator permissions.'
+      end
+    else
+      redirect_to @project, alert: 'You are not authorized to update permissions.'
+    end
   end
 
   private

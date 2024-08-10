@@ -67,6 +67,7 @@ Rails.application.routes.draw do
         get 'commit_logs', to: 'projects#commit_logs', as: 'commit_logs'
         post 'toggle_favorite', to: 'projects#toggle_favorite'
         get 'stats'
+        patch 'update_permissions'
       end
     end
 

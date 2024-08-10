@@ -25,7 +25,6 @@ class Project < ApplicationRecord
 
   def favorite_count
     favorite_count = favorites.count
-    favorite_count += 1 unless favorites.exists?(user: user)
     favorite_count
   end
 

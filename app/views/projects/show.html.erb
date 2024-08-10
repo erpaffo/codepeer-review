@@ -17,6 +17,11 @@
   <% @project.project_files.each do |file| %>
     <li>
       <%= link_to file.file_identifier, show_file_project_path(@project, file_id: file.id) %>
+      <% if @project.collaborators.find_by(user: current_user)&.permissions == 'full' %>
+        <%= link_to 'Edit File', edit_file_project_path(@project, file_id: file.id), class: "btn btn-secondary" %>
+      <% elsif @project.collaborators.find_by(user: current_user)&.permissions == 'partial' %>
+        <%= link_to 'Edit File', edit_file_project_path(@project, file_id: file.id), class: "btn btn-secondary" %>
+      <% end %>
     </li>
   <% end %>
 </ul>
@@ -27,9 +32,25 @@
   <p><strong>Owner:</strong> Unknown</p>
 <% end %>
 
-<%= link_to 'Edit', edit_project_path(@project), class: "btn btn-secondary" %>
+<%= link_to 'Edit', edit_project_path(@project), class: "btn btn-secondary" if current_user == @project.user %>
 <%= link_to 'Back to Projects', projects_path, class: "btn btn-primary" %>
-<%= link_to 'Create File', new_file_project_path(@project), class: "btn btn-secondary" %>
+<%= link_to 'Create File', new_file_project_path(@project), class: "btn btn-secondary" if current_user == @project.user || @project.collaborators.find_by(user: current_user)&.permissions == 'full' %>
+
+<% if @project.collaborators.exists? && current_user == @project.user %>
+  <h3>Collaborators</h3>
+  <ul>
+    <% @project.collaborators.each do |collaborator| %>
+      <li>
+        <%= collaborator.user.email %> - <%= collaborator.permissions.capitalize %>
+        <%= form_with url: update_permissions_project_path(@project), method: :patch, local: true do |f| %>
+          <%= f.hidden_field :collaborator_id, value: collaborator.id %>
+          <%= f.select :permissions, options_for_select(['full', 'partial'], collaborator.permissions) %>
+          <%= f.submit 'Update', class: "btn btn-secondary btn-sm" %>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
 
 <h2>Snippets</h2>
 <ul>
@@ -41,4 +62,5 @@
     <% end %>
   <% end %>
 </ul>
+
 <%= link_to 'View Commit Logs', commit_logs_project_path(@project), class: 'btn btn-primary' %>
