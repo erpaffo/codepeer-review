@@ -30,6 +30,11 @@
     <%= text_field_tag :collaborator_emails, params[:collaborator_emails], placeholder: 'Enter collaborator emails' %>
   </div>
 
+  <div class="field">
+    <%= f.label :collaborator_permissions, 'Permissions' %>
+    <%= select_tag :collaborator_permissions, options_for_select([['Full', 'full'], ['Partial', 'partial']]) %>
+  </div>
+
   <h3>Files</h3>
   <%= f.fields_for :project_files do |ff| %>
     <%= render 'project_file_fields', f: ff %>

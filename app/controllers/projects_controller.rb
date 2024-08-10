@@ -13,7 +13,6 @@ class ProjectsController < ApplicationController
     record_view
   end
 
-
   def new
     @project = current_user.projects.build
     @project.project_files.build
@@ -259,7 +258,7 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    params.require(:project).permit(:title, :description, :visibility, project_files_attributes: [:id, :file, :_destroy], collaborator_ids: [])
+    params.require(:project).permit(:title, :description, :visibility, project_files_attributes: [:id, :file, :_destroy])
   end
 
   def file_params
@@ -276,10 +275,21 @@ class ProjectsController < ApplicationController
 
   def send_collaborator_invitations
     emails = params[:collaborator_emails].split(',')
+    permissions = params[:collaborator_permissions] # Prende i permessi dal form
+
     emails.each do |email|
       collaborator_user = User.find_by(email: email.strip)
+
       if collaborator_user
-        @project.collaborator_invitations.create(email: email.strip, user: collaborator_user)
+        collaborator = @project.collaborators.create!(user: collaborator_user, permissions: permissions)
+        invitation = CollaboratorInvitation.create!(project: @project, user: collaborator_user, email: email.strip)
+
+        if invitation.persisted?
+          CollaboratorMailer.invite_email(invitation).deliver_now
+        else
+          Rails.logger.error "Failed to create invitation for #{email.strip}"
+          raise ActiveRecord::Rollback
+        end
       else
         @project.errors.add(:base, "The email #{email.strip} does not belong to any registered user.")
         raise ActiveRecord::Rollback
