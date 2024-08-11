@@ -1,0 +1,12 @@
+<h1>Upload Project: <%= @project.title %></h1>
+
+<p><%= @project.description %></p>
+
+<h3>Select a Platform to Upload</h3>
+<div class="upload-buttons">
+  <%= link_to 'Upload to Google Drive', upload_to_google_drive_project_path(@project), method: :post, class: "btn btn-secondary" %>
+  <%= link_to 'Upload to GitHub', upload_to_github_project_path(@project), method: :post, class: "btn btn-secondary" %>
+  <%= link_to 'Upload to GitLab', upload_to_gitlab_project_path(@project), method: :post, class: "btn btn-secondary" %>
+</div>
+
+<%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>

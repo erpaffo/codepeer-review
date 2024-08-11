@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -262,10 +262,118 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def upload_to_google_drive
+    require 'zip'
+    callback_url = "http://127.0.0.1:3000/oauth2callback?project_id=#{@project.id}"
+
+    client_id = Google::Auth::ClientId.new(ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'])
+    token_store = Google::Auth::Stores::FileTokenStore.new(file: 'tokens.yaml')
+    authorizer = Google::Auth::UserAuthorizer.new(client_id, Google::Apis::DriveV3::AUTH_DRIVE, token_store)
+
+    user_id = current_user.email
+    credentials = authorizer.get_credentials(user_id)
+
+    if credentials.nil?
+      url = authorizer.get_authorization_url(base_url: callback_url)
+      redirect_to url and return
+    else
+      begin
+        session = GoogleDrive::Session.from_credentials(credentials)
+
+        # Verifica se la cartella "CodePeer Projects" esiste, altrimenti creala
+        folder = session.collection_by_title("CodePeer Projects")
+        if folder.nil?
+          folder = session.root_collection.create_subcollection("CodePeer Projects")
+        end
+
+        zipfile_name = "#{Rails.root}/tmp/#{@project.title}.zip"
+
+        Zip::File.open(zipfile_name, Zip::File::CREATE) do |zipfile|
+          @project.project_files.each do |file|
+            file_path = "#{Rails.root}/public/uploads/#{file.file}"
+            zipfile.add(file.file_identifier, file_path) if File.exist?(file_path)
+          end
+        end
+
+        folder.upload_from_file(zipfile_name, "#{@project.title}.zip", convert: false)
+
+        redirect_to @project, notice: 'Project successfully uploaded to Google Drive.'
+      rescue StandardError => e
+        Rails.logger.error "Failed to upload to Google Drive: #{e.message}"
+        redirect_to @project, alert: "Error during the upload process: #{e.message}"
+      end
+    end
+  end
+
+  def google_drive_auth
+    project_id = params[:project_id] || session[:project_id]
+
+    if project_id.blank?
+      redirect_to projects_path, alert: "Project ID is missing."
+      return
+    end
+
+    @project = Project.find(project_id)
+
+    client_id = Google::Auth::ClientId.new(ENV['GOOGLE_CLIENT_ID'], ENV['GOOGLE_CLIENT_SECRET'])
+    token_store = Google::Auth::Stores::FileTokenStore.new(file: 'tokens.yaml')
+    authorizer = Google::Auth::UserAuthorizer.new(client_id, "https://www.googleapis.com/auth/drive", token_store)
+
+    user_id = current_user.email
+
+    credentials = authorizer.get_and_store_credentials_from_code(
+      user_id: user_id,
+      code: params[:code],
+      base_url: "http://127.0.0.1:3000/oauth2callback"
+    )
+
+    # Invece di memorizzare l'intero oggetto credentials nella sessione, puoi memorizzare solo i dati necessari
+    session[:google_credentials] = {
+      access_token: credentials.access_token,
+      refresh_token: credentials.refresh_token,
+      expires_at: credentials.expires_at
+    }
+
+    redirect_to upload_to_google_drive_project_path(@project)
+  end
+
+
+  def upload_to_github
+    @project = Project.find(params[:id])
+
+    client = Octokit::Client.new(access_token: ENV['GITHUB_ACCESS_TOKEN'])
+    repo = client.create_repository(@project.title.parameterize)
+
+    @project.project_files.each do |file|
+      file_path = "#{Rails.root}/public/uploads/#{file.file}"
+      content = File.read(file_path)
+      client.create_contents(repo.full_name, file.file_identifier, "Add #{file.file_identifier}", content)
+    end
+
+    redirect_to @project, notice: "Project uploaded to GitHub: #{repo.full_name}"
+  end
+
+  def upload_to_gitlab
+    @project = Project.find(params[:id])
+
+    client = Gitlab.client(endpoint: 'https://gitlab.com/api/v4', private_token: ENV['GITLAB_ACCESS_TOKEN'])
+    gitlab_project = client.create_project(@project.title.parameterize)
+
+    @project.project_files.each do |file|
+      file_path = "#{Rails.root}/public/uploads/#{file.file}"
+      if File.exist?(file_path)
+        client.create_file(gitlab_project.id, file.file_identifier, 'master', File.read(file_path), commit_message: "Upload #{file.file_identifier}")
+      end
+    end
+
+    redirect_to @project, notice: 'Project successfully uploaded to GitLab.'
+  end
+
   private
 
   def set_project
     @project = Project.find(params[:id])
+    session[:project_id] = @project.id
     unless @project.visibility == 'public' || @project.user == current_user || @project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to access this project.'
     end

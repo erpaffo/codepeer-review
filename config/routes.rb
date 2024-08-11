@@ -68,6 +68,12 @@ Rails.application.routes.draw do
         post 'toggle_favorite', to: 'projects#toggle_favorite'
         get 'stats'
         patch 'update_permissions'
+        get 'upload'
+        get 'google_drive_auth'
+        post 'google_drive_auth'
+        post 'upload_to_google_drive'
+        post 'upload_to_github'
+        post 'upload_to_gitlab'
       end
     end
 
@@ -106,6 +112,7 @@ Rails.application.routes.draw do
     get 'download_project/:id', to: 'projects#download_project', as: :download_project
     get 'download_file/:id', to: 'projects#download_file', as: :download_file
     get 'accept_invitation/:token', to: 'collaborator_invitations#accept', as: :accept_invitation
+    get '/oauth2callback', to: 'projects#google_drive_auth'
   end
 
   unauthenticated do
