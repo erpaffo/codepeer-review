@@ -1,0 +1,47 @@
+<!-- app/views/users/profile_from_community.html.erb -->
+<div id="profile-content">
+  <h1><%= @user.nickname %>'s Profile</h1>
+
+  <p>
+    <strong>Nickname:</strong>
+    <%= @user.nickname %>
+  </p>
+
+  <% if @user.profile_image.attached? %>
+    <p>
+      <strong>Profile Image:</strong><br />
+      <%= image_tag @user.profile_image.variant(resize: '200x200') %>
+    </p>
+  <% elsif @user.profile_image_url.present? %>
+    <p>
+      <strong>Profile Image:</strong><br />
+      <%= image_tag @user.profile_image_url, size: '200x200' %>
+    </p>
+  <% end %>
+
+  <p>
+    <strong>Number of Snippets:</strong>
+    <%= @user.snippets.count %>
+  </p>
+
+  <p>
+    <strong>Number of Projects:</strong>
+    <%= @user.projects.count %>
+  </p>
+
+  <p>
+    <strong>Number of Followers:</strong>
+    <%= @user.followers.count %>
+  </p>
+
+  <p>
+    <strong>Number of Following:</strong>
+    <%= @user.following.count %>
+  </p>
+
+  <% if user_signed_in? %>
+    <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-primary', data: { turbo: false } %>
+  <% end %>
+
+  <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+</div>

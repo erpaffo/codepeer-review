@@ -9,6 +9,10 @@ class User < ApplicationRecord
   has_many :snippets, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
   has_many :received_feedbacks, class_name: 'Feedback', foreign_key: 'user_profile_id'
+  has_many :follower_relationships, class_name: "Follow", foreign_key: "followed_id", dependent: :destroy
+  has_many :followers, through: :follower_relationships, source: :follower
+  has_many :following_relationships, class_name: "Follow", foreign_key: "follower_id", dependent: :destroy
+  has_many :following, through: :following_relationships, source: :followed
   attribute :profile_image_url, :string
   attr_accessor :remove_profile_image
 
@@ -92,6 +96,19 @@ class User < ApplicationRecord
     else
       ActionController::Base.helpers.asset_url('white_image.png')
     end
+  end
+
+  def follow(other_user)
+    following_relationships.find_or_create_by(followed_id: other_user.id) unless self == other_user
+  end
+
+  def unfollow(other_user)
+    relationship = following_relationships.find_by(followed_id: other_user.id)
+    relationship&.destroy
+  end
+
+  def following?(user)
+    following.include?(user)
   end
 
   private

@@ -1,0 +1,20 @@
+<h1>Followers</h1>
+
+<p>
+  <strong>Number of Followers:</strong>
+  <%= @followers_count %>
+</p>
+
+<% if @followers_users.present? %>
+  <ul>
+    <% @followers_users.each do |follower_user| %>
+      <li>
+        <%= link_to "#{follower_user.nickname}", user_profile_from_community_path(follower_user) %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No followers yet.</p>
+<% end %>
+
+<%= link_to 'Back to Profile', profile_path, class: 'btn btn-secondary' %>

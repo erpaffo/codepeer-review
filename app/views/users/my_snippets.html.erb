@@ -2,6 +2,12 @@
 
 <h1>My Snippets</h1>
 
+<!-- Link per creare un nuovo Snippet -->
+<%= link_to 'Create New Snippet', new_snippet_path, class: 'btn btn-primary mb-3' %>
+
+<!-- Link per visualizzare le bozze -->
+<%= link_to 'View Drafts', drafts_snippets_path, class: 'btn btn-secondary mb-3' %>
+
 <!-- Dropdown menu for sorting -->
 <div class="dropdown mb-3">
   <button class="btn btn-secondary dropdown-toggle" type="button" id="sortMenu" data-bs-toggle="dropdown" aria-expanded="false">
@@ -31,10 +37,12 @@
 
 <ul>
   <% @snippets.each do |snippet| %>
-    <li>
-      <%= link_to snippet.title, snippet_path(snippet) %>
-      <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
-    </li>
+    <% if !snippet.draft %> <!-- Aggiungi questa condizione per escludere le bozze -->
+      <li>
+        <%= link_to snippet.title, snippet_path(snippet) %>
+        <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
+      </li>
+    <% end %>
   <% end %>
 </ul>
 

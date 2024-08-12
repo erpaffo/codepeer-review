@@ -1,14 +1,16 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow]
 
   def complete_profile
     @user = current_user
   end
 
   def update_profile
-    @user = current_user
+    @user = current_user # Usa l'utente attualmente autenticato
+
     if @user.update(user_params)
-      handle_profile_image_update
+      handle_profile_image_update # Se hai una logica specifica per gestire l'immagine del profilo
       redirect_to authenticated_root_path, notice: 'Profile updated successfully'
     else
       render :complete_profile
@@ -16,14 +18,45 @@ class UsersController < ApplicationController
   end
 
   def show
-    if params[:id].present?
-      @user = User.find(params[:id])
-      redirect_to authenticated_root_path, alert: 'User not found.' if @user.nil?
-    else
-      @user = current_user
-    end
+    @user = current_user
     @snippets = @user.snippets.includes(:feedbacks)
     @feedbacks = @user.received_feedbacks
+    @followers_count = @user.followers.where.not(nickname: [nil, '']).count
+    @following_count = @user.following.where.not(nickname: [nil, '']).count
+  end
+
+  def show_following
+    @user = current_user
+    @following_count = @user.following.where.not(nickname: [nil, '']).count
+    @following = @user.following
+  end
+
+  def show_followers
+    @user = current_user
+    @followers_users = @user.followers
+    @followers_count = @followers_users.count
+  end
+
+  def profile_from_community
+    @user = User.find(params[:id])
+    @is_following = current_user.following?(@user)
+    @snippets = @is_following ? @user.snippets : []
+    @projects = @is_following ? @user.projects : []
+
+    respond_to do |format|
+      format.html  # Renderizza `profile_with_details.html.erb` per richieste HTML
+    end
+  end
+
+  def profile_with_details
+    @user = User.find(params[:id])
+    @is_following = current_user.following?(@user)
+    @snippets = @is_following ? @user.snippets : []
+    @projects = @is_following ? @user.projects : []
+
+    respond_to do |format|
+      format.html  # Renderizza `profile_with_details.html.erb` per richieste HTML
+    end
   end
 
   def profile
@@ -32,12 +65,10 @@ class UsersController < ApplicationController
   end
 
   def leave_feedback
-    @user = User.find(params[:id])
     @feedback = Feedback.new
   end
 
   def create_feedback
-    @user = User.find(params[:id])
     @feedback = @user.received_feedbacks.new(feedback_params)
     @feedback.user = current_user
 
@@ -49,11 +80,33 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = current_user
   end
 
+  def drafts
+    @snippets = current_user.snippets.where(draft: true)
+  end
+
+
   def update
-    @user = current_user
+    if params[:save_as_draft]
+      @snippet.draft = true
+    else
+      @snippet.draft = false
+    end
+
+    if @snippet.update(snippet_params)
+      if params[:save_as_draft]
+        redirect_to my_snippets_drafts_path, notice: 'Snippet was successfully updated as a draft.'
+      else
+        redirect_to snippet_path(@snippet), notice: 'Snippet was successfully updated.'
+      end
+    else
+      render :edit
+    end
+  end
+
+
+  def update
     if @user.update(user_params)
       handle_profile_image_update
       @user.generate_otp_secret if @user.otp_enabled_changed? && @user.otp_enabled
@@ -80,16 +133,8 @@ class UsersController < ApplicationController
     @snippets = current_user.snippets
   end
 
-  def show
-    @snippets = current_user.snippets
-    @favorite_snippets = current_user.snippets.where(favorite: true)
-  end
-
   def my_snippets
-    # Recupera tutti i linguaggi disponibili per i filtri
     @languages = Snippet.languages
-
-    # Recupera gli snippet dell'utente, applica i filtri e l'ordinamento come necessario
     @snippets = current_user.snippets
 
     if params[:order_by] == 'most_recent'
@@ -101,24 +146,48 @@ class UsersController < ApplicationController
     end
 
     if params[:language] == 'other'
-      # Filtra gli snippets che non hanno un linguaggio incluso nei linguaggi conosciuti
       @snippets = @snippets.where.not(language: Snippet.languages)
     elsif params[:language].present?
-      # Filtra gli snippet per linguaggio specifico
       @snippets = @snippets.where(language: params[:language])
     end
+  end
 
-    # Rendi la vista con i dati impostati
+  def follow
+    if current_user.following?(@user)
+      flash[:notice] = "You are already following this user."
+    else
+      current_user.follow(@user)
+      respond_to do |format|
+        format.js { render 'follows/create' }
+      end
+    end
+  end
+
+  def unfollow
+    if current_user.following?(@user)
+      current_user.unfollow(@user)
+      respond_to do |format|
+        format.js { render 'follows/destroy' }
+      end
+    else
+      flash[:notice] = "You are not following this user."
+      respond_to do |format|
+        format.js { render 'follows/destroy' }
+      end
+    end
   end
 
   private
 
-  def user_params
-    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image_url, :remove_profile_image, :profile_image).dup
+  def set_user
+    @user = params[:id] ? User.find(params[:id]) : current_user
+  rescue ActiveRecord::RecordNotFound
+    redirect_to authenticated_root_path, alert: 'User not found.'
   end
 
-  def remove_profile_image
-    @user.profile_image.purge if @user.profile_image.attached?
+
+  def user_params
+    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image_url, :remove_profile_image, :profile_image).dup
   end
 
   def feedback_params
@@ -127,16 +196,14 @@ class UsersController < ApplicationController
 
   def handle_profile_image_update
     if params[:user][:remove_profile_image] == '1'
-      # Rimuovi l'immagine attualmente collegata e sostituiscila con white_image.png
       @user.profile_image.purge if @user.profile_image.attached?
       @user.profile_image.attach(io: File.open(Rails.root.join('app', 'assets', 'images', 'white_image.png')),
                                  filename: 'white_image.png',
                                  content_type: 'image/png')
-      @user.update(profile_image_url: nil)  # Rimuove l'URL esterno se è stato sostituito con un file caricato
+      @user.update(profile_image_url: nil)
     elsif params[:user][:profile_image].present?
-      # Aggiorna l'immagine del profilo con quella fornita nel parametro
       @user.profile_image.attach(params[:user][:profile_image])
-      @user.update(profile_image_url: nil)  # Rimuove l'URL esterno se è stato sostituito con un file caricato
+      @user.update(profile_image_url: nil)
     end
   end
 end

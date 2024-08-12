@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_08_151226) do
+ActiveRecord::Schema.define(version: 2024_08_12_142024) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -52,6 +52,13 @@ ActiveRecord::Schema.define(version: 2024_08_08_151226) do
     t.index ["user_profile_id"], name: "index_feedbacks_on_user_profile_id"
   end
 
+  create_table "follows", force: :cascade do |t|
+    t.integer "follower_id"
+    t.integer "followed_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "project_files", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "file"
@@ -85,11 +92,12 @@ ActiveRecord::Schema.define(version: 2024_08_08_151226) do
     t.text "content"
     t.text "comment"
     t.integer "user_id", null: false
-    t.integer "project_file_id", null: false
+    t.integer "project_file_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "favorite"
     t.string "language"
+    t.boolean "draft", default: false
     t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
     t.index ["user_id"], name: "index_snippets_on_user_id"
   end
