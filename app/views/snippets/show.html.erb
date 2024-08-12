@@ -12,7 +12,10 @@
 
 <% if @snippet.user == current_user %>
   <%= link_to 'Edit', edit_snippet_path(@snippet), class: 'btn btn-primary' %>
+  <% if @snippet.draft %>
+    <%= link_to 'Make Public', make_public_snippet_path(@snippet), method: :post, class: 'btn btn-success' %>
+  <% end %>
 <% end %>
 
-<%= link_to 'Condividi via email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
+<%= link_to 'Share via Email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
 <%= link_to 'Back to My Snippets', my_snippets_path, class: 'btn btn-secondary' %>

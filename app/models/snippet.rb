@@ -1,7 +1,9 @@
 # app/models/snippet.rb
 class Snippet < ApplicationRecord
+
   belongs_to :user
-  
+  belongs_to :project_file, optional: true
+
   has_many :feedbacks, dependent: :destroy
 
   # Definisci i linguaggi supportati come costante
@@ -21,7 +23,15 @@ class Snippet < ApplicationRecord
   validates :comment, presence: true
   validates :user_id, presence: true
 
+  attribute :draft, :boolean, default: false
+
   before_save :set_language_from_title
+
+  # Scope to fetch only drafts
+  scope :drafts, -> { where(draft: true) }
+
+  # Scope to fetch only published snippets
+  scope :published, -> { where(draft: false) }
 
   # Metodo di classe per ottenere tutti i linguaggi disponibili
   def self.languages

@@ -1,0 +1,20 @@
+<h1>Following</h1>
+
+<p>
+  <strong>Number of Following:</strong>
+  <%= @following_count %>
+</p>
+
+<% if @following.present? %>
+  <ul>
+    <% @following.each do |following| %>
+      <li>following
+        <%= link_to "#{following.nickname}", user_profile_with_details_path(following) %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>Not following anyone yet.</p>
+<% end %>
+
+<%= link_to 'Back to Profile', profile_path, class: 'btn btn-secondary' %>

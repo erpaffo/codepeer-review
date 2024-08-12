@@ -3,11 +3,16 @@
 <%= link_to 'Back to Dashboard', authenticated_root_path, class: 'back-link' %>
 
 <% @snippets.each do |snippet| %>
-  <div class="snippet">
-    <h2><%= snippet.title %></h2>
-    <p><%= snippet.content %></p>
-    <p>By: <%= snippet.user.first_name %> <%= snippet.user.last_name %></p>
-    <%= link_to 'View Snippet', community_activity_path(snippet), class: "btn btn-info" %>
-    <%= link_to 'Send Feedback', feedback_community_activity_path(snippet), class: "btn btn-primary" %>
-  </div>
+  <% if snippet.user != current_user %>
+    <div class="snippet">
+      <h2><%= snippet.title %></h2>
+      <p><%= snippet.content %></p>
+      <p>
+        By: 
+        <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_from_community_path(snippet.user) %>
+      </p>
+      <%= link_to 'View Snippet', community_activity_path(snippet), class: "btn btn-info" %>
+      <%= link_to 'Send Feedback', feedback_community_activity_path(snippet), class: "btn btn-primary" %>
+    </div>
+  <% end %>
 <% end %>

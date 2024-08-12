@@ -1,0 +1,14 @@
+<!-- app/views/snippets/show_from_profile.html.erb -->
+<h1><%= @snippet.title %></h1>
+
+<p>
+  <strong>Content:</strong>
+  <%= @snippet.content %> <!-- Sostituisci `content` con l'attributo corretto -->
+</p>
+
+<p>
+  <strong>Comment:</strong>
+  <%= @snippet.comment %> <!-- Sostituisci con l'attributo corretto se necessario -->
+</p>
+
+<%= link_to 'Back to Profile', user_profile_with_details_path(@user), class: 'btn btn-secondary' %>

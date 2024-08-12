@@ -3,7 +3,7 @@ class CommunityActivityController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @snippets = Snippet.all.includes(:user)
+    @snippets = Snippet.where.not(user_id: current_user.id)
   end
 
   def feedback

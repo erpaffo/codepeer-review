@@ -1,0 +1,11 @@
+<h1>My Drafts</h1>
+
+<ul>
+  <% @drafts.each do |snippet| %>
+    <li>
+      <%= link_to snippet.title, snippet_path(snippet) %>
+    </li>
+  <% end %>
+</ul>
+
+<%= link_to 'Back to My Snippets', my_snippets_path, class: 'btn btn-secondary' %>

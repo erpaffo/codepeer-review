@@ -36,6 +36,7 @@
 
   <div class="actions">
     <%= form.submit 'Create Snippet', class: 'btn btn-primary' %>
+    <%= form.submit 'Save as Draft', name: 'save_as_draft', class: 'btn btn-secondary' %>
     <%= link_to 'Cancel', authenticated_root_path, class: 'btn btn-secondary' %>
   </div>
 <% end %>

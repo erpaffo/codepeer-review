@@ -13,7 +13,8 @@ Rails.application.routes.draw do
     root 'dashboard#index', as: :authenticated_root
 
     get 'complete_profile', to: 'users#complete_profile', as: :complete_profile
-    patch 'update_profile', to: 'users#update_profile', as: :update_profile
+    patch 'users/:id/update_profile', to: 'users#update_profile', as: :update_profile
+
 
     get 'profile', to: 'users#show', as: :profile
     get 'profile/edit', to: 'users#edit', as: :edit_profile
@@ -25,6 +26,12 @@ Rails.application.routes.draw do
         post 'create_feedback'
       end
     end
+
+    resources :follows, only: [:create, :destroy]
+
+
+    get 'users/:id/followers', to: 'users#show_followers', as: 'user_followers'
+    get 'users/:id/following', to: 'users#show_following', as: 'user_following'
 
     # Password Change Routes
     get 'password/edit', to: 'passwords#edit', as: :edit_password
@@ -87,27 +94,39 @@ Rails.application.routes.draw do
         get 'feedback'
         post 'create_feedback'
         delete 'feedback/:feedback_id', to: 'community_activity#destroy_feedback', as: 'destroy_feedback'
+        post 'make_public' 
+      end
+
+      collection do
+        get 'drafts'
       end
     end
 
     resources :users, only: [:show] do
       member do
+        get 'snippets', to: 'users#user_snippets', as: :user_snippets
+        get 'projects', to: 'users#user_projects', as: :user_projects
         get 'leave_feedback'
         post 'create_feedback'
       end
     end
 
-    resources :snippets, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+    # Follow/Unfollow Routes
+    post 'users/:id/follow', to: 'follows#create', as: :follow_user
+    delete 'users/:id/unfollow', to: 'follows#destroy', as: :unfollow_user
 
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
     get 'favorite_snippets', to: 'users#favorite_snippets', as: :favorite_snippets
+    # config/routes.rb
+    get 'snippets/:id/from_profile', to: 'snippets#show_from_profile', as: :snippet_from_profile
 
     # Search Route
     get 'search', to: 'search#index'
     post 'search', to: 'search#results'
 
-    get 'user_profile/:id', to: 'users#profile', as: :user_profile
+    get 'users/:id/profile_with_details', to: 'users#profile_with_details', as: :user_profile_with_details
+    get 'user_profile/:id', to: 'users#profile_from_community', as: :user_profile_from_community
     get 'project_public/:id', to: 'projects#public_view', as: :project_public
     get 'download_project/:id', to: 'projects#download_project', as: :download_project
     get 'download_file/:id', to: 'projects#download_file', as: :download_file

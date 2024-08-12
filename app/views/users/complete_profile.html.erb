@@ -1,7 +1,7 @@
 <!-- app/views/users/complete_profile.html.erb -->
 <h1>Complete Your Profile</h1>
 
-<%= form_for @user, url: update_profile_path, html: { multipart: true, class: 'profile-form' } do |f| %>
+<%= form_for @user, url: update_profile_path(@user),method: :patch, html: { multipart: true, class: 'profile-form' } do |f| %>
   <div class="field">
     <%= f.label :first_name %><br />
     <%= f.text_field :first_name, autofocus: true, autocomplete: "first_name" %>

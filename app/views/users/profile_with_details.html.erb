@@ -1,0 +1,93 @@
+<!-- app/views/users/_profile_with_details.html.erb -->
+<div id="profile-content">
+  <h1><%= @user.nickname %>'s Profile</h1>
+
+  <p>
+    <strong>First name:</strong>
+    <%= @user.first_name %>
+  </p>
+
+  <p>
+    <strong>Last name:</strong>
+    <%= @user.last_name %>
+  </p>
+
+  <p>
+    <strong>Nickname:</strong>
+    <%= @user.nickname %>
+  </p>
+
+  <p>
+    <strong>Email:</strong>
+    <%= @user.email %>
+  </p>
+
+  <p>
+    <strong>Phone number:</strong>
+    <%= @user.phone_number %>
+  </p>
+
+  <% if @user.profile_image.attached? %>
+    <p>
+      <strong>Profile Image:</strong><br />
+      <%= image_tag @user.profile_image.variant(resize: '200x200') %>
+    </p>
+  <% elsif @user.profile_image_url.present? %>
+    <p>
+      <strong>Profile Image:</strong><br />
+      <%= image_tag @user.profile_image_url, size: '200x200' %>
+    </p>
+  <% end %>
+
+  <p>
+    <strong>Number of Snippets:</strong>
+    <%= @user.snippets.count %>
+  </p>
+
+  <p>
+    <strong>Number of Projects:</strong>
+    <%= @user.projects.count %>
+  </p>
+
+  <p>
+    <strong>Number of Followers:</strong>
+    <%= @user.followers.count %>
+  </p>
+
+  <p>
+    <strong>Number of Following:</strong>
+    <%= @user.following.count %>
+  </p>
+
+  <% if user_signed_in? %>
+    <%= button_to 'Unfollow', unfollow_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
+  <% end %>
+
+  <h2>Snippets</h2>
+  <% if @user.snippets.any? %>
+    <ul>
+      <% @user.snippets.each do |snippet| %>
+        <li>
+          <%= link_to snippet.title, snippet_from_profile_path(snippet) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No snippets available.</p>
+  <% end %>
+
+  <h2>Projects</h2>
+  <% if @user.projects.any? %>
+    <ul>
+      <% @user.projects.each do |project| %>
+        <li>
+          <%= link_to project.title, project_path(project) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p>No projects available.</p>
+  <% end %>
+
+  <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+</div>
