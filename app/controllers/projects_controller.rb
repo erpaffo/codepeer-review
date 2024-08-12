@@ -83,15 +83,22 @@ class ProjectsController < ApplicationController
     download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
     @file_content = read_file_content(local_path)
 
+    # Debug the file content
+    Rails.logger.debug "File content being passed to the view: #{@file_content.inspect}"
+
     respond_to do |format|
-      format.html
-      format.json { render json: { file_content: @file_content } }
+        format.html
+        format.json { render json: { file_content: @file_content } }
     end
   end
+
 
   def update_file
     @file = @project.project_files.find(params[:file_id])
     new_file_content = params[:project_file][:file]
+
+    # Se il contenuto viene ricevuto come stringa JSON, decodifica i caratteri \n
+    new_file_content.gsub!(/\\n/, "\n")
 
     new_file_content_utf8 = new_file_content.encode('UTF-8')
 
@@ -109,6 +116,7 @@ class ProjectsController < ApplicationController
 
     redirect_to project_path(@project), notice: 'File was successfully updated.'
   end
+
 
   def run_code
     code = params[:code]
@@ -519,9 +527,9 @@ class ProjectsController < ApplicationController
   end
 
   def read_file_content(file_path)
-    content = File.read(file_path, encoding: 'UTF-8')
-    content
+    File.read(file_path, encoding: 'UTF-8')
   end
+
 
   def calculate_diff(original_content, new_content)
     original_lines = original_content.split("\n")
