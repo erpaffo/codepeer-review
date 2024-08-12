@@ -64,17 +64,4 @@
   </div>
 </div>
 
-<script>
-  // JavaScript to handle sidebar toggle
-  const sidebarToggle = document.querySelectorAll('.sidebar-toggle');
-  const sidebar = document.querySelector('.sidebar');
-  const content = document.querySelector('.flex-1');
 
-  sidebarToggle.forEach(toggle => {
-    toggle.addEventListener('click', () => {
-      sidebar.classList.toggle('-translate-x-full');
-      content.classList.toggle('ml-16');
-      content.classList.toggle('ml-64');
-    });
-  });
-</script>
