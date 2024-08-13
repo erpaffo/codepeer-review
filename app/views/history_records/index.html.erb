@@ -1,0 +1,22 @@
+<h1>Change History</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Old Value</th>
+      <th>New Value</th>
+      <th>Changed At</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @history_records.each do |record| %>
+      <tr>
+        <td><%= record.field %></td>
+        <td><%= record.old_value %></td>
+        <td><%= record.new_value %></td>
+        <td><%= record.created_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

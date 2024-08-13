@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_12_142024) do
+ActiveRecord::Schema.define(version: 2024_08_13_121516) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -57,6 +57,16 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
     t.integer "followed_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "history_records", force: :cascade do |t|
+    t.integer "snippet_id", null: false
+    t.string "field"
+    t.string "old_value"
+    t.string "new_value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["snippet_id"], name: "index_history_records_on_snippet_id"
   end
 
   create_table "project_files", force: :cascade do |t|
@@ -141,6 +151,7 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
+  add_foreign_key "history_records", "snippets"
   add_foreign_key "project_files", "projects"
   add_foreign_key "projects", "users"
   add_foreign_key "snippets", "project_files"

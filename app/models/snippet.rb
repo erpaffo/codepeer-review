@@ -5,6 +5,7 @@ class Snippet < ApplicationRecord
   belongs_to :project_file, optional: true
 
   has_many :feedbacks, dependent: :destroy
+  has_many :history_records, dependent: :destroy
 
   # Definisci i linguaggi supportati come costante
   SUPPORTED_LANGUAGES = {
