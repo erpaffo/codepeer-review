@@ -27,7 +27,7 @@ class SnippetsController < ApplicationController
 
     if @snippet.save
       if @snippet.draft
-        redirect_to my_snippets__path, notice: notice_message
+        redirect_to my_snippets_path, notice: notice_message
       else
         redirect_to my_snippets_path, notice: notice_message
       end

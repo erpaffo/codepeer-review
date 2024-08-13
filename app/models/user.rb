@@ -5,7 +5,10 @@ class User < ApplicationRecord
          :omniauthable, omniauth_providers: %i[google_oauth2 github gitlab]
 
   validate :password_complexity
+  validates :email, presence: true, uniqueness: true
   has_many :projects, dependent: :destroy
+  has_many :collaborators, dependent: :destroy
+  has_many :collaborated_projects, through: :collaborators, source: :project
   has_many :snippets, dependent: :destroy
   has_many :feedbacks, dependent: :destroy
   has_many :received_feedbacks, class_name: 'Feedback', foreign_key: 'user_profile_id'
@@ -14,6 +17,10 @@ class User < ApplicationRecord
   has_many :following_relationships, class_name: "Follow", foreign_key: "follower_id", dependent: :destroy
   has_many :following, through: :following_relationships, source: :followed
   attribute :profile_image_url, :string
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_projects, through: :favorites, source: :project
+
+  
   attr_accessor :remove_profile_image
 
   after_create :create_user_directory

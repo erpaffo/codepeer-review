@@ -18,8 +18,9 @@
         <td><%= truncate(project.description, length: 50) %></td>
         <td><%= link_to 'Show', project, class: "btn btn-secondary" %></td>
         <td><%= link_to 'Edit', edit_project_path(project), class: "btn btn-warning" %></td>
-        <td><%= link_to 'Destroy', project, method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger" %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<%= link_to 'My Favorite Projects', favorite_projects_projects_path, class: 'btn btn-primary' %>

@@ -96,3 +96,10 @@ gem 'carrierwave', '~> 2.0'
 
 # Use fog-aws to connect to AWS
 gem 'fog-aws'
+
+gem 'diffy'
+
+gem 'gitlab'
+gem 'google_drive', '~> 3.0'
+
+gem 'rubyzip', '~> 2.3'

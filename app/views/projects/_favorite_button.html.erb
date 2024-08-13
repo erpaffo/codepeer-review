@@ -1,0 +1,5 @@
+<% if current_user.favorites.exists?(project: project) %>
+  <%= button_to 'Remove from Favorites', toggle_favorite_project_path(project), method: :post, remote: true, class: "btn btn-danger" %>
+<% else %>
+  <%= button_to 'Add to Favorites', toggle_favorite_project_path(project), method: :post, remote: true, class: "btn btn-primary" %>
+<% end %>

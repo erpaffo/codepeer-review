@@ -18,9 +18,12 @@
       background-color: #f7f7f7;
       white-space: pre-wrap;
     }
+    .editor-controls {
+      margin-bottom: 10px;
+    }
   </style>
 </head>
-<body class="font-Inter bg-gray-50 text-gray-800">
+<body class="font-Inter bg-gray-50 text-gray-800" data-turbolinks="false">
 
 <div class="flex">
   <div class="flex flex-col">
@@ -55,6 +58,51 @@
       </div>
     </div>
 
+    <!-- Hidden field to pass file identifier for language detection -->
+    <input type="hidden" id="file-identifier" value="<%= @file.file_identifier %>">
+
+    <div class="editor-controls">
+      <label for="language-select">Language:</label>
+      <select id="language-select">
+        <option value="python">Python</option>
+        <option value="javascript">JavaScript</option>
+        <option value="html">HTML</option>
+        <option value="css">CSS</option>
+        <option value="ruby">Ruby</option>
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="java">Java</option>
+        <option value="typescript">TypeScript</option>
+        <option value="go">Go</option>
+        <option value="php">PHP</option>
+        <option value="swift">Swift</option>
+        <option value="kotlin">Kotlin</option>
+        <option value="shell">Shell</option>
+      </select>
+
+      <label for="theme-select">Theme:</label>
+      <select id="theme-select">
+        <option value="vs-dark" selected>Dark</option>
+        <option value="vs-light">Light</option>
+        <option value="hc-black">High Contrast</option>
+      </select>
+
+      <label for="font-size">Font Size:</label>
+      <input type="number" id="font-size" value="14" min="8" max="36">
+
+      <label for="minimap-select">Show Minimap:</label>
+      <input type="checkbox" id="minimap-select" checked>
+
+      <label for="multi-cursor">Multi-cursor:</label>
+      <input type="checkbox" id="multi-cursor" checked>
+
+      <label for="highlight-line">Highlight Active Line:</label>
+      <input type="checkbox" id="highlight-line" checked>
+
+      <label for="auto-close-brackets">Auto Close Brackets:</label>
+      <input type="checkbox" id="auto-close-brackets" checked>
+    </div>
+
     <div>
       <button id="save-file" class="btn btn-primary">Save File</button>
       <button id="run-code" class="btn btn-secondary">Run Code</button>
@@ -64,7 +112,8 @@
       <%= f.hidden_field :file, id: 'file-content' %>
     <% end %>
 
-    <div id="code-editor" data-content="<%= json_escape(@file_content) %>" style="height:500px; border:1px solid grey;"></div>
+    <div id="code-editor" data-content="<%= @file_content %>" style="height:500px; border:1px solid grey;"></div>
+
 
     <div id="output"></div>
 
@@ -74,44 +123,7 @@
 
 <!-- Load Monaco Editor from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
-<script>
-  (function() {
-    let monacoEditor;
+<%= javascript_pack_tag 'monaco_editor' %>
 
-    function initializeMonacoEditor() {
-      console.log('Initializing Monaco Editor');
-      const editorElement = document.getElementById('code-editor');
-      if (editorElement && !monacoEditor) {
-        const content = editorElement.dataset.content.replace(/\\n/g, '\n');
-        monacoEditor = monaco.editor.create(editorElement, {
-          value: content,
-          language: 'python',
-          theme: 'vs-dark'
-        });
-        console.log('Monaco Editor initialized');
-      } else if (!editorElement) {
-        console.error('code-editor element not found');
-      } else {
-        console.log('Monaco Editor already initialized');
-      }
-    }
-
-    function disposeMonacoEditor() {
-      console.log('Disposing Monaco Editor');
-      if (monacoEditor) {
-        monacoEditor.dispose();
-        monacoEditor = null;
-        console.log('Monaco Editor disposed');
-      }
-    }
-
-    function loadMonacoEditor() {
-      if (typeof window.require !== 'undefined') {
-        if (!window.require.monacoConfigured) {
-          window.require.config({ paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }});
-          window.require.monacoConfigured = true;
-        }
-        window.require(['vs/editor/editor.main'], function() {
-          if (document.getElementById('code-editor')) {
-            initializeMonacoEditor();
-     
+</body>
+</html>

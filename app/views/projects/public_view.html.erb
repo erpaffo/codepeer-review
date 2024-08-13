@@ -1,13 +1,24 @@
+<!-- app/views/projects/public_view.html.erb -->
 <h1><%= @project.title %></h1>
-<p><%= @project.description %></p>
+<p><strong>Author:</strong> <%= @project.user.email %></p>
 
-<h2>Files</h2>
+<div id="favorite-button">
+  <%= render partial: 'projects/favorite_button', locals: { project: @project } %>
+</div>
+
+<h3>Statistics</h3>
 <ul>
-  <% @files.each do |file| %>
-    <li>
-      <%= link_to file.file_identifier, download_file_path(file) %> <!-- Implementa download_file_path per il download -->
-    </li>
+  <li><strong>Unique Views:</strong> <%= @project.unique_view_count %></li>
+  <li><strong>Favorites:</strong> <%= @project.favorite_count %></li>
+</ul>
+
+<p><strong>Description:</strong> <%= @project.description %></p>
+
+<h3>Files:</h3>
+<ul>
+  <% @project.project_files.each do |file| %>
+    <li><%= link_to file.file_identifier, download_file_path(@project, file) %></li>
   <% end %>
 </ul>
 
-<%= link_to 'Download Project', download_project_path(@project), class: 'btn btn-primary' %> <!-- Implementa download_project_path per il download del progetto -->
+<%= link_to 'Back', projects_path, class: 'btn btn-secondary' %>

@@ -40,6 +40,50 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "collaborator_invitations", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "user_id"
+    t.string "email", null: false
+    t.string "token", null: false
+    t.boolean "accepted", default: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_collaborator_invitations_on_project_id"
+    t.index ["token"], name: "index_collaborator_invitations_on_token", unique: true
+    t.index ["user_id"], name: "index_collaborator_invitations_on_user_id"
+  end
+
+  create_table "collaborators", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "permissions", default: "partial"
+    t.index ["project_id"], name: "index_collaborators_on_project_id"
+    t.index ["user_id", "project_id"], name: "index_collaborators_on_user_id_and_project_id", unique: true
+    t.index ["user_id"], name: "index_collaborators_on_user_id"
+  end
+
+  create_table "commit_logs", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.text "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "user_id"
+    t.string "message"
+    t.index ["project_id"], name: "index_commit_logs_on_project_id"
+    t.index ["user_id"], name: "index_commit_logs_on_user_id"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_favorites_on_project_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
   create_table "feedbacks", force: :cascade do |t|
     t.text "content"
     t.integer "user_id", null: false
@@ -53,10 +97,13 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
   end
 
   create_table "follows", force: :cascade do |t|
-    t.integer "follower_id"
-    t.integer "followed_id"
+    t.integer "follower_id", null: false
+    t.integer "followed_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["followed_id"], name: "index_follows_on_followed_id"
+    t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id", unique: true
+    t.index ["follower_id"], name: "index_follows_on_follower_id"
   end
 
   create_table "history_records", force: :cascade do |t|
@@ -77,6 +124,15 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
     t.index ["project_id"], name: "index_project_files_on_project_id"
   end
 
+  create_table "project_views", force: :cascade do |t|
+    t.integer "project_id", null: false
+    t.integer "user_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["project_id"], name: "index_project_views_on_project_id"
+    t.index ["user_id"], name: "index_project_views_on_user_id"
+  end
+
   create_table "projects", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -85,6 +141,7 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "public"
     t.string "visibility", default: "private"
+    t.boolean "favorite"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
@@ -109,7 +166,6 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
     t.string "language"
     t.boolean "draft", default: false
     t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
-    t.index ["user_id"], name: "index_snippets_on_user_id"
   end
 
   create_table "user_sessions", force: :cascade do |t|
@@ -148,11 +204,22 @@ ActiveRecord::Schema.define(version: 2024_08_13_121516) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "collaborator_invitations", "projects"
+  add_foreign_key "collaborator_invitations", "users"
+  add_foreign_key "collaborators", "projects"
+  add_foreign_key "collaborators", "users"
+  add_foreign_key "commit_logs", "projects"
+  add_foreign_key "commit_logs", "users"
+  add_foreign_key "favorites", "projects"
+  add_foreign_key "favorites", "users"
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
   add_foreign_key "history_records", "snippets"
   add_foreign_key "project_files", "projects"
+  add_foreign_key "project_views", "projects"
+  add_foreign_key "project_views", "users"
   add_foreign_key "projects", "users"
   add_foreign_key "snippets", "project_files"
+  add_foreign_key "snippets", "users"
 end

@@ -25,7 +25,7 @@
             <%= link_to "Dashboard", authenticated_root_path, class: "text-gray-600 hover:underline" %>
             <%= link_to "Profile", profile_path, class: "text-gray-600 hover:underline" %>
             <%= link_to "My Snippets", my_snippets_path, class: "text-gray-600 hover:underline" %>
-            <%= link_to "My Projects", my_projects_projects_path, class: "text-gray-600 hover:underline" %>
+            <%= link_to "My Projects", projects_path, class: "text-gray-600 hover:underline" %>
             <%= link_to "Logout", logout_path, method: :delete, class: "text-red-600 hover:underline" %>
           <% else %>
             <%= link_to "Sign In", new_user_session_path, class: "text-gray-600 hover:underline" %>
