@@ -30,14 +30,11 @@ When('I delete the project with title {string}') do |title|
   project = Project.find_by(title: title)
   visit edit_project_path(project)
 
-  # Verifica che il testo 'Delete Project' sia presente
   expect(page).to have_content('Delete Project')
 
-  # Compila il campo di conferma con il valore placeholder
   confirmation_value = "#{project.user.nickname}/#{project.title}"
   fill_in 'confirmation', with: confirmation_value
 
-  # Gestisci la finestra di dialogo di conferma
   page.accept_confirm do
     click_button 'Delete Project'
   end
@@ -47,4 +44,3 @@ Then('I should not see the project with title {string} in the list of my project
   visit projects_path
   expect(page).not_to have_content(title)
 end
-

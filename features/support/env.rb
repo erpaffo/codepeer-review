@@ -1,11 +1,12 @@
 require 'cucumber/rails'
 
 Capybara.register_driver :selenium do |app|
-  Capybara::Selenium::Driver.new(app, browser: :firefox)
+  Capybara::Selenium::Driver.new(app, browser: :chrome)
 end
 
 Capybara.default_driver = :selenium
 Capybara.javascript_driver = :selenium
+
 
 World(Warden::Test::Helpers)
 
