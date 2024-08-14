@@ -19,7 +19,7 @@ class Project < ApplicationRecord
 
   def unique_view_count
     view_count = project_views.select(:user_id).distinct.count
-    view_count += 1 unless project_views.exists?(user: user)
+    view_count += 1 if project_views.exists?(user: user)
     view_count
   end
 

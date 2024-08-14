@@ -42,13 +42,8 @@ function initializeMonacoEditor() {
 
     let content = editorElement.dataset.content;
 
-    // Debugging logs to verify the content
     console.log('Original content:', content);
-
-    // Here we do not replace \n or other control characters to preserve the format
-    // content = content.replace(/\\n/g, '\n');  // Do not do this replacement
-
-    console.log('Processed content:', content); // Debugging log after processing
+    console.log('Processed content:', content);
 
     try {
         monacoEditor = monaco.editor.create(editorElement, {
@@ -92,6 +87,17 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('multi-cursor').addEventListener('change', initializeMonacoEditor);
     document.getElementById('highlight-line').addEventListener('change', initializeMonacoEditor);
     document.getElementById('auto-close-brackets').addEventListener('change', initializeMonacoEditor);
+
+    // Save the content of the editor to the hidden input field when the "Save File" button is clicked
+    document.getElementById('save-file').addEventListener('click', () => {
+        if (monacoEditor) {
+            const content = monacoEditor.getValue();
+            console.log('Content to be saved:', content);  // Debug log
+
+            document.getElementById('file-content').value = content;
+            document.getElementById('edit-file-form').submit();
+        }
+    });
 });
 
 window.addEventListener('beforeunload', () => {

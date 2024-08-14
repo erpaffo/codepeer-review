@@ -114,14 +114,12 @@
 
     <div id="code-editor" data-content="<%= @file_content %>" style="height:500px; border:1px solid grey;"></div>
 
-
     <div id="output"></div>
 
     <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
   </div>
 </div>
 
-<!-- Load Monaco Editor from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
 <%= javascript_pack_tag 'monaco_editor' %>
 
