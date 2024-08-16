@@ -1,0 +1,29 @@
+<!-- app/views/history_records/index.html.erb -->
+<h1>Change History</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Field</th>
+      <th>Old Value</th>
+      <th>New Value</th>
+      <th>Changed At</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @history_records.each do |record| %>
+      <tr>
+        <td><%= record.field %></td>
+        <td><%= record.old_value %></td>
+        <td><%= record.new_value %></td>
+        <td><%= record.created_at %></td>
+        <td>
+          <%= link_to 'View Previous Snippet', previous_snippet_history_record_path(@snippet, record), class: 'btn btn-info' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to 'Back to Snippet', snippet_path(@snippet), class: 'btn btn-secondary' %>

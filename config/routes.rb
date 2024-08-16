@@ -87,6 +87,12 @@ Rails.application.routes.draw do
     post 'run_code', to: 'projects#run_code'
 
     resources :snippets do
+      resources :history_records, only: [:index] do
+        member do
+          get 'previous', to: 'history_records#show_previous', as: :previous
+        end
+      end
+
       member do
         get 'share', to: 'shares#new', as: :new_share
         post 'share', to: 'shares#create'
@@ -94,7 +100,7 @@ Rails.application.routes.draw do
         get 'feedback'
         post 'create_feedback'
         delete 'feedback/:feedback_id', to: 'community_activity#destroy_feedback', as: 'destroy_feedback'
-        post 'make_public' 
+        post 'make_public'
       end
 
       collection do
