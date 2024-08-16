@@ -7,6 +7,8 @@ class Snippet < ApplicationRecord
   has_many :feedbacks, dependent: :destroy
   has_many :history_records, dependent: :destroy
 
+  after_update :record_history
+
   # Definisci i linguaggi supportati come costante
   SUPPORTED_LANGUAGES = {
     '.rb' => 'Ruby',
@@ -53,4 +55,17 @@ class Snippet < ApplicationRecord
     extension = File.extname(title).downcase
     SUPPORTED_LANGUAGES[extension] || 'Other'
   end
+
+  def record_history
+    changes.each do |field, (old_value, new_value)|
+      next if old_value == new_value # Salta i campi che non sono cambiati
+
+      history_records.create!(
+        field: field,
+        old_value: old_value,
+        new_value: new_value
+      )
+    end
+  end
+
 end

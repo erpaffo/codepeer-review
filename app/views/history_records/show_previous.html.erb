@@ -1,0 +1,8 @@
+<!-- app/views/history_records/show_previous.html.erb -->
+<h1><%= @previous_snippet.title %></h1>
+
+<p><%= @previous_snippet.content %></p>
+
+<p><%= @previous_snippet.comment %></p>
+
+<%= link_to 'Back', snippet_path(@snippet), class: 'btn btn-secondary' %>

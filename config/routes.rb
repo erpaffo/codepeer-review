@@ -87,7 +87,11 @@ Rails.application.routes.draw do
     post 'run_code', to: 'projects#run_code'
 
     resources :snippets do
-      resources :history_records, only: [:index]
+      resources :history_records, only: [:index] do
+        member do
+          get 'previous', to: 'history_records#show_previous', as: :previous
+        end
+      end
 
       member do
         get 'share', to: 'shares#new', as: :new_share
