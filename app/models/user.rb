@@ -20,7 +20,7 @@ class User < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :favorite_projects, through: :favorites, source: :project
 
-  
+
   attr_accessor :remove_profile_image
 
   after_create :create_user_directory
@@ -116,6 +116,11 @@ class User < ApplicationRecord
 
   def following?(user)
     following.include?(user)
+  end
+
+  def followed_by_current_user?(user)
+    # Supponiamo che tu abbia un'associazione `following` tra gli utenti
+    self.following.include?(user)
   end
 
   private

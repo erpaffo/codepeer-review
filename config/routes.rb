@@ -30,8 +30,8 @@ Rails.application.routes.draw do
     resources :follows, only: [:create, :destroy]
 
 
-    get 'users/:id/followers', to: 'users#show_followers', as: 'user_followers'
-    get 'users/:id/following', to: 'users#show_following', as: 'user_following'
+    get '/users/:id/followers', to: 'users#show_followers', as: :user_followers
+    get 'users/:id/following', to: 'users#show_following', as: :user_following
 
     # Password Change Routes
     get 'password/edit', to: 'passwords#edit', as: :edit_password
