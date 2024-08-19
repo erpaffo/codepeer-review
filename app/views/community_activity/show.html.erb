@@ -2,8 +2,14 @@
 
 <p><%= @snippet.content %></p>
 
+<p><%= @snippet.comment %></p>
+
 <p>By: <%= @snippet.user.first_name %> <%= @snippet.user.last_name %></p>
 
+<!-- Pulsante per modificare lo snippet -->
+<%= link_to 'Edit Snippet', edit_snippet_path(@snippet), class: "btn btn-warning" %>
+
+<!-- Altri link esistenti -->
 <%= link_to 'Send Feedback', feedback_community_activity_path(@snippet), class: "btn btn-primary" %>
 <%= link_to 'Condividi via email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
 <%= link_to 'Back to Community Snippets', community_activity_index_path, class: "btn btn-secondary" %>

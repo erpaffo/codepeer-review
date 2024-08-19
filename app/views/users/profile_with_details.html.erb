@@ -68,7 +68,7 @@
     <ul>
       <% @user.snippets.each do |snippet| %>
         <li>
-          <%= link_to snippet.title, snippet_from_profile_path(snippet) %>
+          <%= link_to snippet.title, community_activity_path(snippet), class: "btn btn-info"%>
         </li>
       <% end %>
     </ul>

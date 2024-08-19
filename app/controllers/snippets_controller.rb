@@ -113,7 +113,8 @@ class SnippetsController < ApplicationController
         snippet: snippet,
         field: field,
         old_value: old_value,
-        new_value: new_value
+        new_value: new_value,
+        modified_by: current_user.nickname.present? ? current_user.nickname : current_user.email
       )
     end
   end

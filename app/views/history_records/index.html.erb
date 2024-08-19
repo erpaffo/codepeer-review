@@ -8,6 +8,7 @@
       <th>Old Value</th>
       <th>New Value</th>
       <th>Changed At</th>
+      <th>Modified By</th>
       <th>Action</th>
     </tr>
   </thead>
@@ -18,6 +19,7 @@
         <td><%= record.old_value %></td>
         <td><%= record.new_value %></td>
         <td><%= record.created_at %></td>
+        <td><%= record.modified_by %></td>
         <td>
           <%= link_to 'View Previous Snippet', previous_snippet_history_record_path(@snippet, record), class: 'btn btn-info' %>
         </td>
