@@ -6,6 +6,22 @@
 
 <hr>
 
+<h2>Collaborators</h2>
+<ul>
+  <% @project.collaborators.each do |collaborator| %>
+    <% if collaborator.user %>
+      <li>
+        <%= collaborator.user.email %>
+        <%= link_to 'Delete', remove_collaborator_project_path(@project, collaborator_id: collaborator.user_id), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
+      </li>
+    <% else %>
+      <li>
+        Collaborator not found
+      </li>
+    <% end %>
+  <% end %>
+</ul>
+
 <h2>Delete Project</h2>
 <p>To confirm, type "<%= @project.user.nickname %>/<%= @project.title %>" in the box below:</p>
 <%= form_with(model: @project, url: project_path(@project), method: :delete, local: true) do |f| %>

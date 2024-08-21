@@ -71,6 +71,7 @@ Rails.application.routes.draw do
         get 'new_file', to: 'projects#new_file', as: 'new_file'
         post 'create_file', to: 'projects#create_file', as: 'create_file'
         post 'invite_collaborator', to: 'projects#invite_collaborator', as: 'invite_collaborator'
+        delete 'remove_collaborator', to: 'projects#remove_collaborator'
         get 'commit_logs', to: 'projects#commit_logs', as: 'commit_logs'
         post 'toggle_favorite', to: 'projects#toggle_favorite'
         get 'stats'
@@ -94,7 +95,7 @@ Rails.application.routes.draw do
         get 'feedback'
         post 'create_feedback'
         delete 'feedback/:feedback_id', to: 'community_activity#destroy_feedback', as: 'destroy_feedback'
-        post 'make_public' 
+        post 'make_public'
       end
 
       collection do

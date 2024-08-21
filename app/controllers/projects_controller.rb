@@ -377,6 +377,21 @@ class ProjectsController < ApplicationController
     redirect_to @project, notice: 'Project successfully uploaded to GitLab.'
   end
 
+  def remove_collaborator
+    @project = Project.find(params[:id])
+    collaborator = @project.collaborators.find_by(user_id: params[:collaborator_id])
+
+    if collaborator
+      collaborator.destroy
+      flash[:notice] = "Collaborator removed successfully."
+    else
+      flash[:alert] = "Collaborator not found."
+    end
+
+    redirect_to edit_project_path(@project)
+  end
+
+
   private
 
   def set_project
