@@ -42,6 +42,11 @@
   <% if user_signed_in? %>
     <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-primary', data: { turbo: false } %>
   <% end %>
+  <% if @user %>
+  <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-primary' %>
+<% else %>
+  <p>User not found or not specified.</p>
+<% end %>
 
   <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
 </div>

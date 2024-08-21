@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_12_142024) do
+ActiveRecord::Schema.define(version: 2024_08_19_164724) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -38,6 +38,16 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "badges", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.string "icon"
+    t.json "criteria", default: "{}"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "icon_url"
   end
 
   create_table "collaborator_invitations", force: :cascade do |t|
@@ -87,10 +97,10 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
   create_table "feedbacks", force: :cascade do |t|
     t.text "content"
     t.integer "user_id", null: false
-    t.integer "snippet_id", null: false
+    t.integer "snippet_id"
+    t.integer "user_profile_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "user_profile_id"
     t.index ["snippet_id"], name: "index_feedbacks_on_snippet_id"
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
     t.index ["user_profile_id"], name: "index_feedbacks_on_user_profile_id"
@@ -104,6 +114,17 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
     t.index ["followed_id"], name: "index_follows_on_followed_id"
     t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
+  end
+
+  create_table "history_records", force: :cascade do |t|
+    t.integer "snippet_id", null: false
+    t.string "field"
+    t.string "old_value"
+    t.string "new_value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "modified_by"
+    t.index ["snippet_id"], name: "index_history_records_on_snippet_id"
   end
 
   create_table "project_files", force: :cascade do |t|
@@ -158,6 +179,15 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
     t.index ["project_file_id"], name: "index_snippets_on_project_file_id"
   end
 
+  create_table "user_badges", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "badge_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["badge_id"], name: "index_user_badges_on_badge_id"
+    t.index ["user_id"], name: "index_user_badges_on_user_id"
+  end
+
   create_table "user_sessions", force: :cascade do |t|
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -187,6 +217,7 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
     t.boolean "otp_required_for_login"
     t.string "profile_image"
     t.string "profile_image_url"
+    t.string "name"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -205,10 +236,13 @@ ActiveRecord::Schema.define(version: 2024_08_12_142024) do
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
+  add_foreign_key "history_records", "snippets"
   add_foreign_key "project_files", "projects"
   add_foreign_key "project_views", "projects"
   add_foreign_key "project_views", "users"
   add_foreign_key "projects", "users"
   add_foreign_key "snippets", "project_files"
   add_foreign_key "snippets", "users"
+  add_foreign_key "user_badges", "badges"
+  add_foreign_key "user_badges", "users"
 end

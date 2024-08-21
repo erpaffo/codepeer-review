@@ -2,6 +2,8 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow]
 
+  include UsersHelper
+
   def complete_profile
     @user = current_user
   end
@@ -20,9 +22,14 @@ class UsersController < ApplicationController
   def show
     @user = current_user
     @snippets = @user.snippets.includes(:feedbacks)
+    @received_feedbacks = @user.received_feedbacks
     @feedbacks = @user.received_feedbacks
-    @followers_count = @user.followers.where.not(nickname: [nil, '']).count
-    @following_count = @user.following.where.not(nickname: [nil, '']).count
+
+    # Contare i follower escludendo se stesso
+    @followers_count = @user.followers.where.not(id: @user.id).count
+
+    # Contare i following escludendo se stesso
+    @following_count = @user.following.where.not(id: @user.id).count
   end
 
   def show_following
@@ -32,7 +39,7 @@ class UsersController < ApplicationController
   end
 
   def show_followers
-    @user = current_user
+    @user = User.find(params[:id])
     @followers_users = @user.followers
     @followers_count = @followers_users.count
   end

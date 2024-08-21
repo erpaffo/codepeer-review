@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     root 'welcome#index', as: :unauthenticated_root
   end
 
+  get 'badges/index'
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations'
@@ -30,12 +31,12 @@ Rails.application.routes.draw do
         post 'create_feedback'
       end
     end
-
+    resources :badges, only: [:index]
     resources :follows, only: [:create, :destroy]
 
 
-    get 'users/:id/followers', to: 'users#show_followers', as: 'user_followers'
-    get 'users/:id/following', to: 'users#show_following', as: 'user_following'
+    get '/users/:id/followers', to: 'users#show_followers', as: :user_followers
+    get 'users/:id/following', to: 'users#show_following', as: :user_following
 
     # Password Change Routes
     get 'password/edit', to: 'passwords#edit', as: :edit_password
@@ -92,6 +93,12 @@ Rails.application.routes.draw do
     post 'run_code', to: 'projects#run_code'
 
     resources :snippets do
+      resources :history_records, only: [:index] do
+        member do
+          get 'previous', to: 'history_records#show_previous', as: :previous
+        end
+      end
+
       member do
         get 'share', to: 'shares#new', as: :new_share
         post 'share', to: 'shares#create'

@@ -45,11 +45,7 @@
 
 <%= link_to 'Edit Profile', edit_profile_path %>
 <%= link_to 'Back to Dashboard', authenticated_root_path, class: 'back-link' %>
-<% if @user %>
-  <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-primary' %>
-<% else %>
-  <p>User not found or not specified.</p>
-<% end %>
+
 
 <h2>Feedback on My Snippets</h2>
 <% if @snippets.any? %>
@@ -63,7 +59,7 @@
               <li>
                 <p><strong>Feedback:</strong> <%= feedback.content %></p>
                 <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-                <%= link_to 'Delete Feedback', destroy_feedback_snippet_path(snippet, feedback), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
+                <%= link_to 'Delete Feedback', destroy_feedback_snippet_path(snippet, feedback_id: feedback.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
               </li>
             <% end %>
           </ul>
@@ -75,6 +71,21 @@
   </ul>
 <% else %>
   <p>No snippets created yet.</p>
+<% end %>
+
+<h2>Feedback on My Profile</h2>
+<% if @received_feedbacks.any? %>
+  <ul>
+    <% @received_feedbacks.each do |feedback| %>
+      <li>
+        <p><strong>Feedback:</strong> <%= feedback.content %></p>
+        <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
+
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No feedback on your profile yet.</p>
 <% end %>
 
 <!-- Follower and Following Sections -->
@@ -91,3 +102,12 @@
   <%= @following_count %>
 </p>
 <%= link_to 'View Following', user_following_path(@user), class: 'btn btn-info' %>
+
+<h3>Badges</h3>
+<% @user.badges.each do |badge| %>
+  <div class="badge">
+    <img src="<%= badge.icon_url %>" alt="<%= badge.name %>">
+    <p><%= badge.name %></p>
+  </div>
+<% end %>
+

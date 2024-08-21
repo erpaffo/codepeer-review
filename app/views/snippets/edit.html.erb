@@ -16,7 +16,11 @@
 
   <div class="field">
     <%= form.label :title %>
-    <%= form.text_field :title %>
+    <% if @snippet.user == current_user %>
+      <%= form.text_field :title %>
+    <% else %>
+      <%= form.text_field :title, readonly: true %>
+    <% end %>
   </div>
 
   <div class="field">
@@ -29,10 +33,12 @@
     <%= form.text_area :comment %>
   </div>
 
-  <div class="field">
-    <%= form.label :favorite %>
-    <%= form.check_box :favorite %>
-  </div>
+  <% if @snippet.user == current_user %>
+    <div class="field">
+      <%= form.label :favorite %>
+      <%= form.check_box :favorite %>
+    </div>
+  <% end %>
 
   <div class="actions">
     <%= form.submit 'Update Snippet', class: 'btn btn-primary' %>

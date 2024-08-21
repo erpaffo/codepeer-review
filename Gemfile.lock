@@ -408,6 +408,7 @@ GEM
     rb-inotify (0.11.1)
       ffi (~> 1.0)
     recaptcha (5.16.0)
+    redis (4.8.1)
     regexp_parser (2.9.2)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -491,6 +492,10 @@ GEM
     tilt (2.4.0)
     timeout (0.4.1)
     trailblazer-option (0.1.2)
+    turbo-rails (2.0.6)
+      actionpack (>= 6.0.0)
+      activejob (>= 6.0.0)
+      railties (>= 6.0.0)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
     turbolinks-source (5.2.0)
@@ -572,6 +577,7 @@ DEPENDENCIES
   rack-mini-profiler (~> 2.0)
   rails (~> 6.1.7, >= 6.1.7.8)
   recaptcha
+  redis (~> 4.0)
   rotp
   rqrcode
   rspec-rails
@@ -580,6 +586,7 @@ DEPENDENCIES
   selenium-webdriver
   spring
   sqlite3 (= 1.4.0)
+  turbo-rails (~> 2.0)
   turbolinks (~> 5)
   twilio-ruby
   tzinfo-data

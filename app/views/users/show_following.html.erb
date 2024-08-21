@@ -8,8 +8,8 @@
 <% if @following.present? %>
   <ul>
     <% @following.each do |following| %>
-      <li>following
-        <%= link_to "#{following.nickname}", user_profile_with_details_path(following) %>
+      <li>
+        <%= link_to following.nickname.present? ? following.nickname : following.email, user_profile_with_details_path(following) %>
       </li>
     <% end %>
   </ul>

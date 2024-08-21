@@ -9,7 +9,10 @@
   <ul>
     <% @followers_users.each do |follower_user| %>
       <li>
-        <%= link_to "#{follower_user.nickname}", user_profile_from_community_path(follower_user) %>
+        <%= link_to(
+          follower_user.nickname.present? ? follower_user.nickname : follower_user.email,
+          followed_by_current_user?(follower_user) ? user_profile_with_details_path(follower_user) : user_profile_from_community_path(follower_user)
+        ) %>
       </li>
     <% end %>
   </ul>

@@ -1,3 +1,4 @@
+# app/controllers/snippets_controller.rb
 class SnippetsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_snippet, only: [:show, :edit, :update, :destroy, :toggle_favorite, :make_public]
@@ -39,17 +40,13 @@ class SnippetsController < ApplicationController
     # @snippet è già impostato dal before_action
   end
 
-  def show_from_profile
-    @snippet = Snippet.find(params[:id])
-    @user = @snippet.user
-  end
-
   def edit
     # @snippet è già impostato dal before_action
   end
 
   def update
     if @snippet.update(snippet_params)
+      log_history_changes(@snippet)
       redirect_to snippet_path(@snippet), notice: 'Snippet was successfully updated.'
     else
       render :edit
@@ -107,5 +104,18 @@ class SnippetsController < ApplicationController
 
   def snippet_params
     params.require(:snippet).permit(:title, :content, :comment, :favorite, :project_file_id)
+  end
+
+  def log_history_changes(snippet)
+    changes = snippet.previous_changes
+    changes.each do |field, (old_value, new_value)|
+      HistoryRecord.create(
+        snippet: snippet,
+        field: field,
+        old_value: old_value,
+        new_value: new_value,
+        modified_by: current_user.nickname.present? ? current_user.nickname : current_user.email
+      )
+    end
   end
 end
