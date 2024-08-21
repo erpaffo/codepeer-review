@@ -9,6 +9,8 @@ class Project < ApplicationRecord
   has_many :favorited_by_users, through: :favorites, source: :user
   has_many :project_views, dependent: :destroy
 
+  after_create :award_badges
+
   accepts_nested_attributes_for :project_files
 
   validates :title, presence: true
@@ -34,5 +36,8 @@ class Project < ApplicationRecord
     if project_files.empty?
       errors.add(:base, 'You must upload at least one file.')
     end
+  end
+  def award_badges
+    user.check_and_award_badges("create_project")
   end
 end

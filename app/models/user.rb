@@ -1,4 +1,6 @@
 # app/models/user.rb
+require 'json'
+
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable, :confirmable,
          :recoverable, :rememberable, :validatable,
@@ -19,7 +21,8 @@ class User < ApplicationRecord
   attribute :profile_image_url, :string
   has_many :favorites, dependent: :destroy
   has_many :favorite_projects, through: :favorites, source: :project
-
+  has_many :user_badges
+  has_many :badges, through: :user_badges
 
   attr_accessor :remove_profile_image
 
@@ -31,6 +34,34 @@ class User < ApplicationRecord
     self.otp_secret ||= ROTP::Base32.random_base32
     save!
   end
+
+  def check_and_award_badges(action)
+    Badge.find_each do |badge|
+      # Supponiamo che `criteria` sia già un Hash
+      criteria = badge.criteria
+
+      # Debugging per controllare i criteri dei badge
+      puts "Verifica badge ID #{badge.id} con criteri #{criteria.inspect}"
+
+      # Salta se l'azione non corrisponde ai criteri
+      next unless criteria[:action] == action
+
+      # Verifica se i criteri sono soddisfatti
+      if meets_criteria?(badge)
+        # Aggiungi un badge se non è già incluso
+        unless badges.include?(badge)
+          # Assegna il badge all'utente qui
+          badges << badge
+          puts "Badge '#{badge.name}' assegnato!"
+        end
+      else
+        puts "Badge ID #{badge.id} non soddisfa i criteri."
+      end
+    end
+  rescue => e
+    puts "Errore durante l'assegnazione dei badge: #{e.message}"
+  end
+
 
   def send_two_factor_authentication_code(method = nil)
     method ||= two_factor_method
@@ -138,4 +169,18 @@ class User < ApplicationRecord
     # Creare una cartella vuota (un oggetto con un '/' finale)
     bucket.object("uploads/#{user_folder_name}/").put(body: "")
   end
+
+  def meets_criteria?(badge)
+    criteria = badge.criteria
+
+    case criteria[:action]
+    when "create_project"
+      projects.count >= criteria[:count]
+    when "leave_feedback"
+      feedbacks.count >= criteria[:count]
+    else
+      false
+    end
+  end
+
 end

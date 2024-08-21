@@ -80,7 +80,7 @@
       <li>
         <p><strong>Feedback:</strong> <%= feedback.content %></p>
         <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-        
+
       </li>
     <% end %>
   </ul>
@@ -102,3 +102,12 @@
   <%= @following_count %>
 </p>
 <%= link_to 'View Following', user_following_path(@user), class: 'btn btn-info' %>
+
+<h3>Badges</h3>
+<% @user.badges.each do |badge| %>
+  <div class="badge">
+    <img src="<%= badge.icon_url %>" alt="<%= badge.name %>">
+    <p><%= badge.name %></p>
+  </div>
+<% end %>
+
