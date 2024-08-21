@@ -1,4 +1,55 @@
-<!-- app/views/welcome/index.html.erb -->
+<div class="bg-gray-900 text-gray-300 min-h-screen flex flex-col items-center justify-center p-6">
+  <h1 class="text-5xl font-extrabold mb-4 text-gold">Welcome to CodePeer Review</h1>
+  <p class="text-lg text-center mb-8 text-gray-400">A platform for collaborating, sharing, and reviewing code with your peers.</p>
+  
+  <!-- Updated Form -->
+  <div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+    <form id="landingForm" method="get">
+      <input
+        type="email"
+        id="emailInput"
+        name="email"
+        placeholder="Enter your email"
+        class="w-full px-4 py-2 bg-gray-700 text-gray-200 placeholder-gray-400 rounded-lg focus:outline-none focus:ring focus:ring-teal-400"
+        required
+      />
+      <p class="mt-2 text-sm text-gray-200">Receive updates on new features and special offers from CodePeer Review.</p>
+      <button type="submit" class="mt-4 bg-teal-600 text-gray-100 p-4 rounded-lg shadow-lg hover:bg-teal-600/80 transition-all duration-300 transform hover:scale-105 w-full">
+        <span class="text-xl font-semibold">Sign Up</span>
+      </button>
+    </form>
+  </div>
+  
+  <p class="mt-8 text-center text-gray-400">Engage with others' code to learn and grow together!</p>
+  <div class="mt-auto text-center text-gray-400">
+    <p>© 2024 CodePeer Review. All rights reserved.</p>
+    <p><a href="#" class="hover:underline">Privacy Policy</a> | <a href="#" class="hover:underline">Terms of Service</a></p>
+  </div>
 
-<h1>Welcome to CodepeerReview</h1>
-<%= link_to 'Sign Up', new_user_registration_path %> or <%= link_to 'Sign In', new_user_session_path %>
+  <div class="mt-8 max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-gold">About the Site</h2>
+    <p class="text-lg text-gray-200">CodePeer Review is dedicated to helping developers collaborate and learn from each other. Join us and start improving your coding skills today.</p>
+  </div>
+
+  <div class="mt-8 max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-bold mb-4 text-gold">Frequently Asked Questions (FAQ)</h2>
+    <div class="mb-4">
+      <h3 class="text-lg font-semibold text-gray-200">How can I start collaborating on CodePeer Review?</h3>
+      <p class="text-gray-100">Simply sign up with your email address and start exploring available projects to collaborate on.</p>
+    </div>
+    <div>
+      <h3 class="text-lg font-semibold text-gray-200">What are the benefits of using CodePeer Review?</h3>
+      <p class="text-gray-100">CodePeer Review provides detailed feedback on your code, allows you to learn from other developers, and helps you build meaningful connections in the community.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("landingForm").addEventListener("submit", function(event) {
+    event.preventDefault();  // Prevent the default form submission
+
+    var email = document.getElementById("emailInput").value;
+
+    window.location.href = "<%= new_user_registration_path %>?email=" + encodeURIComponent(email);
+  });
+</script>

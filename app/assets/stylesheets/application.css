@@ -1,3 +1,16 @@
+:root {
+  --color-bg-dark: #2E2E2E; /* Grigio scuro per sfondi */
+  --color-bg-light: #3C3C3C; /* Grigio antracite per sfondi leggeri */
+  --color-text-light: #EDEDED; /* Bianco sporco per testo */
+  --color-text-dark: #2E2E2E; /* Grigio scuro per testo */
+  --color-accent-gold: #FFD700; /* Oro per accenti */
+  --color-accent-teal: #008080; /* Blu petrolio per accenti */
+  --color-bg-teal-light: #66B2B2; /* Blu petrolio chiaro */
+  --color-text-hover: #66B2B2; /* Colore hover per testo */
+  --color-btn-bg: #4B0082; /* Viola scuro per pulsanti */
+  --color-btn-bg-hover: #5A00A2; /* Viola scuro più chiaro per hover */
+}
+
 .snippet-info {
   display: flex;
   justify-content: space-between;
@@ -21,3 +34,44 @@
 .flex-1 {
   transition: margin-left 0.3s ease;
 }
+
+/* Base Styles */
+body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Header and Navigation */
+header {
+  background-color: var(--color-bg-light);
+}
+
+nav a {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+nav a:hover {
+  color: var(--color-accent-teal);
+}
+
+/* Buttons */
+.btn {
+  background-color: var(--color-btn-bg);
+  color: var(--color-text-light);
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: var(--color-btn-bg-hover);
+}
+
+/* Footer */
+footer {
+  background-color: var(--color-bg-light);
+  color: var(--color-text-light);
+}
+
