@@ -23,11 +23,12 @@ class CommunityActivityController < ApplicationController
   end
 
   def destroy_feedback
-    @feedback = Feedback.find(params[:feedback_id])
-    @feedback.destroy
-    redirect_to profile_path, notice: 'Feedback deleted successfully'
-  end
-
+      @snippet = Snippet.find(params[:id])
+      @feedback = @snippet.feedbacks.find(params[:feedback_id])
+      @feedback.destroy
+      redirect_to @snippet, notice: 'Feedback was successfully deleted.'
+    end
+    
   def show
     @snippet = Snippet.find(params[:id])
   end

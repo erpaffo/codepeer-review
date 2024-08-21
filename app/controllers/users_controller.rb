@@ -22,6 +22,7 @@ class UsersController < ApplicationController
   def show
     @user = current_user
     @snippets = @user.snippets.includes(:feedbacks)
+    @received_feedbacks = @user.received_feedbacks
     @feedbacks = @user.received_feedbacks
 
     # Contare i follower escludendo se stesso
