@@ -47,12 +47,22 @@ class SnippetsController < ApplicationController
   def update
     if @snippet.update(snippet_params)
       log_history_changes(@snippet)
+
+      # Crea una notifica se lo snippet è stato modificato da un altro utente
+      if @snippet.user != current_user
+        Notification.create(
+          user_id: @snippet.user.id,
+          notifier_id: current_user.id,  # Aggiungi il notifier_id
+          message: "#{current_user.nickname.present? ? current_user.nickname : current_user.email} has modified your snippet!",
+          read: false
+        )
+      end
+
       redirect_to snippet_path(@snippet), notice: 'Snippet was successfully updated.'
     else
       render :edit
     end
   end
-
   def destroy
     @snippet.destroy
     redirect_to my_snippets_path, notice: 'Snippet was successfully deleted.'

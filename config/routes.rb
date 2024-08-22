@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
+  get 'badges/index'
+  get 'notifications/index'
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
 
-  get 'badges/index'
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations',
@@ -32,7 +33,7 @@ Rails.application.routes.draw do
         post 'create_feedback'
       end
     end
-    resources :badges, only: [:index]
+
     resources :follows, only: [:create, :destroy]
 
     get 'user_profile/:id', to: 'users#profile', as: :user_profile

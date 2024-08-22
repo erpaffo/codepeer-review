@@ -1,0 +1,28 @@
+<h1 class="text-2xl font-semibold mb-4">Your Notifications</h1>
+
+<% if @notifications.empty? %>
+  <p>No notifications found.</p>
+<% else %>
+  <ul>
+    <% @notifications.each do |notification| %>
+      <li class="mb-2 notification <%= 'read' if notification.read %>" data-id="<%= notification.id %>">
+        <% # Determina il percorso corretto per l'utente che ha scatenato la notifica %>
+        <% notifier = User.find_by(id: notification.notifier_id) %>
+        <% if notifier && current_user.following?(notifier) %>
+          <% link_path = user_profile_with_details_path(notifier) %>
+        <% else %>
+          <% link_path = user_profile_from_community_path(notifier) %>
+        <% end %>
+
+        <% # Mostra il messaggio con il nome o l'email cliccabile %>
+        <%= link_to notification.message.gsub(notifier.email, "<strong>#{notifier.email}</strong>").html_safe, link_path, class: 'text-blue-600 hover:underline' %>
+
+        <% unless notification.read %>
+          <%= link_to 'Mark as Read', mark_as_read_notification_path(notification), method: :patch, remote: true, class: 'text-blue-600 hover:underline mark-as-read' %>
+        <% end %>
+
+        <%= link_to 'Delete', notification_path(notification), method: :delete, remote: true, class: 'text-red-600 hover:underline delete-notification' %>
+      </li>
+    <% end %>
+  </ul>
+<% end %>
