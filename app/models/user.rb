@@ -9,6 +9,7 @@ class User < ApplicationRecord
   validate :password_complexity
   validates :email, presence: true, uniqueness: true
   has_many :projects, dependent: :destroy
+  has_many :notifications
   has_many :collaborators, dependent: :destroy
   has_many :collaborated_projects, through: :collaborators, source: :project
   has_many :snippets, dependent: :destroy
