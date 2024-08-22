@@ -9,11 +9,18 @@ class FollowsController < ApplicationController
       flash[:notice] = "You are already following this user."
     else
       current_user.follow(@user)
+      Notification.create(
+        user_id: @user.id,
+        message: "#{current_user.nickname.present? ? current_user.nickname : current_user.email} has started following you!",
+        notifier_id: current_user.id, 
+        read: false
+      )
       flash[:notice] = "You are now following this user."
     end
 
     respond_to do |format|
-      format.html { redirect_to user_profile_with_details_path(@user) } # Redirige alla vista aggiornata
+      format.html { redirect_to user_profile_with_details_path(@user) }
+      format.js   # Questo richiede un template create.js.erb
     end
   end
 
@@ -28,7 +35,8 @@ class FollowsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { redirect_to user_profile_from_community_path(@user) } # Redirige alla vista aggiornata
+      format.html { redirect_to user_profile_from_community_path(@user) }
+      format.js   # Assicurati di avere un template destroy.js.erb se necessario
     end
   end
 end

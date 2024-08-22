@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_19_164724) do
+ActiveRecord::Schema.define(version: 2024_08_22_004928) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -117,6 +117,17 @@ ActiveRecord::Schema.define(version: 2024_08_19_164724) do
     t.index ["snippet_id"], name: "index_history_records_on_snippet_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "message"
+    t.boolean "read"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.integer "notifier_id"
+    t.index ["notifier_id"], name: "index_notifications_on_notifier_id"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "project_files", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "file"
@@ -217,6 +228,7 @@ ActiveRecord::Schema.define(version: 2024_08_19_164724) do
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
   add_foreign_key "history_records", "snippets"
+  add_foreign_key "notifications", "users"
   add_foreign_key "project_files", "projects"
   add_foreign_key "project_views", "projects"
   add_foreign_key "project_views", "users"

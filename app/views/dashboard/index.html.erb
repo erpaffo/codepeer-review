@@ -33,6 +33,7 @@
           <a href="<%= profile_path %>" class="text-zinc-600 hover:underline">Profile</a>
           <a href="<%= my_snippets_path %>" class="text-zinc-600 hover:underline">Snippets</a>
           <a href="<%= projects_path %>" class="text-zinc-600 hover:underline">Projects</a>
+          <a href="<%= notifications_path %>" class="text-zinc-600 hover:underline">Notifications</a> <!-- Added this line -->
           <a href="<%= search_path %>" class="text-zinc-600 hover:underline">Search</a>
           <%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'text-zinc-600 hover:underline' %>
         </div>
@@ -63,5 +64,3 @@
     </div>
   </div>
 </div>
-
-

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get 'notifications/index'
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations'
@@ -27,8 +28,9 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :follows, only: [:create, :destroy]
-
+    resources :notifications, only: [:index, :destroy] do
+      patch :mark_as_read, on: :member
+    end
 
     get '/users/:id/followers', to: 'users#show_followers', as: :user_followers
     get 'users/:id/following', to: 'users#show_following', as: :user_following
