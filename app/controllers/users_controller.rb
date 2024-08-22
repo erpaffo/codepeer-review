@@ -9,10 +9,10 @@ class UsersController < ApplicationController
   end
 
   def update_profile
-    @user = current_user # Usa l'utente attualmente autenticato
+    @user = current_user
 
     if @user.update(user_params)
-      handle_profile_image_update # Se hai una logica specifica per gestire l'immagine del profilo
+      handle_profile_image_update
       redirect_to authenticated_root_path, notice: 'Profile updated successfully'
     else
       render :complete_profile
@@ -192,25 +192,19 @@ class UsersController < ApplicationController
     redirect_to authenticated_root_path, alert: 'User not found.'
   end
 
-
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image_url, :remove_profile_image, :profile_image).dup
-  end
-
-  def feedback_params
-    params.require(:feedback).permit(:content)
+    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image, :remove_profile_image)
   end
 
   def handle_profile_image_update
     if params[:user][:remove_profile_image] == '1'
       @user.profile_image.purge if @user.profile_image.attached?
-      @user.profile_image.attach(io: File.open(Rails.root.join('app', 'assets', 'images', 'white_image.png')),
-                                 filename: 'white_image.png',
-                                 content_type: 'image/png')
-      @user.update(profile_image_url: nil)
     elsif params[:user][:profile_image].present?
       @user.profile_image.attach(params[:user][:profile_image])
-      @user.update(profile_image_url: nil)
     end
+  end
+
+  def feedback_params
+    params.require(:feedback).permit(:content)
   end
 end

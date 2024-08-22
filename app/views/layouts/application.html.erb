@@ -8,9 +8,11 @@
   <%= csp_meta_tag %>
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <%= stylesheet_link_tag 'flash', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld66CwqAAAAANYIsBtGugIN0C9QtbpekQg9bjL2"></script>  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body class="font-Inter bg-gray-900 text-gray-300">
 
   <div class="min-h-screen flex flex-col">
@@ -25,6 +27,7 @@
             <%= link_to "Profile", profile_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Snippets", my_snippets_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Projects", projects_path, class: "text-gray-200 hover:text-teal-300" %>
+            <%= link_to 'Search', search_path, class: 'hover:text-teal-300' %>
             <%= link_to "Logout", logout_path, method: :delete, class: "text-red-400 hover:text-red-300" %>
           <% else %>
             <%= link_to "Sign In", new_user_session_path, class: "text-gray-200 hover:text-teal-300" %>
@@ -33,6 +36,15 @@
         </nav>
       </div>
     </header>
+
+    <!-- Flash messages -->
+    <div class="container mx-auto mt-4 px-4">
+      <% flash.each do |key, message| %>
+        <div class="flash-<%= key %>">
+          <%= message %>
+        </div>
+      <% end %>
+    </div>
 
     <%= yield %>
 
@@ -55,4 +67,5 @@
     });
   </script>
 </body>
+
 </html>

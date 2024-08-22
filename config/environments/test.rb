@@ -64,7 +64,4 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
   Rails.application.routes.default_url_options[:host] = 'localhost:3000'
 
-  Recaptcha.configure do |config|
-    config.skip_verify_env << 'test'
-  end
 end

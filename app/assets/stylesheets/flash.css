@@ -1,0 +1,32 @@
+.flash-notice {
+    background-color: #38a169; /* verde per i messaggi di successo */
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .flash-alert {
+    background-color: #e53e3e; /* rosso per gli avvisi e gli errori */
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .flash-error {
+    background-color: #e53e3e; /* rosso per gli errori */
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .flash-default {
+    background-color: #4a5568; /* grigio per messaggi generici */
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  

@@ -26,24 +26,15 @@
     </div>
   </div>
   <div class="flex-1 p-6 transition-all duration-300 ml-16 md:ml-64">
-    <div class="bg-gray-700 shadow-lg p-4 rounded-lg mb-6 text-gray-300">
-      <div class="flex justify-between items-center flex-wrap">
-        <h1 class="text-2xl font-semibold text-gold">CodePeer Review</h1>
-        <div class="flex space-x-4 mt-4 md:mt-0">
-          <a href="<%= profile_path %>" class="hover:text-teal-300">Profile</a>
-          <a href="<%= my_snippets_path %>" class="hover:text-teal-300">Snippets</a>
-          <a href="<%= projects_path %>" class="hover:text-teal-300">Projects</a>
-          <a href="<%= search_path %>" class="hover:text-teal-300">Search</a>
-          <%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'hover:text-red-300' %>
-        </div>
-      </div>
-    </div>
+        
     <h2 class="text-xl font-semibold text-gold mb-4">Dashboard</h2>
     <p class="mb-4 text-gray-300">Welcome, <%= current_user.nickname %>!</p>
-    <div class="bg-teal-300 p-4 rounded-lg mb-6 text-gray-900">
-      <p class="mb-2">Please complete your profile</p>
-      <a href="<%= complete_profile_path %>" class="text-teal-700 hover:underline">Complete Profile</a>
-    </div>
+    <% if !current_user.profile_complete? %>
+      <div class="bg-teal-300 p-4 rounded-lg mb-6 text-gray-900">
+        <p class="mb-2">Please complete your profile</p>
+        <a href="<%= complete_profile_path %>" class="text-teal-700 hover:underline">Complete Profile</a>
+      </div>
+    <% end %>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
@@ -67,12 +58,11 @@
         <p>Manage your account settings.</p>
         <a href="<%= settings_path %>" class="text-teal-400 hover:underline">Go to Settings</a>
       </div>
-      <div class="bg-white shadow-lg p-4 rounded-lg">
-  <h3 class="font-semibold">Badges</h3>
-  <p>Check your badges here.</p>
-  <a href="<%= badges_path %>" class="text-blue-600 hover:underline">View Badges</a>
-</div>
-
+      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
+        <h3 class="font-semibold text-gold">Badges</h3>
+        <p>Check your badges here.</p>
+        <a href="<%= badges_path %>" class="text-teal-400 hover:underline">View Badges</a>
+      </div>
     </div>
   </div>
 </div>

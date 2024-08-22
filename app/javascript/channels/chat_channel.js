@@ -1,4 +1,4 @@
-import consumer from "./consumer"
+/*import consumer from "./consumer"
 
 consumer.subscriptions.create({ channel: "ChatChannel", chat_room_id: chatRoomId }, {
   connected() {
@@ -18,3 +18,4 @@ consumer.subscriptions.create({ channel: "ChatChannel", chat_room_id: chatRoomId
     this.perform('speak', { message: message })
   }
 });
+*/

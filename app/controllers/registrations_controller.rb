@@ -3,9 +3,6 @@ class RegistrationsController < Devise::RegistrationsController
     super do |resource|
       if resource.persisted? && resource.email.present?
         puts "User created with email: #{resource.email}"
-      else
-        flash[:alert] = "There was an issue creating your account."
-        redirect_to new_user_registration_path
       end
     end
   end

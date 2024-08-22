@@ -1,4 +1,3 @@
-# app/models/user.rb
 require 'json'
 
 class User < ApplicationRecord
@@ -35,33 +34,19 @@ class User < ApplicationRecord
     save!
   end
 
-  def check_and_award_badges(action)
-    Badge.find_each do |badge|
-      # Supponiamo che `criteria` sia già un Hash
-      criteria = badge.criteria
-
-      # Debugging per controllare i criteri dei badge
-      puts "Verifica badge ID #{badge.id} con criteri #{criteria.inspect}"
-
-      # Salta se l'azione non corrisponde ai criteri
-      next unless criteria[:action] == action
-
-      # Verifica se i criteri sono soddisfatti
-      if meets_criteria?(badge)
-        # Aggiungi un badge se non è già incluso
-        unless badges.include?(badge)
-          # Assegna il badge all'utente qui
-          badges << badge
-          puts "Badge '#{badge.name}' assegnato!"
-        end
-      else
-        puts "Badge ID #{badge.id} non soddisfa i criteri."
-      end
-    end
-  rescue => e
-    puts "Errore durante l'assegnazione dei badge: #{e.message}"
+  def profile_complete?
+    first_name.present? && last_name.present? && nickname.present?
   end
 
+  def check_and_award_badges(action)
+    Badge.find_each do |badge|
+      criteria = badge.criteria
+      next unless criteria[:action] == action
+      if meets_criteria?(badge)
+        badges << badge unless badges.include?(badge)
+      end
+    end
+  end
 
   def send_two_factor_authentication_code(method = nil)
     method ||= two_factor_method
@@ -99,7 +84,6 @@ class User < ApplicationRecord
   end
 
   def self.from_omniauth(auth)
-
     user = where(provider: auth.provider, uid: auth.uid).first_or_initialize do |user|
       user.email = auth.info.email
       user.password = Devise.friendly_token[0, 20] + "Aa1@"
@@ -107,15 +91,13 @@ class User < ApplicationRecord
       user.last_name = auth.info.last_name
       user.nickname = auth.info.nickname
       user.skip_confirmation!
-      user.confirmed_at = Time.current # Conferma automatica dell'utente
+      user.confirmed_at = Time.current
       user.profile_image_url = auth.info.image
     end
 
-    # Controlla se esiste un utente con la stessa email ma un diverso provider
     if user.new_record?
       existing_user = find_by(email: auth.info.email)
       if existing_user
-        # Collega il nuovo provider all'utente esistente
         existing_user.update(provider: auth.provider, uid: auth.uid)
         return existing_user
       end
@@ -150,15 +132,13 @@ class User < ApplicationRecord
   end
 
   def followed_by_current_user?(user)
-    # Supponiamo che tu abbia un'associazione `following` tra gli utenti
-    self.following.include?(user)
+    following.include?(user)
   end
 
   private
 
   def password_complexity
     return if password.blank? || password =~ /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[[:^alnum:]])/
-
     errors.add :password, 'must include at least one lowercase letter, one uppercase letter, one digit, and one special character'
   end
 
@@ -166,13 +146,11 @@ class User < ApplicationRecord
     s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
     bucket = s3.bucket(ENV['AWS_BUCKET'])
     user_folder_name = email.split('@').first
-    # Creare una cartella vuota (un oggetto con un '/' finale)
     bucket.object("uploads/#{user_folder_name}/").put(body: "")
   end
 
   def meets_criteria?(badge)
     criteria = badge.criteria
-
     case criteria[:action]
     when "create_project"
       projects.count >= criteria[:count]
@@ -182,5 +160,4 @@ class User < ApplicationRecord
       false
     end
   end
-
 end

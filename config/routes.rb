@@ -6,7 +6,8 @@ Rails.application.routes.draw do
   get 'badges/index'
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
-    registrations: 'registrations'
+    registrations: 'registrations',
+    sessions: 'sessions'
   }
 
   devise_scope :user do
@@ -34,6 +35,7 @@ Rails.application.routes.draw do
     resources :badges, only: [:index]
     resources :follows, only: [:create, :destroy]
 
+    get 'user_profile/:id', to: 'users#profile', as: :user_profile
 
     get '/users/:id/followers', to: 'users#show_followers', as: :user_followers
     get 'users/:id/following', to: 'users#show_following', as: :user_following
