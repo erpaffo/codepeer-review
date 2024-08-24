@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
-  get 'badges/index'
-  get 'notifications/index'
+  resources :badges, only: [:index]
+  resources :notifications, only: [:index]
+  resources :notifications do
+    member do
+      patch :mark_as_read
+    end
+  end
+
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end

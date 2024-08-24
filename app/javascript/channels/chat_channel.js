@@ -1,18 +1,29 @@
 /*import consumer from "./consumer"
 
-consumer.subscriptions.create({ channel: "ChatChannel", chat_room_id: chatRoomId }, {
-  connected() {
-    // Chiamata quando il canale è connesso
-  },
+// Supponendo che la funzione sia definita correttamente e restituisca un valore
+//const chatRoomId = someFunctionThatReturnsChatRoomId();
 
-  disconnected() {
-    // Chiamata quando il canale è disconnesso
-  },
+//if (chatRoomId) {
+  //consumer.subscriptions.create({ channel: "ChatChannel", chat_room_id: chatRoomId }, {
+    //connected() {
+      //console.log("Connected to the chat room with ID:", chatRoomId);
+    //},
 
-  received(data) {
-    // Chiamata quando vengono ricevuti nuovi dati
-    console.log("Received:", data)
-  },
+    //disconnected() {
+      //console.log("Disconnected from the chat room with ID:", chatRoomId);
+    //},
+
+   // received(data) {
+      // Gestisce i dati ricevuti dal WebSocket
+    //},
+
+    //speak(message) {
+      //this.perform('speak', { message: message });
+    //}
+  //});
+//} else {
+  //console.error("Chat Room ID is undefined. Cannot establish a subscription.");
+//}
 
   speak(message) {
     this.perform('speak', { message: message })

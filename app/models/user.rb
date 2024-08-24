@@ -44,7 +44,13 @@ class User < ApplicationRecord
       criteria = badge.criteria
       next unless criteria[:action] == action
       if meets_criteria?(badge)
-        badges << badge unless badges.include?(badge)
+        unless badges.include?(badge)
+          badges << badge
+          puts "Badge '#{badge.name}' assegnato!"
+          Notification.create_badge_notification(self, badge, self)
+        end
+      else
+        puts "Badge ID #{badge.id} non soddisfa i criteri."
       end
     end
   end

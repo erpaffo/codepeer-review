@@ -56,6 +56,42 @@ nav a:hover {
   color: var(--color-accent-teal);
 }
 
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.bg-red-600 {
+  background-color: #e53e3e; 
+}
+
+.rounded-full {
+  border-radius: 9999px;
+}
+
+.w-2 {
+  width: 0.5rem;
+}
+
+.h-2 {
+  height: 0.5rem; 
+}
+
+
+.notifications-link {
+  position: relative;
+  display: inline-block;
+}
+
+.notifications-link .notification-dot {
+  position: absolute;
+  top: -0.25rem; 
+  right: -0.5rem;
+}
+
 /* Buttons */
 .btn {
   background-color: var(--color-btn-bg);

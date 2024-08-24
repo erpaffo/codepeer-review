@@ -27,6 +27,10 @@
             <%= link_to "Profile", profile_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Snippets", my_snippets_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Projects", projects_path, class: "text-gray-200 hover:text-teal-300" %>
+            <%= link_to "Notifications", notifications_path, class: "notifications-link text-gray-200 hover:text-teal-300 relative" %>
+            <% if current_user.notifications.unread.any? %>
+            <span class="notification-dot w-2 h-2 bg-red-600 rounded-full"></span>
+            <% end %>
             <%= link_to 'Search', search_path, class: 'hover:text-teal-300' %>
             <%= link_to "Logout", logout_path, method: :delete, class: "text-red-400 hover:text-red-300" %>
           <% else %>
