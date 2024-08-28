@@ -1,49 +1,65 @@
-<!-- app/views/users/my_snippets.html.erb -->
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6">My Snippets</h1>
 
-<h1>My Snippets</h1>
+  <!-- Link per creare un nuovo Snippet -->
+  <div class="flex justify-between mb-6">
+    <%= link_to 'Create New Snippet', new_snippet_path, class: 'bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition ease-in-out duration-300' %>
+    <%= link_to 'View Drafts', drafts_snippets_path, class: 'bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300' %>
+  </div>
 
-<!-- Link per creare un nuovo Snippet -->
-<%= link_to 'Create New Snippet', new_snippet_path, class: 'btn btn-primary mb-3' %>
-
-<!-- Link per visualizzare le bozze -->
-<%= link_to 'View Drafts', drafts_snippets_path, class: 'btn btn-secondary mb-3' %>
-
-<!-- Dropdown menu for sorting -->
-<div class="dropdown mb-3">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="sortMenu" data-bs-toggle="dropdown" aria-expanded="false">
-    Sort by
+  <!-- Dropdown menu for sorting -->
+<div class="relative mb-6 inline-block">
+  <button class="bg-teal-600 text-white py-2 px-4 rounded-lg flex items-center hover:bg-teal-500 transition ease-in-out duration-300" id="sortMenuButton">
+    <span class="mr-2">Sort by</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+    </svg>
   </button>
-  <ul class="dropdown-menu" aria-labelledby="sortMenu">
-    <li><%= link_to 'Most Recent', my_snippets_path(order_by: 'most_recent'), class: 'dropdown-item' %></li>
-    <li><%= link_to 'Least Recent', my_snippets_path(order_by: 'least_recent'), class: 'dropdown-item' %></li>
-    <li><%= link_to 'Favorites', my_snippets_path(order_by: 'favorites'), class: 'dropdown-item' %></li>
+  <ul class="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-lg z-10 hidden" id="sortMenu">
+    <li><%= link_to 'Most Recent', my_snippets_path(order_by: 'most_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
+    <li><%= link_to 'Least Recent', my_snippets_path(order_by: 'least_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
+    <li><%= link_to 'Favorites', my_snippets_path(order_by: 'favorites'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
   </ul>
 </div>
 
 <!-- Dropdown menu for languages -->
-<div class="dropdown mb-3">
-  <button class="btn btn-secondary dropdown-toggle" type="button" id="languageMenu" data-bs-toggle="dropdown" aria-expanded="false">
-    Filter by Language
+<div class="relative mb-6 inline-block ml-4">
+  <button class="bg-teal-600 text-white py-2 px-4 rounded-lg flex items-center hover:bg-teal-500 transition ease-in-out duration-300" id="languageMenuButton">
+    <span class="mr-2">Filter by Language</span>
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 011.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+    </svg>
   </button>
-  <ul class="dropdown-menu" aria-labelledby="languageMenu">
+  <ul class="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-lg z-10 hidden" id="languageMenu">
     <% if @languages.present? %>
       <% @languages.each do |language| %>
-        <li><%= link_to language.capitalize, my_snippets_path(language: language), class: 'dropdown-item' %></li>
+        <li><%= link_to language.capitalize, my_snippets_path(language: language), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
       <% end %>
     <% end %>
-    <li><%= link_to 'Other', my_snippets_path(language: 'other'), class: 'dropdown-item' %></li>
+    <li><%= link_to 'Other', my_snippets_path(language: 'other'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
   </ul>
 </div>
 
-<ul>
-  <% @snippets.each do |snippet| %>
-    <% if !snippet.draft %> <!-- Aggiungi questa condizione per escludere le bozze -->
-      <li>
-        <%= link_to snippet.title, snippet_path(snippet) %>
-        <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
-      </li>
-    <% end %>
-  <% end %>
-</ul>
 
-<%= link_to 'Back to My Profile', profile_path, class: 'btn btn-secondary' %>
+  <!-- Snippet Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @snippets.each do |snippet| %>
+      <% if !snippet.draft %>
+        <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-300">
+          <h2 class="text-lg font-bold text-white mb-2"><%= link_to snippet.title, snippet_path(snippet) %></h2>
+          <p class="text-gray-400 mb-4"><%= truncate(snippet.description, length: 100) %></p>
+          <div class="flex justify-between items-center">
+            <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "text-yellow-500 text-lg" %>
+            <%= link_to 'Edit', edit_snippet_path(snippet), class: 'text-blue-400 hover:text-blue-300' %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="mt-8">
+    <%= link_to 'Back to Dashboard', authenticated_root_path, class: 'bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300' %>
+  </div>
+</div>
+
+<%= javascript_pack_tag 'my_snippets' %>
