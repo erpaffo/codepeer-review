@@ -1,33 +1,28 @@
-<div class="flex">
-  <div class="flex flex-col">
-    <div class="sidebar bg-gray-800 text-gray-300 w-64 h-screen p-4 fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 z-10">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold text-gold">Dashboard Menu</h2>
-        <div class="sidebar-toggle bg-gray-800 text-gray-300 w-8 h-8 flex items-center justify-center cursor-pointer">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </div>
+<div class="flex flex-col md:flex-row">
+  <!-- Sidebar -->
+  <div class="sidebar bg-gray-800 text-gray-300 p-4 fixed md:w-64 h-full md:h-screen transition-transform duration-300 transform -translate-x-full md:translate-x-0">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-bold text-gold">Dashboard Menu</h2>
+      <div class="sidebar-toggle bg-gray-800 text-gray-300 w-8 h-8 flex items-center justify-center cursor-pointer md:hidden">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
       </div>
-      <ul>
-        <li class="mb-2"><a href="<%= profile_path %>" class="hover:text-teal-300">My Profile</a></li>
-        <li class="mb-2"><a href="<%= snippets_path %>" class="hover:text-teal-300">My Snippets</a></li>
-        <li class="mb-2"><a href="<%= projects_path %>" class="hover:text-teal-300">Projects</a></li>
-        <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:text-teal-300">Community Activity</a></li>
-        <li class="mb-2"><a href="<%= settings_path %>" class="hover:text-teal-300">Settings</a></li>
-        <li class="mb-2"><%= link_to 'Search', search_path, class: 'hover:text-teal-300' %></li>
-        <li><%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'hover:text-red-300' %></li>
-      </ul>
     </div>
-    <div class="sidebar-toggle bg-gray-800 text-gray-300 w-16 h-16 flex items-center justify-center cursor-pointer fixed top-0 left-0 z-20">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
-    </div>
+    <ul>
+      <li class="mb-2"><a href="<%= profile_path %>" class="hover:text-teal-300">My Profile</a></li>
+      <li class="mb-2"><a href="<%= snippets_path %>" class="hover:text-teal-300">My Snippets</a></li>
+      <li class="mb-2"><a href="<%= projects_path %>" class="hover:text-teal-300">Projects</a></li>
+      <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:text-teal-300">Community Activity</a></li>
+      <li class="mb-2"><a href="<%= settings_path %>" class="hover:text-teal-300">Settings</a></li>
+      <li class="mb-2"><%= link_to 'Search', search_path, class: 'hover:text-teal-300' %></li>
+      <li><%= link_to 'Logout', logout_path, method: :delete, data: { confirm: 'Are you sure?' }, class: 'hover:text-red-300' %></li>
+    </ul>
   </div>
+
+  <!-- Main Content -->
   <div class="flex-1 p-6 transition-all duration-300 ml-16 md:ml-64">
-  
-    <h2 class="text-xl font-semibold text-gold mb-4">Dashboard</h2>
+    <h2 class="text-2xl font-semibold text-gold mb-4">Dashboard</h2>
     <p class="mb-4 text-gray-300">Welcome, <%= current_user.nickname %>!</p>
     <% if !current_user.profile_complete? %>
       <div class="bg-teal-300 p-4 rounded-lg mb-6 text-gray-900">
@@ -36,33 +31,38 @@
       </div>
     <% end %>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
-        <h3 class="font-semibold text-gold">My Snippets</h3>
-        <p>Create and manage your code snippets.</p>
-        <a href="<%= my_snippets_path %>" class="text-teal-400 hover:underline">View Snippets</a>
-      </div>
-      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
-        <h3 class="font-semibold text-gold">Projects</h3>
-        <p>Create and manage your projects.</p>
-        <a href="<%= projects_path %>" class="text-teal-400 hover:underline">View Projects</a>
-      </div>
-      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
-        <h3 class="font-semibold text-gold">Community Activity</h3>
-        <p>Check your community activity.</p>
-        <a href="<%= community_activity_index_path %>" class="text-teal-400 hover:underline">View Activity</a>
-      </div>
-      <!-- New Tile for Settings -->
-      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
-        <h3 class="font-semibold text-gold">Settings</h3>
-        <p>Manage your account settings.</p>
-        <a href="<%= settings_path %>" class="text-teal-400 hover:underline">Go to Settings</a>
-      </div>
-      <div class="bg-gray-700 shadow-lg p-4 rounded-lg text-gray-300">
-        <h3 class="font-semibold text-gold">Badges</h3>
-        <p>Check your badges here.</p>
-        <a href="<%= badges_path %>" class="text-teal-400 hover:underline">View Badges</a>
-      </div>
-    </div>
+    <!-- Tiles Section -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <a href="<%= my_snippets_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">My Snippets</h3>
+      <p>Create and manage your code snippets.</p>
+      <p class="text-teal-400 hover:underline">View Snippets</p>
+    </a>
+
+    <a href="<%= projects_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Projects</h3>
+      <p>Create and manage your projects.</p>
+      <p class="text-teal-400 hover:underline">View Projects</p>
+    </a>
+
+    <a href="<%= community_activity_index_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Community Activity</h3>
+      <p>Check your community activity.</p>
+      <p class="text-teal-400 hover:underline">View Activity</p>
+    </a>
+
+    <a href="<%= settings_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Settings</h3>
+      <p>Manage your account settings.</p>
+      <p class="text-teal-400 hover:underline">Go to Settings</p>
+    </a>
+
+    <a href="<%= badges_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Badges</h3>
+      <p>Check your badges here.</p>
+      <p class="text-teal-400 hover:underline">View Badges</p>
+    </a>
   </div>
 </div>
+
+

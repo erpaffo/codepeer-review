@@ -1,127 +1,145 @@
+/* Sidebar Styles */
 .sidebar {
-    background-color: #1c1c1e;
-    color: white;
-    width: 16rem;
-    height: 100vh;
-    padding: 1rem;
-    position: fixed;
-    top: 0;
-    left: 0;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 10;
-  }
-  
-  .sidebar-toggle {
-    background-color: #1c1c1e;
-    color: white;
-    width: 4rem;
-    height: 4rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 20;
-    transition: left 0.3s ease-in-out;
-  }
-  
-  .sidebar h2 {
-    font-size: 1.125rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-  }
-  
-  .sidebar ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  .sidebar li {
-    margin-bottom: 0.5rem;
-  }
-  
-  .sidebar a {
-    color: white;
-    text-decoration: none;
-  }
-  
-  .sidebar a:hover {
-    text-decoration: underline;
-  }
-  
-  .flex-1 {
-    padding: 1.5rem;
-    margin-left: 4rem; /* Space for the sidebar toggle */
-    transition: margin-left 0.3s ease-in-out;
-  }
-  
-  .bg-white {
-    background-color: white;
-  }
-  
-  .shadow-lg {
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  }
-  
-  .p-4 {
-    padding: 1rem;
-  }
-  
-  .rounded-lg {
-    border-radius: 0.5rem;
-  }
-  
-  .mb-6 {
-    margin-bottom: 1.5rem;
-  }
-  
-  .text-2xl {
-    font-size: 1.5rem;
-  }
-  
-  .font-semibold {
-    font-weight: 600;
-  }
-  
-  .text-zinc-600 {
-    color: #4a5568;
-  }
-  
-  .text-blue-600 {
-    color: #3182ce;
-  }
-  
-  .text-blue-600:hover {
-    text-decoration: underline;
-  }
-  
-  .bg-yellow-200 {
-    background-color: #fefcbf;
-  }
-  
-  .grid {
-    display: grid;
-    gap: 1rem;
-  }
-  
-  .grid-cols-1 {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
-  }
-  
-  .md\\:grid-cols-2 {
-    @media (min-width: 768px) {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  
-  .lg\\:grid-cols-3 {
-    @media (min-width: 1024px) {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
+  background-color: #2c2c2c; /* Grigio scuro per sidebar */
+  color: var(--color-text-light);
+  width: 16rem;
+  height: 100vh;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  z-index: 10;
+}
 
+.sidebar-toggle {
+  background-color: #2c2c2c;
+  color: var(--color-text-light);
+  width: 4rem;
+  height: 4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  transition: left 0.3s ease, background-color 0.3s ease;
+}
 
-  
+.sidebar h2 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: var(--color-accent-gold); /* Oro per il titolo della sidebar */
+}
+
+.sidebar ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin-bottom: 0.5rem;
+}
+
+.sidebar a {
+  color: var(--color-text-light);
+  text-decoration: none;
+}
+
+.sidebar a:hover {
+  text-decoration: underline;
+  color: var(--color-accent-teal); /* Cambia colore su hover */
+}
+
+.flex-1 {
+  padding: 1.5rem;
+  margin-left: 4rem; /* Space for the sidebar toggle */
+  transition: margin-left 0.3s ease-in-out;
+}
+
+.bg-gray-700 {
+  background-color: #3c3c3c; /* Grigio scuro per le tiles */
+}
+
+.text-gold {
+  color: var(--color-accent-gold); /* Oro per i titoli */
+}
+
+.text-teal-400 {
+  color: var(--color-accent-teal); /* Verde teal per i link */
+}
+
+.text-teal-400:hover {
+  color: var(--color-bg-teal-light); /* Verde teal chiaro su hover */
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+.text-gray-300 {
+  color: #d1d1d1;
+}
+
+.text-gray-600 {
+  color: #4a5568;
+}
+
+.text-gray-600:hover {
+  text-decoration: underline;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.md\\:grid-cols-2 {
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.lg\\:grid-cols-3 {
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* Animations */
+.grid > .tile {
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.grid > .tile:hover {
+  transform: translateY(-5px); /* Solleva leggermente l'elemento su hover */
+  background-color: var(--color-bg-teal-light); /* Cambia sfondo su hover */
+}

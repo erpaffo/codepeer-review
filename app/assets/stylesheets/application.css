@@ -28,12 +28,24 @@
   color: #888;
 }
 
+/* Sidebar */
 .sidebar {
-  transition: transform 0.3s ease;
+  transform: translateX(-100%); /* Hidden by default */
+  transition: transform 0.3s ease-in-out;
+}
+
+.sidebar.show {
+  transform: translateX(0); /* Show when toggled */
 }
 
 .sidebar-toggle {
-  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Add a hover effect to the sidebar toggle button */
+.sidebar-toggle:hover {
+  background-color: var(--color-bg-light);
+  transform: scale(1.1);
 }
 
 .flex-1 {
