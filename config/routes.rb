@@ -28,7 +28,6 @@ Rails.application.routes.draw do
     get 'complete_profile', to: 'users#complete_profile', as: :complete_profile
     patch 'users/:id/update_profile', to: 'users#update_profile', as: :update_profile
 
-
     get 'profile', to: 'users#show', as: :profile
     get 'profile/edit', to: 'users#edit', as: :edit_profile
     patch 'profile', to: 'users#update'
@@ -71,7 +70,6 @@ Rails.application.routes.draw do
     patch 'enable_two_factor_auth', to: 'users#enable_two_factor_auth', as: :enable_two_factor_auth
     patch 'disable_two_factor_auth', to: 'users#disable_two_factor_auth', as: :disable_two_factor_auth
 
-    # Project Routes
     resources :projects do
       collection do
         get 'my_projects'
@@ -82,6 +80,7 @@ Rails.application.routes.draw do
         get 'show_file/:file_id', to: 'projects#show_file', as: 'show_file'
         get 'edit_file/:file_id', to: 'projects#edit_file', as: 'edit_file'
         patch 'update_file/:file_id', to: 'projects#update_file', as: 'update_file'
+        post 'upload_file', to: 'projects#upload_file', as: 'upload_file'
         get 'new_file', to: 'projects#new_file', as: 'new_file'
         post 'create_file', to: 'projects#create_file', as: 'create_file'
         post 'invite_collaborator', to: 'projects#invite_collaborator', as: 'invite_collaborator'
@@ -96,6 +95,9 @@ Rails.application.routes.draw do
         post 'upload_to_google_drive'
         post 'upload_to_github'
         post 'upload_to_gitlab'
+
+        # Aggiungi questa rotta per gestire la pagina di caricamento dei file
+        get 'upload_files', to: 'projects#upload_files', as: 'upload_files'
       end
     end
 

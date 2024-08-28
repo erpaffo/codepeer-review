@@ -17,8 +17,6 @@ class Project < ApplicationRecord
   validates :description, presence: true
   validates :visibility, inclusion: { in: %w[private public] }
 
-  validate :at_least_one_file
-
   def unique_view_count
     view_count = project_views.select(:user_id).distinct.count
     view_count += 1 if project_views.exists?(user: user)

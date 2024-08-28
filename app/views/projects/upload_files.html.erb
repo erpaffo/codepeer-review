@@ -1,0 +1,42 @@
+<h1>Upload Files for <%= @project.title %></h1>
+
+<div class="dropzone" id="file-dropzone">
+  <div class="dz-message">Drop files here or click to upload</div>
+</div>
+
+<div class="actions">
+  <%= link_to 'Back to Project', project_path(@project), class: 'btn btn-primary' %>
+</div>
+
+<script>
+function initializeDropzone() {
+  const dropzoneElement = document.querySelector("#file-dropzone");
+
+  if (dropzoneElement) {
+    const dropzone = new Dropzone(dropzoneElement, {
+      url: "<%= upload_file_project_path(@project) %>",
+      paramName: "file",
+      maxFilesize: 5,
+      addRemoveLinks: true,
+      headers: {
+        "X-CSRF-Token": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+      },
+      init: function() {
+        this.on("success", function(file, response) {
+          console.log("File uploaded successfully", response);
+        });
+
+        this.on("error", function(file, errorMessage) {
+          console.error("Error uploading file", errorMessage);
+        });
+      }
+    });
+  }
+}
+
+// Initialize Dropzone
+initializeDropzone();
+
+// Reinitialize Dropzone when the page is reloaded via Turbolinks
+document.addEventListener('turbolinks:load', initializeDropzone);
+</script>

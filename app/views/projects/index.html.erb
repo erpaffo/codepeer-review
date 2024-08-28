@@ -1,8 +1,11 @@
-<h1>My Projects</h1>
+<h1 class="page-title">My Projects</h1>
 
-<%= link_to 'New Project', new_project_path, class: "btn btn-primary" %>
+<div class="actions-bar">
+  <%= link_to 'New Project', new_project_path, class: "btn btn-primary" %>
+  <%= link_to 'My Favorite Projects', favorite_projects_projects_path, class: 'btn btn-secondary' %>
+</div>
 
-<table class="table">
+<table class="table project-table">
   <thead>
     <tr>
       <th>Name</th>
@@ -16,11 +19,9 @@
       <tr>
         <td><%= project.title %></td>
         <td><%= truncate(project.description, length: 50) %></td>
-        <td><%= link_to 'Show', project, class: "btn btn-secondary" %></td>
-        <td><%= link_to 'Edit', edit_project_path(project), class: "btn btn-warning" %></td>
+        <td><%= link_to 'Show', project, class: "btn btn-show" %></td>
+        <td><%= link_to 'Edit', edit_project_path(project), class: "btn btn-edit" %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
-
-<%= link_to 'My Favorite Projects', favorite_projects_projects_path, class: 'btn btn-primary' %>

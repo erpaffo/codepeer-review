@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab]
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -26,7 +26,7 @@ class ProjectsController < ApplicationController
         ActiveRecord::Base.transaction do
           send_collaborator_invitations if params[:collaborator_emails].present?
         end
-        redirect_to @project, notice: 'Project was successfully created.'
+        redirect_to upload_files_project_path(@project), notice: 'Project was successfully created. Now upload your files.'
       rescue => e
         Rails.logger.error "Failed to create project: #{e.message}"
         @project.destroy  # Elimina il progetto se c'è un errore
@@ -36,6 +36,21 @@ class ProjectsController < ApplicationController
     else
       render :new
     end
+  end
+
+
+  def upload_file
+    @project = Project.find(params[:id]) 
+    @file = @project.project_files.build(file: params[:file])
+
+    if @file.save
+      render json: { message: "File uploaded successfully" }, status: :created
+    else
+      render json: { errors: @file.errors.full_messages }, status: :unprocessable_entity
+    end
+  end
+
+  def upload_files
   end
 
   def edit

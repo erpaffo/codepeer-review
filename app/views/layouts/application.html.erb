@@ -6,11 +6,14 @@
   <title><%= content_for?(:title) ? yield(:title) : "CodePeer Review" %></title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css">
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   <%= stylesheet_link_tag 'flash', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld66CwqAAAAANYIsBtGugIN0C9QtbpekQg9bjL2"></script>  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld66CwqAAAAANYIsBtGugIN0C9QtbpekQg9bjL2"></script>  
+  <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
 </head>
 
 <body class="font-Inter bg-gray-900 text-gray-300">
@@ -23,7 +26,6 @@
         </h1>
         <nav class="flex space-x-4">
           <% if user_signed_in? %>
-            <%= link_to "Dashboard", authenticated_root_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "Profile", profile_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Snippets", my_snippets_path, class: "text-gray-200 hover:text-teal-300" %>
             <%= link_to "My Projects", projects_path, class: "text-gray-200 hover:text-teal-300" %>
@@ -56,20 +58,6 @@
       <p>&copy; 2024 CodePeer Review. All rights reserved.</p>
     </footer>
   </div>
-
-  <script>
-    const sidebarToggle = document.querySelectorAll('.sidebar-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    const content = document.querySelector('.flex-1');
-
-    sidebarToggle.forEach(toggle => {
-      toggle.addEventListener('click', () => {
-        sidebar.classList.toggle('-translate-x-full');
-        content.classList.toggle('ml-16');
-        content.classList.toggle('ml-64');
-      });
-    });
-  </script>
 </body>
 
 </html>

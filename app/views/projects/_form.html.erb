@@ -1,7 +1,7 @@
-<%= form_for(@project) do |f| %>
+<%= form_for @project, html: { class: 'form-container' } do |f| %>
   <% if @project.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@project.errors.count, "error") %> prohibited this project from being saved:</h2>
+    <div id="error_explanation" class="error-messages">
+      <h2><%= pluralize(@project.errors.count, "error") %> prevented this project from being saved:</h2>
       <ul>
         <% @project.errors.full_messages.each do |message| %>
           <li><%= message %></li>
@@ -10,38 +10,32 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :title, 'Title' %>
-    <%= f.text_field :title %>
+  <div class="field-group">
+    <%= f.label :title, 'Title', class: 'form-label' %>
+    <%= f.text_field :title, class: 'form-input' %>
   </div>
 
-  <div class="field">
-    <%= f.label :description, 'Description' %>
-    <%= f.text_area :description %>
+  <div class="field-group">
+    <%= f.label :description, 'Description', class: 'form-label' %>
+    <%= f.text_area :description, class: 'form-textarea' %>
   </div>
 
-  <div class="field">
-    <%= f.label :visibility, 'Visibility' %>
-    <%= f.select :visibility, [['Public', 'public'], ['Private', 'private']] %>
+  <div class="field-group">
+    <%= f.label :visibility, 'Visibility', class: 'form-label' %>
+    <%= f.select :visibility, [['Public', 'public'], ['Private', 'private']], {}, class: 'form-select' %>
   </div>
 
-  <div class="field">
-    <%= label_tag :collaborator_emails, 'Collaborators (emails separated by commas)' %>
-    <%= text_field_tag :collaborator_emails, params[:collaborator_emails], placeholder: 'Enter collaborator emails' %>
+  <div class="field-group">
+    <%= label_tag :collaborator_emails, 'Collaborators (emails separated by commas)', class: 'form-label' %>
+    <%= text_field_tag :collaborator_emails, params[:collaborator_emails], placeholder: 'Enter collaborator emails', class: 'form-input' %>
   </div>
 
-  <div class="field">
-    <%= f.label :collaborator_permissions, 'Permissions' %>
-    <%= select_tag :collaborator_permissions, options_for_select([['Full', 'full'], ['Partial', 'partial']]) %>
+  <div class="field-group">
+    <%= f.label :collaborator_permissions, 'Permissions', class: 'form-label' %>
+    <%= select_tag :collaborator_permissions, options_for_select([['Full', 'full'], ['Partial', 'partial']]), class: 'form-select' %>
   </div>
-
-  <h3>Files</h3>
-  <%= f.fields_for :project_files do |ff| %>
-    <%= render 'project_file_fields', f: ff %>
-  <% end %>
-  <%= link_to_add_fields "Add File", f, :project_files %>
 
   <div class="actions">
-    <%= f.submit %>
+    <%= f.submit "Create Project", class: 'btn btn-primary' %>
   </div>
 <% end %>

@@ -9,6 +9,7 @@
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "5.4.4",
     "bootstrap": "^5.3.3",
+    "dropzone": "^6.0.0-beta.2",
     "highlight.js": "^11.10.0",
     "jquery": "^3.7.1",
     "turbolinks": "^5.2.0",
