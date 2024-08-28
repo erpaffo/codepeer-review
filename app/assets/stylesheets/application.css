@@ -13,6 +13,7 @@
   --color-border-focus: #4A4F55; /* Grigio medio per i bordi in focus */
   --color-bg-form: #262A30; /* Grigio scuro per lo sfondo del form, simile all'header */
   --color-bg-form-input: #32363C; /* Grigio per gli input, simile alla barra di navigazione */
+  --color-profile-bg: #2A2F35; /* Nuovo colore di sfondo per la sezione profilo */
 }
 
 .snippet-info {
@@ -374,4 +375,98 @@ input[type="submit"]:hover {
 .btn-edit:hover {
   background-color: var(--color-btn-bg-hover);
   transform: scale(1.05);
+}
+
+/* Profile */
+.profile-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: var(--color-profile-bg); /* Aggiunto sfondo specifico per il profilo */
+  border-radius: 8px; /* Aggiunge un bordo arrotondato per evidenziare la sezione */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Aggiunge un'ombra per far risaltare la sezione */
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.profile-info,
+.profile-snippets,
+.profile-feedback,
+.profile-followers-following {
+  margin-bottom: 2rem;
+}
+
+.profile-info h2,
+.profile-snippets h2,
+.profile-feedback h2,
+.profile-followers-following h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.profile-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.profile-buttons a {
+  font-size: 0.875rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.375rem;
+  text-align: center;
+  text-decoration: none;
+}
+
+.profile-followers-following {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.profile-followers-following div {
+  flex: 1;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.profile-followers-following div h2 {
+  font-size: 1.2rem;
+}
+
+.badge-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.badge {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.badge img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 0.5rem;
+  border: 2px solid var(--color-border-light);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .profile-buttons {
+    flex-direction: column;
+  }
+
+  .profile-followers-following {
+    flex-direction: column;
+  }
 }

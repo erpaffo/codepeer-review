@@ -1,113 +1,50 @@
-<h1><%= @user.nickname %>'s Profile</h1>
-
-<p>
-  <strong>First name:</strong>
-  <%= @user.first_name %>
-</p>
-
-<p>
-  <strong>Last name:</strong>
-  <%= @user.last_name %>
-</p>
-
-<p>
-  <strong>Nickname:</strong>
-  <%= @user.nickname %>
-</p>
-
-<p>
-  <strong>Email:</strong>
-  <%= @user.email %>
-</p>
-
-<p>
-  <strong>Phone number:</strong>
-  <%= @user.phone_number %>
-</p>
-
-<% if @user.profile_image.attached? %>
-  <p>
-    <strong>Profile Image:</strong><br />
-    <%= image_tag @user.profile_image.variant(resize: '200x200') %>
-  </p>
-<% elsif @user.profile_image_url.present? %>
-  <p>
-    <strong>Profile Image:</strong><br />
-    <%= image_tag @user.profile_image_url, size: '200x200' %>
-  </p>
-<% end %>
-
-<!-- Link to My Snippets -->
-<%= link_to 'My Snippets', my_snippets_path, class: "btn btn-primary" %>
-
-<!-- Link to My Favorite Snippets -->
-<%= link_to 'My Favorite Snippets', favorite_snippets_path, class: "btn btn-primary" %>
-
-<%= link_to 'Edit Profile', edit_profile_path %>
-<%= link_to 'Back to Dashboard', authenticated_root_path, class: 'back-link' %>
-
-
-<h2>Feedback on My Snippets</h2>
-<% if @snippets.any? %>
-  <ul>
-    <% @snippets.each do |snippet| %>
-      <li>
-        <p><strong>Snippet:</strong> <%= link_to snippet.title, snippet_path(snippet) %></p>
-        <% if snippet.feedbacks.any? %>
-          <ul>
-            <% snippet.feedbacks.each do |feedback| %>
-              <li>
-                <p><strong>Feedback:</strong> <%= feedback.content %></p>
-                <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-                <%= link_to 'Delete Feedback', destroy_feedback_snippet_path(snippet, feedback_id: feedback.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'btn btn-danger' %>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <p>No feedback yet.</p>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No snippets created yet.</p>
-<% end %>
-
-<h2>Feedback on My Profile</h2>
-<% if @received_feedbacks.any? %>
-  <ul>
-    <% @received_feedbacks.each do |feedback| %>
-      <li>
-        <p><strong>Feedback:</strong> <%= feedback.content %></p>
-        <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No feedback on your profile yet.</p>
-<% end %>
-
-<!-- Follower and Following Sections -->
-<h2>Followers</h2>
-<p>
-  <strong>Number of Followers:</strong>
-  <%= @followers_count %>
-</p>
-<%= link_to 'View Followers', user_followers_path(@user), class: 'btn btn-info' %>
-
-<h2>Following</h2>
-<p>
-  <strong>Number of Following:</strong>
-  <%= @following_count %>
-</p>
-<%= link_to 'View Following', user_following_path(@user), class: 'btn btn-info' %>
-
-<h3>Badges</h3>
-<% @user.badges.each do |badge| %>
-  <div class="badge">
-    <img src="<%= badge.icon_url %>" alt="<%= badge.name %>">
-    <p><%= badge.name %></p>
+<div class="profile-container">
+  <div class="profile-header">
+    <%= image_tag @user.profile_image_url || @user.profile_image, class: "rounded-full w-32 h-32" %>
+    <h1><%= @user.nickname %>'s Profile</h1>
+    <p><%= @user.first_name %> <%= @user.last_name %></p>
+    <p><%= @user.email %></p>
   </div>
-<% end %>
 
+  <div class="profile-info">
+    <h2>Profile Information</h2>
+    <p><strong>First Name:</strong> <%= @user.first_name %></p>
+    <p><strong>Last Name:</strong> <%= @user.last_name %></p>
+    <p><strong>Phone Number:</strong> <%= @user.phone_number %></p>
+  </div>
+
+  <div class="profile-buttons">
+    <%= link_to 'Edit Profile', edit_profile_path, class: "bg-teal-500 text-white" %>
+    <%= link_to 'Back to Dashboard', authenticated_root_path, class: "bg-purple-600 text-white" %>
+    <%= link_to 'My Snippets', my_snippets_path, class: "bg-teal-500 text-white" %>
+    <%= link_to 'My Favorite Snippets', favorite_snippets_path, class: "bg-purple-600 text-white" %>
+  </div>
+
+  <div class="profile-feedback">
+    <h2>Feedback on My Profile</h2>
+    <p>No feedback on your profile yet.</p>
+  </div>
+
+  <div class="profile-followers-following">
+    <div>
+      <h2>Followers</h2>
+      <p><strong>Number of Followers:</strong> <%= @followers_count %></p>
+      <%= link_to 'View Followers', user_followers_path(@user), class: 'bg-teal-500 text-white' %>
+    </div>
+    <div>
+      <h2>Following</h2>
+      <p><strong>Number of Following:</strong> <%= @following_count %></p>
+      <%= link_to 'View Following', user_following_path(@user), class: 'bg-teal-500 text-white' %>
+    </div>
+  </div>
+
+  <h3>Badges</h3>
+  <div class="badge-container">
+    <% @user.badges.each do |badge| %>
+      <div class="badge">
+        <img src="<%= badge.icon_url %>" alt="<%= badge.name %>">
+        <p><%= badge.name %></p>
+      </div>
+    <% end %>
+  </div>
+</div>
