@@ -1,3 +1,5 @@
+<!-- app/views/users/my_snippets.html.erb -->
+
 <div class="container mx-auto p-6">
   <h1 class="text-3xl font-bold mb-6">My Snippets</h1>
 
@@ -16,9 +18,9 @@
     </svg>
   </button>
   <ul class="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-lg z-10 hidden" id="sortMenu">
-    <li><%= link_to 'Most Recent', my_snippets_path(order_by: 'most_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
-    <li><%= link_to 'Least Recent', my_snippets_path(order_by: 'least_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
-    <li><%= link_to 'Favorites', my_snippets_path(order_by: 'favorites'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
+    <li><%= link_to 'Most Recent', my_snippets_path(order_by: 'most_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg', data: { turbolinks: false } %></li>
+    <li><%= link_to 'Least Recent', my_snippets_path(order_by: 'least_recent'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg', data: { turbolinks: false } %></li>
+    <li><%= link_to 'Favorites', my_snippets_path(order_by: 'favorites'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg', data: { turbolinks: false } %></li>
   </ul>
 </div>
 
@@ -33,13 +35,12 @@
   <ul class="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-lg z-10 hidden" id="languageMenu">
     <% if @languages.present? %>
       <% @languages.each do |language| %>
-        <li><%= link_to language.capitalize, my_snippets_path(language: language), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
+        <li><%= link_to language.capitalize, my_snippets_path(language: language), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg', data: { turbolinks: false } %></li>
       <% end %>
     <% end %>
-    <li><%= link_to 'Other', my_snippets_path(language: 'other'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg' %></li>
+    <li><%= link_to 'Other', my_snippets_path(language: 'other'), class: 'block px-4 py-2 text-white hover:bg-gray-700 rounded-lg', data: { turbolinks: false } %></li>
   </ul>
 </div>
-
 
   <!-- Snippet Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -47,7 +48,7 @@
       <% if !snippet.draft %>
         <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-300">
           <h2 class="text-lg font-bold text-white mb-2"><%= link_to snippet.title, snippet_path(snippet) %></h2>
-          <p class="text-gray-400 mb-4"><%= truncate(snippet.description, length: 100) %></p>
+          <!-- Rimosso il paragrafo della descrizione per evitare l'errore -->
           <div class="flex justify-between items-center">
             <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "text-yellow-500 text-lg" %>
             <%= link_to 'Edit', edit_snippet_path(snippet), class: 'text-blue-400 hover:text-blue-300' %>
