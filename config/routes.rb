@@ -51,7 +51,7 @@ Rails.application.routes.draw do
     patch 'password', to: 'passwords#update', as: :password
 
     # Settings
-    get 'settings', to: 'users#settings', as: :settings
+    get 'settings', to: 'settings#index', as: :settings
 
     # Two-Factor Authentication Routes
     scope 'two_factor_auth', controller: 'two_factor_auth' do
@@ -124,6 +124,8 @@ Rails.application.routes.draw do
         get 'drafts'
       end
     end
+
+    get 'snippets/:id/public', to: 'snippets#public_show', as: 'snippet_public'
 
     resources :users, only: [:show] do
       member do

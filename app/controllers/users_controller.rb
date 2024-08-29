@@ -132,8 +132,11 @@ class UsersController < ApplicationController
   end
 
   def disable_two_factor_auth
-    current_user.update(otp_enabled: false, otp_secret: nil)
-    redirect_to authenticated_root_path, notice: 'Two-Factor Authentication disabled'
+    if current_user.update(otp_enabled: false, otp_secret: nil, two_factor_method: nil)
+      redirect_to settings_path, notice: 'Two-Factor Authentication disabled'
+    else
+      redirect_to settings_path, alert: 'Failed to disable Two-Factor Authentication'
+    end
   end
 
   def my_profile

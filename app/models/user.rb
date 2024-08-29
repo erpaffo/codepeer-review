@@ -142,6 +142,10 @@ class User < ApplicationRecord
     following.include?(user)
   end
 
+  def two_factor_enabled?
+    otp_required_for_login || two_factor_method.present?
+  end
+  
   private
 
   def password_complexity
@@ -155,6 +159,8 @@ class User < ApplicationRecord
     user_folder_name = email.split('@').first
     bucket.object("uploads/#{user_folder_name}/").put(body: "")
   end
+
+
 
   def meets_criteria?(badge)
     criteria = badge.criteria

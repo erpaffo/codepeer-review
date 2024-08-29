@@ -1,24 +1,43 @@
 <!-- app/views/projects/public_view.html.erb -->
-<h1><%= @project.title %></h1>
-<p><strong>Author:</strong> <%= @project.user.email %></p>
 
-<div id="favorite-button">
-  <%= render partial: 'projects/favorite_button', locals: { project: @project } %>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-3xl font-bold text-white"><%= @project.title %></h1>
+      <%= render partial: 'projects/favorite_button', locals: { project: @project } %>
+    </div>
+
+    <p class="text-gray-400"><strong>Author:</strong> <%= @project.user.email %></p>
+
+    <div class="my-6">
+      <h3 class="text-2xl font-semibold text-white mb-2">Statistics</h3>
+      <ul class="text-gray-400 space-y-2">
+        <li><strong>Unique Views:</strong> <%= @project.unique_view_count %></li>
+        <li><strong>Favorites:</strong> <%= @project.favorite_count %></li>
+      </ul>
+    </div>
+
+    <div class="my-6">
+      <h3 class="text-2xl font-semibold text-white mb-2">Description</h3>
+      <p class="text-gray-300 leading-relaxed"><%= @project.description %></p>
+    </div>
+
+    <div class="my-6">
+      <h3 class="text-2xl font-semibold text-white mb-2">Files</h3>
+      <ul class="text-gray-300 space-y-2">
+        <% @project.project_files.each do |file| %>
+          <li class="flex items-center space-x-2">
+            <%= link_to file.file_identifier, download_file_path(@project, file), class: "text-teal-400 hover:text-teal-300 transition ease-in-out duration-300" %>
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-teal-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 3.6v12.8c0 .993.804 1.6 1.6 1.6h10.8c.993 0 1.6-.804 1.6-1.6V3.6C17 2.606 16.196 2 15.4 2H4.6C3.606 2 3 2.606 3 3.6zm9 7.2V6a1 1 0 112 0v4.8h2.2a1 1 0 010 2H14v4.8a1 1 0 11-2 0v-4.8H9.8a1 1 0 010-2H12z" clip-rule="evenodd" />
+            </svg>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div class="mt-6">
+      <%= link_to 'Back', projects_path, class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
 </div>
-
-<h3>Statistics</h3>
-<ul>
-  <li><strong>Unique Views:</strong> <%= @project.unique_view_count %></li>
-  <li><strong>Favorites:</strong> <%= @project.favorite_count %></li>
-</ul>
-
-<p><strong>Description:</strong> <%= @project.description %></p>
-
-<h3>Files:</h3>
-<ul>
-  <% @project.project_files.each do |file| %>
-    <li><%= link_to file.file_identifier, download_file_path(@project, file) %></li>
-  <% end %>
-</ul>
-
-<%= link_to 'Back', projects_path, class: 'btn btn-secondary' %>

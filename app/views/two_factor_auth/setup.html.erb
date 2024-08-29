@@ -1,17 +1,29 @@
-<h1>Setup Two-Factor Authentication</h1>
-<p>Select a method:</p>
-<%= form_with url: choose_two_factor_auth_path, method: :post do %>
-  <div>
-    <%= radio_button_tag :method, 'sms' %>
-    <%= label_tag :method_sms, 'SMS' %>
-  </div>
-  <div>
-    <%= radio_button_tag :method, 'email' %>
-    <%= label_tag :method_email, 'Email' %>
-  </div>
-  <div>
-    <%= radio_button_tag :method, 'qr_code' %>
-    <%= label_tag :method_qr_code, 'Authenticator App' %>
-  </div>
-  <%= submit_tag 'Continue' %>
-<% end %>
+<div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold text-white mb-4 text-center">Setup Two-Factor Authentication</h1>
+  <p class="text-gray-300 text-center mb-6">Select a method to secure your account:</p>
+  
+  <%= form_with url: choose_two_factor_auth_path, method: :post, class: "space-y-4" do %>
+    <div class="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+      <%= label_tag :method_sms, class: "flex items-center space-x-3" do %>
+        <%= radio_button_tag :method, 'sms', false, class: "form-radio text-teal-500" %>
+        <span class="text-white">SMS</span>
+      <% end %>
+    </div>
+    
+    <div class="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+      <%= label_tag :method_email, class: "flex items-center space-x-3" do %>
+        <%= radio_button_tag :method, 'email', false, class: "form-radio text-teal-500" %>
+        <span class="text-white">Email</span>
+      <% end %>
+    </div>
+    
+    <div class="p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition-colors cursor-pointer">
+      <%= label_tag :method_qr_code, class: "flex items-center space-x-3" do %>
+        <%= radio_button_tag :method, 'qr_code', false, class: "form-radio text-teal-500" %>
+        <span class="text-white">Authenticator App</span>
+      <% end %>
+    </div>
+    
+    <%= submit_tag 'Continue', class: "w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-400 transition-colors" %>
+  <% end %>
+</div>

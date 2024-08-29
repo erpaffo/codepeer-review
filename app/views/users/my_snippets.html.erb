@@ -48,7 +48,6 @@
       <% if !snippet.draft %>
         <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-300">
           <h2 class="text-lg font-bold text-white mb-2"><%= link_to snippet.title, snippet_path(snippet) %></h2>
-          <!-- Rimosso il paragrafo della descrizione per evitare l'errore -->
           <div class="flex justify-between items-center">
             <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "text-yellow-500 text-lg" %>
             <%= link_to 'Edit', edit_snippet_path(snippet), class: 'text-blue-400 hover:text-blue-300' %>

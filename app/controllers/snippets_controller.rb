@@ -63,6 +63,7 @@ class SnippetsController < ApplicationController
       render :edit
     end
   end
+
   def destroy
     @snippet.destroy
     redirect_to my_snippets_path, notice: 'Snippet was successfully deleted.'
@@ -104,6 +105,10 @@ class SnippetsController < ApplicationController
     else
       redirect_to drafts_snippets_path, alert: 'Snippet not found or unauthorized access.'
     end
+  end
+
+  def public_show
+    @snippet = Snippet.find(params[:id])
   end
 
   private
