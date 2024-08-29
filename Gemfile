@@ -8,7 +8,7 @@ gem 'rails', '~> 6.1.7', '>= 6.1.7.8'
 
 gem 'ffi', '1.16.3'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3', '1.4.0'
+gem 'pg'
 
 
 # Use Puma as the app server

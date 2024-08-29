@@ -12,6 +12,9 @@
 
 ActiveRecord::Schema.define(version: 2024_08_23_151730) do
 
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
+
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -44,15 +47,15 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
     t.string "name"
     t.text "description"
     t.string "icon"
-    t.json "criteria", default: "{}"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "icon_url"
+    t.jsonb "criteria", default: "{}"
   end
 
   create_table "collaborator_invitations", force: :cascade do |t|
-    t.integer "project_id", null: false
-    t.integer "user_id"
+    t.bigint "project_id", null: false
+    t.bigint "user_id"
     t.string "email", null: false
     t.string "token", null: false
     t.boolean "accepted", default: false
@@ -64,8 +67,8 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "collaborators", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "project_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "project_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "permissions", default: "partial"
@@ -75,19 +78,19 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "commit_logs", force: :cascade do |t|
-    t.integer "project_id", null: false
+    t.bigint "project_id", null: false
     t.text "description"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "user_id"
+    t.bigint "user_id"
     t.string "message"
     t.index ["project_id"], name: "index_commit_logs_on_project_id"
     t.index ["user_id"], name: "index_commit_logs_on_user_id"
   end
 
   create_table "favorites", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "project_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "project_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["project_id"], name: "index_favorites_on_project_id"
@@ -96,9 +99,9 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
 
   create_table "feedbacks", force: :cascade do |t|
     t.text "content"
-    t.integer "user_id", null: false
-    t.integer "snippet_id"
-    t.integer "user_profile_id"
+    t.bigint "user_id", null: false
+    t.bigint "snippet_id"
+    t.bigint "user_profile_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["snippet_id"], name: "index_feedbacks_on_snippet_id"
@@ -117,7 +120,7 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "history_records", force: :cascade do |t|
-    t.integer "snippet_id", null: false
+    t.bigint "snippet_id", null: false
     t.string "field"
     t.string "old_value"
     t.string "new_value"
@@ -128,21 +131,21 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "notifications", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "notifier_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "notifier_id", null: false
     t.string "message"
     t.datetime "read_at"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "read"
-    t.integer "badge_id"
+    t.bigint "badge_id"
     t.index ["badge_id"], name: "index_notifications_on_badge_id"
     t.index ["notifier_id"], name: "index_notifications_on_notifier_id"
     t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "project_files", force: :cascade do |t|
-    t.integer "project_id", null: false
+    t.bigint "project_id", null: false
     t.string "file"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -150,8 +153,8 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "project_views", force: :cascade do |t|
-    t.integer "project_id", null: false
-    t.integer "user_id", null: false
+    t.bigint "project_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["project_id"], name: "index_project_views_on_project_id"
@@ -161,7 +164,7 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   create_table "projects", force: :cascade do |t|
     t.string "title"
     t.text "description"
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.boolean "public"
@@ -194,8 +197,8 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "user_badges", force: :cascade do |t|
-    t.integer "user_id", null: false
-    t.integer "badge_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "badge_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["badge_id"], name: "index_user_badges_on_badge_id"
