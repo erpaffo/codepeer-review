@@ -9,24 +9,24 @@
 </head>
 <body class="font-Inter bg-gray-900 text-gray-300 flex items-center justify-center h-screen">
 
-  <div class="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-    <h2 class="text-2xl font-bold text-center mb-6">Log in</h2>
+  <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-6 text-white">Log in</h2>
     <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
       <%= render "devise/shared/error_messages", resource: resource %>
 
       <div class="mb-4">
-        <%= f.label :email, class: "block text-gray-700" %>
-        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 p-2 w-full border rounded bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring focus:ring-teal-400" %>
+        <%= f.label :email, class: "block text-gray-400" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "mt-1 p-2 w-full border rounded bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring focus:ring-teal-500" %>
       </div>
 
       <div class="mb-4">
-        <%= f.label :password, class: "block text-gray-700" %>
-        <%= f.password_field :password, autocomplete: "current-password", class: "mt-1 p-2 w-full border rounded bg-gray-700 text-gray-200 placeholder-gray-400 focus:outline-none focus:ring focus:ring-teal-400" %>
+        <%= f.label :password, class: "block text-gray-400" %>
+        <%= f.password_field :password, autocomplete: "current-password", class: "mt-1 p-2 w-full border rounded bg-gray-700 text-white placeholder-gray-500 focus:outline-none focus:ring focus:ring-teal-500" %>
       </div>
 
       <div class="mb-4 flex items-center">
-        <%= f.check_box :remember_me, class: "mr-2 leading-tight bg-gray-700 text-gray-200" %>
-        <%= f.label :remember_me, class: "text-sm text-gray-700" %>
+        <%= f.check_box :remember_me, class: "mr-2 leading-tight bg-gray-700 text-white border-gray-600 focus:ring-teal-500" %>
+        <%= f.label :remember_me, class: "text-sm text-gray-400" %>
       </div>
 
       <div class="mb-4">
@@ -34,12 +34,11 @@
       </div>
 
       <div class="mb-4">
-        <%= f.submit "Log in", class: "w-full bg-btn-bg text-white py-2 rounded-lg hover:bg-btn-bg-hover transition-all duration-300 transform hover:scale-105" %>
+        <%= f.submit "Log in", class: "w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-500 transition-all duration-300 transform hover:scale-105" %>
       </div>
     <% end %>
 
     <div class="text-center">
-      <%= link_to "Forgot your password?", new_user_password_path, class: "text-sm text-teal-500 hover:underline" %>
       <%= render "devise/shared/links" %>
     </div>
   </div>
