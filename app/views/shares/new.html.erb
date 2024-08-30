@@ -12,3 +12,20 @@
 <% end %>
 
 <%= link_to 'Back to Dashboard', authenticated_root_path, class: 'back-link' %>
+--
+Milgiroa anche questa vista:
+
+<h2>Condividi Snippet</h2>
+<p>Invia questo snippet via email a un destinatario specifico.</p>
+
+<%= form_with url: share_snippet_path(@snippet), method: :post, local: true do |form| %>
+  <div class="form-group">
+    <%= form.label :email, 'Email del destinatario' %>
+    <%= form.email_field :email, class: 'form-control', required: true %>
+  </div>
+  <div class="form-group">
+    <%= form.submit 'Invia', class: 'btn btn-primary' %>
+  </div>
+<% end %>
+
+<%= link_to 'Back to Dashboard', authenticated_root_path, class: 'back-link' %>

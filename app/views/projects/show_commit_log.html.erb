@@ -1,0 +1,9 @@
+<h1 class="text-3xl font-bold mb-6">Changes in Commit <%= @commit_log.created_at.strftime("%d/%m/%Y %H:%M:%S") %></h1>
+
+<div class="bg-gray-900 p-6 rounded-lg shadow-lg">
+  <div class="diff bg-gray-800 p-4 rounded-lg overflow-auto" style="max-height: 500px;">
+    <%= raw @commit_log.diff %>
+  </div>
+</div>
+
+<%= link_to 'Back to Commit Logs', project_commit_logs_path(@project), class: 'bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition-all duration-300 mt-4' %>

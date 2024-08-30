@@ -1,8 +1,12 @@
-<ul>
-  <% snippets.each do |snippet| %>
-    <li>
-      <%= link_to snippet.title, snippet_path(snippet) %>
-      <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "toggle-favorite" %>
-    </li>
-  <% end %>
-</ul>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <ul class="text-gray-300 space-y-2">
+      <% snippets.each do |snippet| %>
+        <li class="flex justify-between items-center">
+          <%= link_to snippet.title, snippet_path(snippet), class: "text-teal-400 hover:text-teal-300 transition ease-in-out duration-300" %>
+          <%= link_to snippet.favorite ? '★' : '☆', toggle_favorite_snippet_path(snippet), method: :post, remote: true, class: "text-yellow-500 text-lg hover:text-yellow-400 transition ease-in-out duration-300" %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

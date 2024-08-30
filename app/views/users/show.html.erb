@@ -14,10 +14,10 @@
   </div>
 
   <div class="profile-buttons">
-    <%= link_to 'Edit Profile', edit_profile_path, class: "bg-teal-500 text-white" %>
-    <%= link_to 'Back to Dashboard', authenticated_root_path, class: "bg-purple-600 text-white" %>
-    <%= link_to 'My Snippets', my_snippets_path, class: "bg-teal-500 text-white" %>
-    <%= link_to 'My Favorite Snippets', favorite_snippets_path, class: "bg-purple-600 text-white" %>
+    <%= link_to 'Edit Profile', edit_profile_path, class: "bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-400 transition" %>
+    <%= link_to 'Back to Dashboard', authenticated_root_path, class: "bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition" %>
+    <%= link_to 'My Snippets', my_snippets_path, class: "bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-400 transition" %>
+    <%= link_to 'My Favorite Snippets', favorite_snippets_path, class: "bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition" %>
   </div>
 
   <div class="profile-feedback">
@@ -25,25 +25,26 @@
     <p>No feedback on your profile yet.</p>
   </div>
 
-  <div class="profile-followers-following">
+  <!-- Improved Followers and Following Section -->
+  <div class="profile-followers-following grid grid-cols-2 gap-4 text-center mb-6">
     <div>
-      <h2>Followers</h2>
+      <h2 class="text-lg font-bold text-white mb-2">Followers</h2>
       <p><strong>Number of Followers:</strong> <%= @followers_count %></p>
-      <%= link_to 'View Followers', user_followers_path(@user), class: 'bg-teal-500 text-white' %>
+      <%= link_to 'View Followers', user_followers_path(@user), class: 'bg-teal-500 text-white py-1 px-3 rounded text-sm hover:bg-teal-400 transition' %>
     </div>
     <div>
-      <h2>Following</h2>
+      <h2 class="text-lg font-bold text-white mb-2">Following</h2>
       <p><strong>Number of Following:</strong> <%= @following_count %></p>
-      <%= link_to 'View Following', user_following_path(@user), class: 'bg-teal-500 text-white' %>
+      <%= link_to 'View Following', user_following_path(@user), class: 'bg-teal-500 text-white py-1 px-3 rounded text-sm hover:bg-teal-400 transition' %>
     </div>
   </div>
 
-  <h3>Badges</h3>
-  <div class="badge-container">
+  <h3 class="text-xl font-bold text-white mb-4 text-center">Badges</h3>
+  <div class="badge-container grid grid-cols-3 gap-4 text-center">
     <% @user.badges.each do |badge| %>
       <div class="badge">
-        <img src="<%= badge.icon_url %>" alt="<%= badge.name %>">
-        <p><%= badge.name %></p>
+        <img src="<%= badge.icon_url %>" alt="<%= badge.name %>" class="w-16 h-16 rounded-full border border-gray-600 mb-2 mx-auto">
+        <p class="text-teal-400"><%= badge.name %></p>
       </div>
     <% end %>
   </div>

@@ -1,40 +1,40 @@
 <% if flash[:notice] %>
-  <div class="bg-green-500 text-white p-4 rounded-lg mb-4">
+  <div class="bg-green-600 text-white p-4 rounded-lg mb-4">
     <%= flash[:notice] %>
   </div>
 <% elsif flash[:alert] %>
-  <div class="bg-red-500 text-white p-4 rounded-lg mb-4">
+  <div class="bg-red-600 text-white p-4 rounded-lg mb-4">
     <%= flash[:alert] %>
   </div>
 <% end %>
 
-<div class="bg-card text-card-foreground p-6 rounded-lg shadow-lg">
-  <h1 class="text-2xl font-bold mb-4"><%= @project.title %></h1>
+<div class="bg-gray-800 text-gray-300 p-6 rounded-lg shadow-lg">
+  <h1 class="text-3xl font-bold text-white mb-4"><%= @project.title %></h1>
 
-  <p class="mb-4"><%= @project.description %></p>
+  <p class="mb-4 text-gray-400"><%= @project.description %></p>
 
   <div id="favorite-button" class="mb-4">
     <%= render partial: 'projects/favorite_button', locals: { project: @project } %>
   </div>
 
-  <h2 class="text-lg font-semibold mb-2">Statistics</h2>
-  <p class="mb-2">Unique Views: <span class="font-bold"><%= @project.unique_view_count %></span></p>
-  <p class="mb-4">Favorites: <span class="font-bold"><%= @project.favorite_count %></span></p>
+  <h2 class="text-xl font-semibold mb-2 text-white">Statistics</h2>
+  <p class="mb-2">Unique Views: <span class="font-bold text-teal-400"><%= @project.unique_view_count %></span></p>
+  <p class="mb-4">Favorites: <span class="font-bold text-teal-400"><%= @project.favorite_count %></span></p>
 
-  <h2 class="text-lg font-semibold mb-2">Files</h2>
+  <h2 class="text-xl font-semibold mb-2 text-white">Files</h2>
   <ul class="mb-4">
     <% @project.project_files.each do |file| %>
       <li class="mb-2 flex justify-between items-center">
-        <%= link_to file.file_identifier, show_file_project_path(@project, file_id: file.id), class: "text-accent hover:text-accent-foreground" %>
+        <%= link_to file.file_identifier, show_file_project_path(@project, file_id: file.id), class: "text-teal-400 hover:text-teal-300 transition ease-in-out duration-300" %>
         <% if @project.collaborators.find_by(user: current_user)&.permissions.present? %>
-          <%= link_to 'Edit File', edit_file_project_path(@project, file_id: file.id), class: "bg-secondary text-secondary-foreground py-1 px-3 rounded-lg text-sm" %>
+          <%= link_to 'Edit File', edit_file_project_path(@project, file_id: file.id), class: "bg-gray-700 text-gray-300 py-1 px-3 rounded-lg text-sm hover:bg-gray-600 transition ease-in-out duration-300" %>
         <% end %>
       </li>
     <% end %>
   </ul>
 
   <div class="flex items-center mb-4">
-    <%= link_to upload_files_project_path(@project), class: "bg-teal-500 text-white py-1 px-3 rounded-lg flex items-center space-x-2 text-sm" do %>
+    <%= link_to upload_files_project_path(@project), class: "bg-teal-600 text-white py-2 px-4 rounded-lg flex items-center space-x-2 text-sm hover:bg-teal-500 transition ease-in-out duration-300" do %>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
         <path fill-rule="evenodd" d="M5 9V7a7 7 0 0114 0v2h2a1 1 0 110 2h-2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6H1a1 1 0 110-2h2zm5 0h6V7a5 5 0 10-10 0v2h4z" clip-rule="evenodd" />
       </svg>
@@ -43,46 +43,46 @@
   </div>
 
   <% if @project.user %>
-    <p class="mb-4">Owner: <span class="font-bold"><%= @project.user.email %></span></p>
+    <p class="mb-4">Owner: <span class="font-bold text-teal-400"><%= @project.user.email %></span></p>
   <% else %>
-    <p class="mb-4">Owner: <span class="font-bold">Unknown</span></p>
+    <p class="mb-4">Owner: <span class="font-bold text-teal-400">Unknown</span></p>
   <% end %>
 
   <div class="flex flex-wrap gap-2 mb-4">
-    <%= link_to 'Edit', edit_project_path(@project), class: "bg-purple-600 text-white py-1 px-3 rounded-lg text-sm" if current_user == @project.user %>
-    <%= link_to 'Back to Projects', projects_path, class: "bg-teal-500 text-white py-1 px-3 rounded-lg text-sm" %>
-    <%= link_to 'Create File', new_file_project_path(@project), class: "bg-purple-600 text-white py-1 px-3 rounded-lg text-sm" if current_user == @project.user || @project.collaborators.find_by(user: current_user)&.permissions == 'full' %>
+    <%= link_to 'Edit', edit_project_path(@project), class: "bg-purple-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-purple-500 transition ease-in-out duration-300" if current_user == @project.user %>
+    <%= link_to 'Back to Projects', projects_path, class: "bg-teal-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-teal-500 transition ease-in-out duration-300" %>
+    <%= link_to 'Create File', new_file_project_path(@project), class: "bg-purple-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-purple-500 transition ease-in-out duration-300" if current_user == @project.user || @project.collaborators.find_by(user: current_user)&.permissions == 'full' %>
   </div>
 
   <% if @project.collaborators.exists? && current_user == @project.user %>
-    <h3 class="text-lg font-semibold mb-2">Collaborators</h3>
+    <h3 class="text-xl font-semibold mb-2 text-white">Collaborators</h3>
     <ul class="mb-4">
       <% @project.collaborators.each do |collaborator| %>
-        <li class="mb-2">
-          <span class="font-bold"><%= collaborator.user.email %></span> - <%= collaborator.permissions.capitalize %>
+        <li class="mb-2 flex items-center space-x-2">
+          <span class="font-bold text-teal-400"><%= collaborator.user.email %></span> - <%= collaborator.permissions.capitalize %>
           <%= form_with url: update_permissions_project_path(@project), method: :patch, local: true do |f| %>
             <%= f.hidden_field :collaborator_id, value: collaborator.id %>
-            <%= f.select :permissions, options_for_select(['full', 'partial'], collaborator.permissions), class: "bg-input text-foreground border border-border rounded-lg text-sm py-1 px-2" %>
-            <%= f.submit 'Update', class: "bg-secondary text-secondary-foreground py-1 px-2 rounded-lg text-sm" %>
+            <%= f.select :permissions, options_for_select(['full', 'partial'], collaborator.permissions), class: "bg-gray-700 text-gray-300 border border-gray-600 rounded-lg text-sm py-1 px-2" %>
+            <%= f.submit 'Update', class: "bg-gray-700 text-gray-300 py-1 px-2 rounded-lg text-sm hover:bg-gray-600 transition ease-in-out duration-300" %>
           <% end %>
         </li>
       <% end %>
     </ul>
   <% end %>
 
-  <h2 class="text-lg font-semibold mb-2">Snippets</h2>
+  <h2 class="text-xl font-semibold mb-2 text-white">Snippets</h2>
   <ul class="mb-4">
     <% @project.project_files.each do |file| %>
       <% file.snippets.each do |snippet| %>
         <li class="mb-2">
-          <%= link_to snippet.content.truncate(50), project_project_file_snippet_path(@project, file, snippet), class: "text-accent hover:text-accent-foreground text-sm" %>
+          <%= link_to snippet.content.truncate(50), project_project_file_snippet_path(@project, file, snippet), class: "text-teal-400 hover:text-teal-300 transition ease-in-out duration-300 text-sm" %>
         </li>
       <% end %>
     <% end %>
   </ul>
 
   <div class="flex flex-wrap gap-2">
-    <%= link_to 'View Commit Logs', commit_logs_project_path(@project), class: 'bg-teal-500 text-white py-1 px-3 rounded-lg text-sm' %>
-    <%= link_to 'Upload Project', upload_project_path(@project), class: "bg-teal-500 text-white py-1 px-3 rounded-lg text-sm" %>
+    <%= link_to 'View Commit Logs', commit_logs_project_path(@project), class: 'bg-teal-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-teal-500 transition ease-in-out duration-300' %>
+    <%= link_to 'Upload Project', upload_project_path(@project), class: "bg-teal-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-teal-500 transition ease-in-out duration-300" %>
   </div>
 </div>

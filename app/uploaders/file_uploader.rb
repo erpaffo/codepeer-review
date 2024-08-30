@@ -7,7 +7,7 @@ class FileUploader < CarrierWave::Uploader::Base
     "uploads/#{user_folder_name}/#{project_folder_name}"
   end
 
-  def extension_whitelist
-    %w[jpg jpeg gif png txt pdf doc docx py c rb cpp css html]
+  def extension_allowlist
+    %w[jpg jpeg gif png txt pdf doc docx]
   end
 end

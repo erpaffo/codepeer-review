@@ -69,6 +69,24 @@ class TwoFactorAuthController < ApplicationController
     end
   end
 
+  def resend_code
+    method = current_user.two_factor_method
+
+    if method == 'sms'
+      if current_user.phone_number.present?
+        current_user.send_two_factor_authentication_code('sms')
+        redirect_to sms_two_factor_auth_path, notice: 'Verification code resent to your phone.'
+      else
+        redirect_to setup_two_factor_auth_path, alert: 'Phone number not found. Please set up your phone number.'
+      end
+    elsif method == 'email'
+      current_user.send_two_factor_authentication_code('email')
+      redirect_to email_two_factor_auth_path, notice: 'Verification code resent to your email.'
+    else
+      redirect_to setup_two_factor_auth_path, alert: 'Invalid 2FA method. Please select a valid method.'
+    end
+  end
+
   private
 
   def phone_number_params

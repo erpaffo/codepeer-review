@@ -40,7 +40,7 @@ class ProjectsController < ApplicationController
 
 
   def upload_file
-    @project = Project.find(params[:id]) 
+    @project = Project.find(params[:id])
     @file = @project.project_files.build(file: params[:file])
 
     if @file.save
@@ -107,31 +107,42 @@ class ProjectsController < ApplicationController
     end
   end
 
-
   def update_file
     @file = @project.project_files.find(params[:file_id])
     new_file_content = params[:project_file][:file]
 
-    # Se il contenuto viene ricevuto come stringa JSON, decodifica i caratteri \n
-    new_file_content.gsub!(/\\n/, "\n")
+    begin
+      # Decode JSON string if needed
+      new_file_content.gsub!(/\\n/, "\n")
+      new_file_content_utf8 = new_file_content.encode('UTF-8')
 
-    new_file_content_utf8 = new_file_content.encode('UTF-8')
+      # Download the original file content from S3
+      local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
+      download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
+      original_file_content = read_file_content(local_path)
 
-    local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
-    download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
-    original_file_content = read_file_content(local_path)
+      # Calculate the diff between the original and new content
+      diff = Diffy::Diff.new(original_file_content, new_file_content_utf8, context: 3).to_s(:html)
 
-    snippet_content = calculate_diff(original_file_content, new_file_content_utf8)
+      # Create a commit log entry with the diff
+      @project.commit_logs.create!(
+        file: @file,
+        user: current_user,
+        message: "Updated #{@file.file_identifier}",
+        diff: diff
+      )
 
-    @file.snippets.create(content: snippet_content)
+      # Update the file content in S3
+      s3 = Aws::S3::Resource.new
+      obj = s3.bucket(ENV['AWS_BUCKET']).object(@file.file.path)
+      obj.put(body: new_file_content_utf8)
 
-    s3 = Aws::S3::Resource.new
-    obj = s3.bucket(ENV['AWS_BUCKET']).object(@file.file.path)
-    obj.put(body: new_file_content_utf8)
-
-    redirect_to project_path(@project), notice: 'File was successfully updated.'
+      redirect_to project_path(@project), notice: 'File was successfully updated.'
+    rescue => e
+      Rails.logger.error "Errore nell'elaborazione del file: #{e.message}"
+      render json: { error: 'File processing error' }, status: :unprocessable_entity
+    end
   end
-
 
   def run_code
     code = params[:code]
@@ -238,6 +249,10 @@ class ProjectsController < ApplicationController
 
   def commit_logs
     @commit_logs = @project.commit_logs.order(created_at: :desc)
+  end
+
+  def show_commit_log
+    @commit_log = @project.commit_logs.find(params[:id])
   end
 
   def toggle_favorite

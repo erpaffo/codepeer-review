@@ -1,5 +1,6 @@
 class ProjectFile < ApplicationRecord
   belongs_to :project
+
   mount_uploader :file, FileUploader
 
   validates :file, presence: true
@@ -38,8 +39,9 @@ class ProjectFile < ApplicationRecord
                 "File '#{file.filename}' was updated. Changes:\n#{generate_diff}"
               end
 
-    self.project.commit_logs.create(user: self.project.user, message: message)
+    self.project.commit_logs.create(message: message)
   end
+
 
   def generate_diff
     original_content = self.file.read.force_encoding('UTF-8').split("\n")

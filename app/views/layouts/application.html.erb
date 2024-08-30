@@ -73,8 +73,9 @@
     <!-- Flash messages -->
     <div class="container mx-auto mt-4 px-4">
       <% flash.each do |key, message| %>
-        <div class="flash-<%= key %>">
-          <%= message %>
+        <div class="flash-<%= key %> relative bg-gray-800 text-white p-4 rounded-lg mb-4">
+          <span><%= message %></span>
+          <button class="close-alert absolute right-2 top-2 text-white">&times;</button>
         </div>
       <% end %>
     </div>
@@ -94,3 +95,5 @@
   </script>
 </body>
 </html>
+
+<%= javascript_pack_tag 'flash_messages' %>

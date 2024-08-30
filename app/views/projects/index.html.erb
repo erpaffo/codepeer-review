@@ -1,27 +1,29 @@
-<h1 class="page-title">My Projects</h1>
+<div class="container mx-auto p-6">
+  <h1 class="page-title">My Projects</h1>
 
-<div class="actions-bar">
-  <%= link_to 'New Project', new_project_path, class: "btn btn-primary" %>
-  <%= link_to 'My Favorite Projects', favorite_projects_projects_path, class: 'btn btn-secondary' %>
-</div>
+  <div class="actions-bar mb-6">
+    <%= link_to 'New Project', new_project_path, class: "btn btn-primary" %>
+    <%= link_to 'My Favorite Projects', favorite_projects_projects_path, class: 'btn btn-secondary ml-4' %>
+  </div>
 
-<table class="table project-table">
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Description</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @projects.each do |project| %>
+  <table class="table project-table w-full text-left bg-gray-800 text-gray-200 shadow-lg rounded-lg overflow-hidden">
+    <thead class="bg-gray-700 text-gray-300">
       <tr>
-        <td><%= project.title %></td>
-        <td><%= truncate(project.description, length: 50) %></td>
-        <td><%= link_to 'Show', project, class: "btn btn-show" %></td>
-        <td><%= link_to 'Edit', edit_project_path(project), class: "btn btn-edit" %></td>
+        <th class="p-4">Name</th>
+        <th class="p-4">Description</th>
+        <th colspan="3" class="p-4"></th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+
+    <tbody>
+      <% @projects.each do |project| %>
+        <tr class="border-b border-gray-700 hover:bg-gray-700 transition-colors duration-200">
+          <td class="p-4 font-semibold"><%= project.title %></td>
+          <td class="p-4"><%= truncate(project.description, length: 50) %></td>
+          <td class="p-4"><%= link_to 'Show', project, class: "btn btn-show" %></td>
+          <td class="p-4"><%= link_to 'Edit', edit_project_path(project), class: "btn btn-edit" %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

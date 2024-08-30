@@ -1,93 +1,61 @@
-<!-- app/views/users/_profile_with_details.html.erb -->
-<div id="profile-content">
-  <h1><%= @user.nickname %>'s Profile</h1>
+<div class="profile-container">
+  <div class="profile-header text-center">
+    <h1 class="text-3xl font-bold mb-6 text-white"><%= @user.nickname %>'s Profile</h1>
+    <% if @user.profile_image.attached? %>
+      <%= image_tag @user.profile_image.variant(resize: '200x200'), class: "rounded-full border border-gray-600" %>
+    <% elsif @user.profile_image_url.present? %>
+      <%= image_tag @user.profile_image_url, size: '200x200', class: "rounded-full border border-gray-600" %>
+    <% end %>
+  </div>
 
-  <p>
-    <strong>First name:</strong>
-    <%= @user.first_name %>
-  </p>
-
-  <p>
-    <strong>Last name:</strong>
-    <%= @user.last_name %>
-  </p>
-
-  <p>
-    <strong>Nickname:</strong>
-    <%= @user.nickname %>
-  </p>
-
-  <p>
-    <strong>Email:</strong>
-    <%= @user.email %>
-  </p>
-
-  <p>
-    <strong>Phone number:</strong>
-    <%= @user.phone_number %>
-  </p>
-
-  <% if @user.profile_image.attached? %>
-    <p>
-      <strong>Profile Image:</strong><br />
-      <%= image_tag @user.profile_image.variant(resize: '200x200') %>
-    </p>
-  <% elsif @user.profile_image_url.present? %>
-    <p>
-      <strong>Profile Image:</strong><br />
-      <%= image_tag @user.profile_image_url, size: '200x200' %>
-    </p>
-  <% end %>
-
-  <p>
-    <strong>Number of Snippets:</strong>
-    <%= @user.snippets.count %>
-  </p>
-
-  <p>
-    <strong>Number of Projects:</strong>
-    <%= @user.projects.count %>
-  </p>
-
-  <p>
-    <strong>Number of Followers:</strong>
-    <%= @user.followers.count %>
-  </p>
-
-  <p>
-    <strong>Number of Following:</strong>
-    <%= @user.following.count %>
-  </p>
+  <div class="profile-info text-center mb-6">
+    <p><strong>First name:</strong> <%= @user.first_name %></p>
+    <p><strong>Last name:</strong> <%= @user.last_name %></p>
+    <p><strong>Email:</strong> <%= @user.email %></p>
+    <p><strong>Phone number:</strong> <%= @user.phone_number %></p>
+    <p><strong>Number of Snippets:</strong> <%= @user.snippets.count %></p>
+    <p><strong>Number of Projects:</strong> <%= @user.projects.count %></p>
+    <p><strong>Number of Followers:</strong> <%= @user.followers.count %></p>
+    <p><strong>Number of Following:</strong> <%= @user.following.count %></p>
+  </div>
 
   <% if user_signed_in? %>
-    <%= button_to 'Unfollow', unfollow_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
+    <div class="profile-buttons text-center">
+      <%= button_to 'Unfollow', unfollow_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
+    </div>
   <% end %>
 
-  <h2>Snippets</h2>
-  <% if @user.snippets.any? %>
-    <ul>
-      <% @user.snippets.each do |snippet| %>
-        <li>
-          <%= link_to snippet.title, community_activity_path(snippet), class: "btn btn-info"%>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p>No snippets available.</p>
-  <% end %>
+  <div class="profile-snippets mb-6">
+    <h2 class="text-xl font-bold mb-4 text-white">Snippets</h2>
+    <% if @user.snippets.any? %>
+      <ul>
+        <% @user.snippets.each do |snippet| %>
+          <li class="mb-2">
+            <%= link_to snippet.title, community_activity_path(snippet), class: "btn btn-info" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No snippets available.</p>
+    <% end %>
+  </div>
 
-  <h2>Projects</h2>
-  <% if @user.projects.any? %>
-    <ul>
-      <% @user.projects.each do |project| %>
-        <li>
-          <%= link_to project.title, project_path(project) %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <p>No projects available.</p>
-  <% end %>
+  <div class="profile-projects">
+    <h2 class="text-xl font-bold mb-4 text-white">Projects</h2>
+    <% if @user.projects.any? %>
+      <ul>
+        <% @user.projects.each do |project| %>
+          <li class="mb-2">
+            <%= link_to project.title, project_path(project), class: "text-teal-400 hover:text-teal-300" %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No projects available.</p>
+    <% end %>
+  </div>
 
-  <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+  <div class="mt-6 text-center">
+    <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+  </div>
 </div>

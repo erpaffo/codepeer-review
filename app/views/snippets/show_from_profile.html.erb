@@ -1,14 +1,19 @@
-<!-- app/views/snippets/show_from_profile.html.erb -->
-<h1><%= @snippet.title %></h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white mb-4"><%= @snippet.title %></h1>
 
-<p>
-  <strong>Content:</strong>
-  <%= @snippet.content %> <!-- Sostituisci `content` con l'attributo corretto -->
-</p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Content</h2>
+      <p class="text-gray-300 leading-relaxed"><%= @snippet.content %></p>
+    </div>
 
-<p>
-  <strong>Comment:</strong>
-  <%= @snippet.comment %> <!-- Sostituisci con l'attributo corretto se necessario -->
-</p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Comment</h2>
+      <p class="text-gray-300 leading-relaxed"><%= @snippet.comment %></p>
+    </div>
 
-<%= link_to 'Back to Profile', user_profile_with_details_path(@user), class: 'btn btn-secondary' %>
+    <div class="mt-6">
+      <%= link_to 'Back to Profile', user_profile_with_details_path(@user), class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
+</div>

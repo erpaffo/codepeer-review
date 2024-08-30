@@ -1,8 +1,14 @@
-<h1>Scan QR Code</h1>
-<p>Scan this QR code with your Authenticator app and enter the code below:</p>
-<%= image_tag @qr_code %>
-<%= form_with url: verify_two_factor_auth_path, method: :post do %>
-  <%= label_tag :otp_attempt, 'Code' %>
-  <%= text_field_tag :otp_attempt %>
-  <%= submit_tag 'Verify' %>
-<% end %>
+<div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-bold text-white mb-4 text-center">Scan QR Code</h1>
+  <p class="text-gray-300 text-center mb-4">Scan this QR code with your Authenticator app and enter the code below:</p>
+  <div class="flex justify-center mb-6">
+    <%= image_tag @qr_code, class: "rounded-lg" %>
+  </div>
+  <%= form_with url: verify_two_factor_auth_path, method: :post do %>
+    <div class="mb-4">
+      <%= label_tag :otp_attempt, 'Code', class: "block text-white mb-2" %>
+      <%= text_field_tag :otp_attempt, nil, class: "w-full p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+    </div>
+    <%= submit_tag 'Verify', class: "w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-400 transition-colors" %>
+  <% end %>
+</div>

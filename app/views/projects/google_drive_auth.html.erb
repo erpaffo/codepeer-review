@@ -1,6 +1,16 @@
-<h1>Authorize Google Drive</h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center">
+    <h1 class="text-3xl font-semibold text-gold mb-6">Authorize Google Drive</h1>
 
-<p>You are being redirected to authorize access to your Google Drive. Please wait...</p>
+    <p class="text-gray-300 mb-6">You are being redirected to authorize access to your Google Drive. Please wait...</p>
+    
+    <div class="flex justify-center items-center">
+      <svg class="animate-spin h-8 w-8 text-teal-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a8 8 0 11-4.702 14.965A8.007 8.007 0 0112 4.354z" />
+      </svg>
+    </div>
+  </div>
+</div>
 
 <script type="text/javascript">
   window.location.href = "<%= @auth_url %>";

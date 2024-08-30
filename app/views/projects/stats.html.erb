@@ -1,6 +1,12 @@
-<h1>Project Statistics: <%= @project.title %></h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white mb-4">Project Statistics: <%= @project.title %></h1>
 
-<p><strong>Unique Views:</strong> <%= @unique_views %></p>
-<p><strong>Favorites:</strong> <%= @favorite_count %></p>
+    <div class="text-gray-400 mb-6">
+      <p class="mb-2"><strong>Unique Views:</strong> <span class="text-teal-400"><%= @unique_views %></span></p>
+      <p class="mb-2"><strong>Favorites:</strong> <span class="text-teal-400"><%= @favorite_count %></span></p>
+    </div>
 
-<%= link_to 'Back to Project', project_path(@project), class: "btn btn-secondary" %>
+    <%= link_to 'Back to Project', project_path(@project), class: "bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300" %>
+  </div>
+</div>

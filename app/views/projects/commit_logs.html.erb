@@ -1,15 +1,26 @@
-<h1>Commit Logs for <%= @project.title %></h1>
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold text-gold mb-6">Commit Logs for <%= @project.title %></h1>
 
-<% if @commit_logs.any? %>
-  <ul>
-    <% @commit_logs.each do |log| %>
-      <li>
-        <strong><%= log.created_at.strftime("%d/%m/%Y %H:%M:%S") %>:</strong> <%= log.message %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No commits have been made to this project yet.</p>
-<% end %>
+  <% if @commit_logs.any? %>
+    <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
+      <ul class="space-y-4">
+        <% @commit_logs.each do |log| %>
+          <li class="border-b border-gray-600 pb-4">
+            <div class="flex justify-between items-center text-gray-300">
+              <span class="font-semibold text-teal-400"><%= log.created_at.strftime("%d/%m/%Y %H:%M:%S") %></span>
+              <p class="ml-4"><%= log.message %></p>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% else %>
+    <div class="bg-gray-700 p-4 rounded-lg shadow-lg">
+      <p class="text-gray-400">No commits have been made to this project yet.</p>
+    </div>
+  <% end %>
 
-<%= link_to 'Back to Project', project_path(@project), class: 'btn btn-secondary' %>
+  <div class="mt-8">
+    <%= link_to 'Back to Project', project_path(@project), class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+  </div>
+</div>

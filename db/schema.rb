@@ -76,13 +76,14 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
 
   create_table "commit_logs", force: :cascade do |t|
     t.integer "project_id", null: false
+    t.integer "file_id", null: false
     t.text "description"
+    t.text "diff"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "user_id"
     t.string "message"
+    t.index ["file_id"], name: "index_commit_logs_on_file_id"
     t.index ["project_id"], name: "index_commit_logs_on_project_id"
-    t.index ["user_id"], name: "index_commit_logs_on_user_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -243,8 +244,8 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   add_foreign_key "collaborator_invitations", "users"
   add_foreign_key "collaborators", "projects"
   add_foreign_key "collaborators", "users"
+  add_foreign_key "commit_logs", "project_files", column: "file_id"
   add_foreign_key "commit_logs", "projects"
-  add_foreign_key "commit_logs", "users"
   add_foreign_key "favorites", "projects"
   add_foreign_key "favorites", "users"
   add_foreign_key "feedbacks", "snippets"

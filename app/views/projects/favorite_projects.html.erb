@@ -1,13 +1,29 @@
-<h1>My Favorite Projects</h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-semibold text-gold mb-6">My Favorite Projects</h1>
 
-<ul>
-  <% @favorite_projects.each do |project| %>
-    <li>
-      <%= link_to project.title, project_path(project) %>
-      <p><strong>Author:</strong> <%= project.user.email %></p>
-      <%= link_to 'Remove from Favorites', toggle_favorite_project_path(project), method: :post, class: "btn btn-danger" %>
-    </li>
-  <% end %>
-</ul>
+    <!-- List of favorite projects -->
+    <ul class="space-y-6">
+      <% @favorite_projects.each do |project| %>
+        <li class="bg-gray-700 p-4 rounded-lg shadow-lg">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-xl font-bold text-teal-400 mb-2">
+                <%= link_to project.title, project_path(project), class: "hover:underline" %>
+              </h2>
+              <p class="text-gray-300"><strong>Author:</strong> <%= project.user.email %></p>
+            </div>
+            <div>
+              <%= link_to 'Remove from Favorites', toggle_favorite_project_path(project), method: :post, class: "bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 transition ease-in-out duration-300" %>
+            </div>
+          </div>
+        </li>
+      <% end %>
+    </ul>
 
-<%= link_to 'Back to My Projects', projects_path, class: 'btn btn-secondary' %>
+    <!-- Back to My Projects button -->
+    <div class="mt-8">
+      <%= link_to 'Back to My Projects', projects_path, class: 'bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
+</div>

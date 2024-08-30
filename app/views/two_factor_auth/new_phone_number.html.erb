@@ -1,7 +1,10 @@
-<h2>Add Phone Number</h2>
-
-<%= form_for(current_user, url: save_phone_number_path, method: :patch) do |f| %>
-  <%= f.label :phone_number, 'Phone Number' %><br>
-  <%= f.telephone_field :phone_number %><br>
-  <%= f.submit 'Save Phone Number' %>
-<% end %>
+<div class="max-w-md mx-auto bg-gray-800 p-6 rounded-lg shadow-lg">
+  <h2 class="text-2xl font-bold text-white mb-4 text-center">Add Phone Number</h2>
+  <%= form_for(current_user, url: save_phone_number_path, method: :patch) do |f| %>
+    <div class="mb-4">
+      <%= f.label :phone_number, 'Phone Number', class: "block text-white mb-2" %>
+      <%= f.telephone_field :phone_number, class: "w-full p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" %>
+    </div>
+    <%= f.submit 'Save Phone Number', class: "w-full bg-teal-500 text-white py-2 rounded-lg hover:bg-teal-400 transition-colors" %>
+  <% end %>
+</div>

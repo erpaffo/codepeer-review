@@ -1,12 +1,18 @@
-<h1>Leave Feedback for <%= @user.first_name %> <%= @user.last_name %></h1>
+<div class="profile-container">
+  <h1 class="text-3xl font-bold text-white mb-6 text-center">Leave Feedback for <%= @user.first_name %> <%= @user.last_name %></h1>
 
-<%= form_with model: [@user, @feedback], url: create_feedback_user_path(@user), local: true do |form| %>
-  <div class="form-group">
-    <%= form.label :content %>
-    <%= form.text_area :content, class: 'form-control' %>
+  <%= form_with model: [@user, @feedback], url: create_feedback_user_path(@user), local: true, class: 'profile-form' do |form| %>
+    <div class="form-group">
+      <%= form.label :content, class: "form-label" %>
+      <%= form.text_area :content, class: "form-textarea" %>
+    </div>
+
+    <div class="text-center mt-6">
+      <%= form.submit 'Submit Feedback', class: 'btn btn-primary' %>
+    </div>
+  <% end %>
+
+  <div class="mt-6 text-center">
+    <%= link_to 'Back to Profile', user_path(@user), class: 'btn btn-secondary' %>
   </div>
-
-  <%= form.submit 'Submit Feedback', class: 'btn btn-primary' %>
-<% end %>
-
-<%= link_to 'Back to Profile', user_path(@user) %>
+</div>

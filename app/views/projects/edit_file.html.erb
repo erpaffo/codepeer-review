@@ -1,127 +1,77 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Edit <%= @file.file_identifier %></title>
-  <meta name="csrf-token" content="<%= form_authenticity_token %>">
-  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'dashboard', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <style>
-    #code-editor {
-      height: 500px;
-      border: 1px solid #ccc;
-    }
-    #output {
-      height: 200px;
-      border: 1px solid #ccc;
-      margin-top: 20px;
-      padding: 10px;
-      background-color: #f7f7f7;
-      white-space: pre-wrap;
-    }
-    .editor-controls {
-      margin-bottom: 10px;
-    }
-  </style>
-</head>
-<body class="font-Inter bg-gray-50 text-gray-800" data-turbolinks="false">
-
-<div class="flex">
-  <div class="flex flex-col">
-    <div class="sidebar bg-zinc-800 text-white w-64 h-screen p-4 fixed top-0 left-0 transform -translate-x-full transition-transform duration-300 z-10">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold">Dashboard Menu</h2>
-        <div class="sidebar-toggle bg-zinc-800 text-white w-8 h-8 flex items-center justify-center cursor-pointer">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
-        </div>
-      </div>
-      <ul>
-        <li class="mb-2"><a href="<%= profile_path %>" class="hover:underline">My Profile</a></li>
-        <li class="mb-2"><a href="<%= snippets_path %>" class="hover:underline">My Snippets</a></li>
-        <li class="mb-2"><a href="<%= projects_path %>" class="hover:underline">Projects</a></li>
-        <li class="mb-2"><a href="<%= community_activity_index_path %>" class="hover:underline">Community Activity</a></li>
-        <li class="mb-2"><a href="<%= settings_path %>" class="hover:underline">Settings</a></li>
-        <li><a href="<%= logout_path %>" class="hover:underline">Logout</a></li>
-      </ul>
-    </div>
-    <div class="sidebar-toggle bg-zinc-800 text-white w-16 h-16 flex items-center justify-center cursor-pointer fixed top-0 left-0 z-20">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-      </svg>
+<div class="p-6 transition-all duration-300">
+  <div class="bg-gray-800 shadow-lg p-6 rounded-lg mb-6">
+    <div class="flex justify-between items-center flex-wrap">
+      <h1 class="text-2xl font-semibold text-light">Edit <%= @file.file_identifier %></h1>
     </div>
   </div>
-  <div class="flex-1 p-6 transition-all duration-300 ml-16 md:ml-64">
-    <div class="bg-white shadow-lg p-4 rounded-lg mb-6">
-      <div class="flex justify-between items-center flex-wrap">
-        <h1 class="text-2xl font-semibold">Edit <%= @file.file_identifier %></h1>
-      </div>
-    </div>
 
-    <!-- Hidden field to pass file identifier for language detection -->
-    <input type="hidden" id="file-identifier" value="<%= @file.file_identifier %>">
+  <!-- Hidden field to pass file identifier for language detection -->
+  <input type="hidden" id="file-identifier" value="<%= @file.file_identifier %>">
 
-    <div class="editor-controls">
-      <label for="language-select">Language:</label>
-      <select id="language-select">
-        <option value="python">Python</option>
-        <option value="javascript">JavaScript</option>
-        <option value="html">HTML</option>
-        <option value="css">CSS</option>
-        <option value="ruby">Ruby</option>
-        <option value="c">C</option>
-        <option value="cpp">C++</option>
-        <option value="java">Java</option>
-        <option value="typescript">TypeScript</option>
-        <option value="go">Go</option>
-        <option value="php">PHP</option>
-        <option value="swift">Swift</option>
-        <option value="kotlin">Kotlin</option>
-        <option value="shell">Shell</option>
-      </select>
+  <div class="editor-controls mb-6 p-4 bg-gray-800 rounded-lg shadow-lg">
+    <label for="language-select">Language:</label>
+    <select id="language-select">
+      <option value="python">Python</option>
+      <option value="javascript">JavaScript</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+      <option value="ruby">Ruby</option>
+      <option value="c">C</option>
+      <option value="cpp">C++</option>
+      <option value="java">Java</option>
+      <option value="typescript">TypeScript</option>
+      <option value="go">Go</option>
+      <option value="php">PHP</option>
+      <option value="swift">Swift</option>
+      <option value="kotlin">Kotlin</option>
+      <option value="shell">Shell</option>
+      <option value="rust">Rust</option>
+      <option value="perl">Perl</option>
+      <option value="r">R</option>
+      <option value="scala">Scala</option>
+      <option value="haskell">Haskell</option>
+    </select>
 
-      <label for="theme-select">Theme:</label>
-      <select id="theme-select">
-        <option value="vs-dark" selected>Dark</option>
-        <option value="vs-light">Light</option>
-        <option value="hc-black">High Contrast</option>
-      </select>
+    <label for="theme-select">Theme:</label>
+    <select id="theme-select">
+      <option value="vs-dark" selected>Dark</option>
+      <option value="vs-light">Light</option>
+      <option value="hc-black">High Contrast</option>
+    </select>
 
-      <label for="font-size">Font Size:</label>
-      <input type="number" id="font-size" value="14" min="8" max="36">
+    <label for="font-size">Font Size:</label>
+    <input type="number" id="font-size" value="14" min="8" max="36">
 
-      <label for="minimap-select">Show Minimap:</label>
-      <input type="checkbox" id="minimap-select" checked>
+    <label for="minimap-select">Show Minimap:</label>
+    <input type="checkbox" id="minimap-select" checked>
 
-      <label for="multi-cursor">Multi-cursor:</label>
-      <input type="checkbox" id="multi-cursor" checked>
+    <label for="multi-cursor">Multi-cursor:</label>
+    <input type="checkbox" id="multi-cursor" checked>
 
-      <label for="highlight-line">Highlight Active Line:</label>
-      <input type="checkbox" id="highlight-line" checked>
+    <label for="highlight-line">Highlight Active Line:</label>
+    <input type="checkbox" id="highlight-line" checked>
 
-      <label for="auto-close-brackets">Auto Close Brackets:</label>
-      <input type="checkbox" id="auto-close-brackets" checked>
-    </div>
+    <label for="auto-close-brackets">Auto Close Brackets:</label>
+    <input type="checkbox" id="auto-close-brackets" checked>
+  </div>
 
-    <div>
-      <button id="save-file" class="btn btn-primary">Save File</button>
-      <button id="run-code" class="btn btn-secondary">Run Code</button>
-    </div>
+  <div class="flex space-x-4 mb-6">
+    <button id="save-file" class="bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300">Save File</button>
+    <button id="run-code" class="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition ease-in-out duration-300">Run Code</button>
+  </div>
 
-    <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
-      <%= f.hidden_field :file, id: 'file-content' %>
-    <% end %>
+  <%= form_for [@project, @file], url: update_file_project_path(@project, file_id: @file.id), method: :patch, html: { id: 'edit-file-form' } do |f| %>
+    <%= f.hidden_field :file, id: 'file-content' %>
+  <% end %>
 
-    <div id="code-editor" data-content="<%= @file_content %>" style="height:500px; border:1px solid grey;"></div>
+  <div id="code-editor" class="bg-gray-800 text-white p-4 rounded-lg"></div>
 
-    <div id="output"></div>
+  <div id="output" class="mt-4 bg-gray-800 text-white p-4 rounded-lg"></div>
 
-    <%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+  <div class="mt-8">
+    <%= link_to 'Back to Project', project_path(@project), class: "bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300" %>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
 <%= javascript_pack_tag 'monaco_editor' %>
-
-</body>
-</html>

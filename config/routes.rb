@@ -67,6 +67,7 @@ Rails.application.routes.draw do
       patch 'save_phone_number', as: :save_phone_number
     end
 
+    post 'resend_two_factor_auth_code', to: 'two_factor_auth#resend_code'
     patch 'enable_two_factor_auth', to: 'users#enable_two_factor_auth', as: :enable_two_factor_auth
     patch 'disable_two_factor_auth', to: 'users#disable_two_factor_auth', as: :disable_two_factor_auth
 

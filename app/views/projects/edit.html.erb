@@ -1,37 +1,53 @@
-<h1>Edit Project</h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-semibold text-gold mb-6">Edit Project</h1>
 
-<%= render 'form', project: @project %>
+    <!-- Render the project form -->
+    <%= render 'form', project: @project %>
 
-<%= link_to 'Back to Projects', projects_path, class: "btn btn-primary" %>
+    <!-- Back to Projects button -->
+    <div class="mt-4">
+      <%= link_to 'Back to Projects', projects_path, class: "bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300" %>
+    </div>
+  </div>
 
-<hr>
+  <hr class="my-8 border-gray-700">
 
-<h2>Collaborators</h2>
-<ul>
-  <% @project.collaborators.each do |collaborator| %>
-    <% if collaborator.user %>
-      <li>
-        <%= collaborator.user.email %>
-        <%= link_to 'Delete', remove_collaborator_project_path(@project, collaborator_id: collaborator.user_id), method: :delete, data: { confirm: 'Are you sure?' }, class: "btn btn-danger btn-sm" %>
-      </li>
-    <% else %>
-      <li>
-        Collaborator not found
-      </li>
+  <!-- Collaborators section -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-gold mb-4">Collaborators</h2>
+    <ul class="space-y-4">
+      <% @project.collaborators.each do |collaborator| %>
+        <% if collaborator.user %>
+          <li class="flex justify-between items-center bg-gray-700 p-4 rounded-lg">
+            <span class="text-gray-300"><%= collaborator.user.email %></span>
+            <%= link_to 'Delete', remove_collaborator_project_path(@project, collaborator_id: collaborator.user_id), method: :delete, data: { confirm: 'Are you sure?' }, class: "bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 transition ease-in-out duration-300" %>
+          </li>
+        <% else %>
+          <li class="bg-gray-700 p-4 rounded-lg text-gray-400">
+            Collaborator not found
+          </li>
+        <% end %>
+      <% end %>
+    </ul>
+  </div>
+
+  <hr class="my-8 border-gray-700">
+
+  <!-- Delete Project section -->
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h2 class="text-2xl font-semibold text-gold mb-4">Delete Project</h2>
+    <p class="text-gray-300 mb-4">To confirm, type "<%= @project.user.nickname %>/<%= @project.title %>" in the box below:</p>
+    <%= form_with(model: @project, url: project_path(@project), method: :delete, local: true) do |f| %>
+      <div class="mb-4">
+        <%= f.label :confirmation, "Confirmation", class: "block text-gray-400 mb-2" %>
+        <%= text_field_tag :confirmation, nil, placeholder: "#{@project.user.nickname}/#{@project.title}", class: "w-full bg-gray-700 text-white p-2 rounded-lg border border-gray-600 focus:border-gray-500 focus:ring focus:ring-teal-400" %>
+      </div>
+      <div>
+        <%= f.submit "Delete Project", class: "bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 transition ease-in-out duration-300", data: { confirm: "Are you sure you want to delete this project?" } %>
+      </div>
     <% end %>
-  <% end %>
-</ul>
-
-<h2>Delete Project</h2>
-<p>To confirm, type "<%= @project.user.nickname %>/<%= @project.title %>" in the box below:</p>
-<%= form_with(model: @project, url: project_path(@project), method: :delete, local: true) do |f| %>
-  <div>
-    <%= f.label :confirmation, "Confirmation" %>
-    <%= text_field_tag :confirmation, nil, placeholder: "#{@project.user.nickname}/#{@project.title}" %>
   </div>
-  <div>
-    <%= f.submit "Delete Project", class: "btn btn-danger", data: { confirm: "Are you sure you want to delete this project?" } %>
-  </div>
-<% end %>
+</div>
 
 <%= javascript_pack_tag 'edit_project' %>

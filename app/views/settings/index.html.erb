@@ -1,24 +1,25 @@
 <div class="container mx-auto p-6">
-  <h1 class="text-3xl font-bold mb-6">Settings</h1>
+  <h1 class="text-3xl font-bold mb-6 text-white">Settings</h1>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Account Settings -->
-    <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-      <h2 class="text-xl font-semibold text-gold mb-4">Account Settings</h2>
-      <p class="mb-4 text-gray-300">Manage your account settings and set preferences.</p>
-      <%= link_to 'Edit Profile', edit_profile_path, class: 'btn btn-primary' %>
+    <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+      <h2 class="text-xl font-semibold text-teal-400 mb-4">Account Settings</h2>
+      <p class="mb-4 text-gray-400">Manage your account settings and set preferences.</p>
+      <%= link_to 'Edit Profile', edit_profile_path, class: 'bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-400 transition duration-300' %>
     </div>
 
     <!-- Two-Factor Authentication -->
     <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
-        <h2 class="text-xl font-semibold text-gold mb-4">Two-Factor Authentication</h2>
-        <% if current_user.two_factor_enabled? %>
-            <p class="mb-4 text-gray-300">Two-factor authentication is enabled.</p>
-            <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: 'btn btn-danger' %>
-        <% else %>
-            <p class="mb-4 text-gray-300">Two-factor authentication is disabled.</p>
-            <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: 'btn btn-primary' %>
-        <% end %>
+      <h2 class="text-xl font-semibold text-gold mb-4">Two-Factor Authentication</h2>
+      <% if current_user.otp_enabled? %>
+        <p class="mb-4 text-gray-300">Two-factor authentication is enabled.</p>
+        <%= link_to 'Disable Two-Factor Authentication', disable_two_factor_auth_path, method: :patch, class: 'btn btn-danger' %>
+      <% else %>
+        <p class="mb-4 text-gray-300">Two-factor authentication is disabled.</p>
+        <%= link_to 'Enable Two-Factor Authentication', setup_two_factor_auth_path, class: 'btn btn-primary' %>
+      <% end %>
     </div>
 
+  </div>
 </div>

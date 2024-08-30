@@ -1,23 +1,25 @@
-<h1>Followers</h1>
+<div class="profile-container">
+  <h1 class="text-3xl font-bold text-white mb-6 text-center">Followers</h1>
 
-<p>
-  <strong>Number of Followers:</strong>
-  <%= @followers_count %>
-</p>
+  <p class="text-center mb-6"><strong>Number of Followers:</strong> <%= @followers_count %></p>
 
-<% if @followers_users.present? %>
-  <ul>
-    <% @followers_users.each do |follower_user| %>
-      <li>
-        <%= link_to(
-          follower_user.nickname.present? ? follower_user.nickname : follower_user.email,
-          followed_by_current_user?(follower_user) ? user_profile_with_details_path(follower_user) : user_profile_from_community_path(follower_user)
-        ) %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No followers yet.</p>
-<% end %>
+  <% if @followers_users.present? %>
+    <ul class="space-y-4">
+      <% @followers_users.each do |follower_user| %>
+        <li class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-xl transition ease-in-out duration-300">
+          <%= link_to(
+            follower_user.nickname.present? ? follower_user.nickname : follower_user.email,
+            followed_by_current_user?(follower_user) ? user_profile_with_details_path(follower_user) : user_profile_from_community_path(follower_user),
+            class: "text-lg font-bold text-teal-500 hover:text-teal-300"
+          ) %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-center">No followers yet.</p>
+  <% end %>
 
-<%= link_to 'Back to Profile', profile_path, class: 'btn btn-secondary' %>
+  <div class="mt-8 text-center">
+    <%= link_to 'Back to Profile', profile_path, class: 'btn btn-secondary' %>
+  </div>
+</div>

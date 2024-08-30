@@ -10,7 +10,7 @@
     <p class="text-gray-400"><strong>Author:</strong> <%= @project.user.email %></p>
 
     <div class="my-6">
-      <h3 class="text-2xl font-semibold text-white mb-2">Statistics</h3>
+      <h3 class="text-2xl font-semibold text-gold mb-2">Statistics</h3>
       <ul class="text-gray-400 space-y-2">
         <li><strong>Unique Views:</strong> <%= @project.unique_view_count %></li>
         <li><strong>Favorites:</strong> <%= @project.favorite_count %></li>
@@ -18,12 +18,12 @@
     </div>
 
     <div class="my-6">
-      <h3 class="text-2xl font-semibold text-white mb-2">Description</h3>
+      <h3 class="text-2xl font-semibold text-gold mb-2">Description</h3>
       <p class="text-gray-300 leading-relaxed"><%= @project.description %></p>
     </div>
 
     <div class="my-6">
-      <h3 class="text-2xl font-semibold text-white mb-2">Files</h3>
+      <h3 class="text-2xl font-semibold text-gold mb-2">Files</h3>
       <ul class="text-gray-300 space-y-2">
         <% @project.project_files.each do |file| %>
           <li class="flex items-center space-x-2">

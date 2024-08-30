@@ -1,30 +1,34 @@
-<h1>New File</h1>
+<div class="container mx-auto p-6">
+  <h1 class="page-title text-gold">New File</h1>
 
-<%= form_with(url: create_file_project_path(@project), method: :post, local: true) do |form| %>
-  <% if @project_file.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@project_file.errors.count, "error") %> prohibited this file from being saved:</h2>
-      <ul>
-        <% @project_file.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <%= form_with(url: create_file_project_path(@project), method: :post, local: true, class: "bg-gray-800 p-6 rounded-lg shadow-lg") do |form| %>
+    <% if @project_file.errors.any? %>
+      <div id="error_explanation" class="bg-red-600 text-white p-4 rounded-lg mb-4">
+        <h2 class="font-semibold"><%= pluralize(@project_file.errors.count, "error") %> prohibited this file from being saved:</h2>
+        <ul class="list-disc pl-6">
+          <% @project_file.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="field mb-4">
+      <%= form.label :file_name, 'File Name', class: "text-gray-300" %>
+      <%= form.text_field :file_name, class: "form-input mt-1 block w-full bg-gray-700 text-gray-300 border-gray-600 rounded-lg focus:border-teal-500 focus:ring-teal-500" %>
+    </div>
+
+    <div class="field mb-6">
+      <%= form.label :extension, 'Extension', class: "text-gray-300" %>
+      <%= form.select :extension, options_for_select(['txt', 'py', 'c', 'rb', 'cpp', 'css', 'html']), {}, class: "form-select mt-1 block w-full bg-gray-700 text-gray-300 border-gray-600 rounded-lg focus:border-teal-500 focus:ring-teal-500" %>
+    </div>
+
+    <div class="actions">
+      <%= form.submit 'Create File', class: "btn btn-primary w-full bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300" %>
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :file_name, 'File Name' %>
-    <%= form.text_field :file_name %>
+  <div class="mt-4">
+    <%= link_to 'Back to Project', project_path(@project), class: "btn btn-secondary bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition ease-in-out duration-300" %>
   </div>
-
-  <div class="field">
-    <%= form.label :extension, 'Extension' %>
-    <%= form.select :extension, options_for_select(['txt', 'py', 'c', 'rb', 'cpp', 'css', 'html']) %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit 'Create File' %>
-  </div>
-<% end %>
-
-<%= link_to 'Back to Project', project_path(@project), class: "btn btn-primary" %>
+</div>
