@@ -8,6 +8,6 @@ class FileUploader < CarrierWave::Uploader::Base
   end
 
   def extension_allowlist
-    %w[jpg jpeg gif png txt pdf doc docx]
+    %w[rb py js ts java c cpp h cs php html css go rs swift kt sh bash zsh ps1 vb vba lua r pl pm asm sql scala clj cljs dart ex exs erl hrl hs lisp scm groovy jade pug m ruby php scss less jsx tsx vbproj csproj sln mxml xml xaml vue jsx tsx ini toml yaml yml json md dockerfile makefile gradle pro s tcl rkt ps scpt bashrc zshrc vimrc awk jsp lua]
   end
 end

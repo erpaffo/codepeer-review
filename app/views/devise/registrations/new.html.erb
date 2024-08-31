@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign up</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="<%= asset_path 'auth.css' %>">
-</head>
-<body class="font-Inter bg-gray-900 text-gray-300 flex items-center justify-center h-screen">
-
+<div class="font-Inter bg-gray-900 text-gray-300 flex items-center justify-center min-h-screen">
   <div class="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
     <h2 class="text-2xl font-bold text-center mb-6 text-white">Sign up</h2>
     <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
@@ -41,17 +31,14 @@
       <%= render "devise/shared/links" %>
     </div>
   </div>
+</div>
 
-  <script>
-    // Ensure the email field is pre-filled if email exists in the query params
-    window.onload = function() {
-      var urlParams = new URLSearchParams(window.location.search);
-      var email = urlParams.get('email');
-      if (email) {
-        document.querySelector('[name="user[email]"]').value = email;
-      }
-    };
-  </script>
-
-</body>
-</html>
+<script>
+  window.onload = function() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var email = urlParams.get('email');
+    if (email) {
+      document.querySelector('[name="user[email]"]').value = email;
+    }
+  };
+</script>

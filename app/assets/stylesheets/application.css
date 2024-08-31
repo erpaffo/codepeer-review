@@ -388,3 +388,40 @@ textarea {
     flex-direction: column;
   }
 }
+
+/* Oauth buttons */
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  border: none;
+}
+
+.oauth-btn .icon {
+  margin-right: 8px;
+}
+
+.google-btn {
+  background-color: #4285F4;
+}
+
+.github-btn {
+  background-color: #333;
+}
+
+.gitlab-btn {
+  background-color: #FC6D26;
+}
+
+.oauth-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}

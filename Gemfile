@@ -114,3 +114,5 @@ gem 'rubyzip', '~> 2.3'
 gem 'bundler-audit', require: false
 
 gem "turbo-rails", "~> 2.0"
+
+gem 'cancancan'
