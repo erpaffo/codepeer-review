@@ -30,6 +30,21 @@ class User < ApplicationRecord
 
   has_one_attached :profile_image
 
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_projects, through: :favorites, source: :project
+
+  def toggle_favorite(project)
+    if favorited?(project)
+      favorite_projects.delete(project)
+    else
+      favorite_projects << project
+    end
+  end
+
+  def favorited?(project)
+    favorite_projects.include?(project)
+  end
+
   def generate_otp_secret
     self.otp_secret ||= ROTP::Base32.random_base32
     save!
@@ -145,7 +160,7 @@ class User < ApplicationRecord
   def two_factor_enabled?
     otp_required_for_login || two_factor_method.present?
   end
-  
+
   private
 
   def password_complexity

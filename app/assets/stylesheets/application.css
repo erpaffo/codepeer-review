@@ -425,3 +425,23 @@ textarea {
   transform: translateY(-3px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
+
+.btn-favorite {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2px;
+  color: grey;
+  transition: color 0.3s ease;
+}
+
+.btn-favorite.filled {
+  fill: #e53e3e;
+  stroke: #e53e3e;
+}
+
+.btn-favorite:not(.filled):hover {
+  color: #e53e3e;
+  stroke: #e53e3e;
+}

@@ -9,9 +9,15 @@ class ProjectsController < ApplicationController
   def show
     if @project.visibility == 'private' && @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to view this project.'
+    elsif @project.user == current_user || @project.collaborating_users.include?(current_user)
+      render :show
+    else
+      render :public_view
     end
+
     record_view
   end
+
 
   def new
     @project = current_user.projects.build

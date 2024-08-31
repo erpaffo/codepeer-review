@@ -2,6 +2,7 @@ class DashboardController < ApplicationController
   before_action :ensure_profile_complete
 
   def index
+    @all_projects = (current_user.projects + current_user.collaborated_projects + Project.where(visibility: 'public')).uniq
   end
 
   private

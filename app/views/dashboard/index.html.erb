@@ -1,62 +1,98 @@
-<div class="flex flex-col md:flex-row">
+<div class="container mx-auto p-6">
+  <!-- Projects Gallery -->
+  <h2 class="text-xl font-semibold text-gold mb-4">Projects Gallery</h2>
 
-  <!-- Main Content -->
-  <div class="p-6 transition-all duration-300">
-    <h2 class="text-xl font-semibold text-gold mb-4">Dashboard</h2>
-    <p class="mb-4 text-gray-300">Welcome, <%= current_user.nickname %>!</p>
-    <% if !current_user.profile_complete? %>
-      <div class="bg-teal-300 p-4 rounded-lg mb-6 text-gray-900">
-        <p class="mb-2">Please complete your profile</p>
-        <a href="<%= complete_profile_path %>" class="text-teal-700 hover:underline">Complete Profile</a>
-      </div>
-    <% end %>
-
-    <!-- Tiles Section -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <a href="<%= projects_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">My Projects</h3>
-        <p>Create and manage your projects.</p>
-        <p class="text-teal-400 hover:underline">View Projects</p>
-      </a>
-
-      <a href="<%= search_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">Search</h3>
-        <p>Search for snippets, projects, and more.</p>
-        <p class="text-teal-400 hover:underline">Go to Search</p>
-      </a>
-
-      <a href="<%= profile_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">Profile</h3>
-        <p>View and edit your profile.</p>
-        <p class="text-teal-400 hover:underline">Go to Profile</p>
-      </a>
-  
-      <a href="<%= my_snippets_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">My Snippets</h3>
-        <p>Create and manage your code snippets.</p>
-        <p class="text-teal-400 hover:underline">View Snippets</p>
-      </a>
-
-      <a href="<%= community_activity_index_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">Community Activity</h3>
-        <p>Check your community activity.</p>
-        <p class="text-teal-400 hover:underline">View Activity</p>
-      </a>
-
-      <a href="<%= settings_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">Settings</h3>
-        <p>Manage your account settings.</p>
-        <p class="text-teal-400 hover:underline">Go to Settings</p>
-      </a>
-
-      <a href="<%= badges_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
-        <h3 class="font-semibold text-gold">Badges</h3>
-        <p>Check your badges here.</p>
-        <p class="text-teal-400 hover:underline">View Badges</p>
-      </a>
+  <div class="relative">
+    <div id="project-slider" class="flex overflow-x-auto snap-x snap-mandatory space-x-6">
+      <% @all_projects.each do |project| %>
+        <div class="flex-shrink-0 w-48 snap-center">
+          <div class="bg-gray-800 p-4 rounded-lg shadow-lg h-48 flex flex-col justify-between">
+            <div>
+              <h3 class="text-sm font-bold text-white mb-2"><%= project.title %></h3>
+              <p class="text-gray-400 text-xs"><%= truncate(project.description, length: 50) %></p>
+            </div>
+            <div class="mt-4 flex justify-between items-center">
+              <%= link_to 'View Project', project.public? ? public_view_project_path(project) : project_path(project), class: "bg-teal-600 text-white py-1 px-3 rounded-lg text-xs hover:bg-teal-500 transition-all duration-300" %>
+              
+              <!-- Cuoricino per aggiungere/rimuovere il progetto dai preferiti -->
+              <%= form_with url: toggle_favorite_project_path(project), method: :post, remote: true do %>
+                <button type="submit" class="focus:outline-none">
+                  <% if current_user.favorited?(project) %>
+                    <i class="fas fa-heart text-red-600"></i>
+                  <% else %>
+                    <i class="far fa-heart text-gray-400 hover:text-red-600 transition duration-300"></i>
+                  <% end %>
+                </button>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
     </div>
+
+    <!-- Buttons for scrolling -->
+    <button id="prev-btn" class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full">
+      &larr;
+    </button>
+    <button id="next-btn" class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-700 text-white p-2 rounded-full">
+      &rarr;
+    </button>
   </div>
 </div>
 
+<!-- Main Content -->
+<div class="container mx-auto p-6 mt-4"> <!-- Aggiunto margine superiore di 4 -->
+  <h2 class="text-xl font-semibold text-gold mb-4">Dashboard</h2>
+  <p class="mb-4 text-gray-300">Welcome, <%= current_user.nickname %>!</p>
+  <% if !current_user.profile_complete? %>
+    <div class="bg-teal-300 p-4 rounded-lg mb-6 text-gray-900">
+      <p class="mb-2">Please complete your profile</p>
+      <a href="<%= complete_profile_path %>" class="text-teal-700 hover:underline">Complete Profile</a>
+    </div>
+  <% end %>
 
+  <!-- Tiles Section -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <a href="<%= projects_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">My Projects</h3>
+      <p>Create and manage your projects.</p>
+      <p class="text-teal-400 hover:underline">View Projects</p>
+    </a>
 
+    <a href="<%= search_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Search</h3>
+      <p>Search for snippets, projects, and more.</p>
+      <p class="text-teal-400 hover:underline">Go to Search</p>
+    </a>
+
+    <a href="<%= profile_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Profile</h3>
+      <p>View and edit your profile.</p>
+      <p class="text-teal-400 hover:underline">Go to Profile</p>
+    </a>
+
+    <a href="<%= my_snippets_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">My Snippets</h3>
+      <p>Create and manage your code snippets.</p>
+      <p class="text-teal-400 hover:underline">View Snippets</p>
+    </a>
+
+    <a href="<%= community_activity_index_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Community Activity</h3>
+      <p>Check your community activity.</p>
+      <p class="text-teal-400 hover:underline">View Activity</p>
+    </a>
+
+    <a href="<%= settings_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Settings</h3>
+      <p>Manage your account settings.</p>
+      <p class="text-teal-400 hover:underline">Go to Settings</p>
+    </a>
+
+    <a href="<%= badges_path %>" class="tile bg-gray-700 shadow-lg p-6 rounded-lg transform transition-transform hover:scale-105 hover:bg-teal-500">
+      <h3 class="font-semibold text-gold">Badges</h3>
+      <p>Check your badges here.</p>
+      <p class="text-teal-400 hover:underline">View Badges</p>
+    </a>
+  </div>
+</div>
