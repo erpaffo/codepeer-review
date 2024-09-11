@@ -7,6 +7,9 @@ class User < ApplicationRecord
 
   validate :password_complexity
   validates :email, presence: true, uniqueness: true
+  has_many :messages
+  has_many :sent_conversations, class_name: 'Conversation', foreign_key: 'sender_id'
+  has_many :received_conversations, class_name: 'Conversation', foreign_key: 'recipient_id'
   has_many :projects, dependent: :destroy
   has_many :notifications
   has_many :collaborators, dependent: :destroy
@@ -39,6 +42,18 @@ class User < ApplicationRecord
     else
       favorite_projects << project
     end
+  end
+
+  def name
+    if nickname.present?
+      nickname
+    else
+      [first_name, last_name].reject(&:blank?).join(' ')
+    end
+  end
+
+  def conversations
+    Conversation.where("sender_id = ? OR recipient_id = ?", id, id)
   end
 
   def favorited?(project)

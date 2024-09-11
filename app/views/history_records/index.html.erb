@@ -1,31 +1,39 @@
 <!-- app/views/history_records/index.html.erb -->
-<h1>Change History</h1>
+<div class="history-container">
+  <div class="history-card bg-gray-800">
+    <div class="history-header">
+      Change History
+    </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>Field</th>
-      <th>Old Value</th>
-      <th>New Value</th>
-      <th>Changed At</th>
-      <th>Modified By</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @history_records.each do |record| %>
-      <tr>
-        <td><%= record.field %></td>
-        <td><%= record.old_value %></td>
-        <td><%= record.new_value %></td>
-        <td><%= record.created_at %></td>
-        <td><%= record.modified_by %></td>
-        <td>
-          <%= link_to 'View Previous Snippet', previous_snippet_history_record_path(@snippet, record), class: 'btn btn-info' %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    <table class="history-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Old Value</th>
+          <th>New Value</th>
+          <th>Changed At</th>
+          <th>Modified By</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @history_records.each do |record| %>
+          <tr>
+            <td><%= record.field %></td>
+            <td><%= record.old_value %></td>
+            <td><%= record.new_value %></td>
+            <td><%= record.created_at %></td>
+            <td><%= record.modified_by %></td>
+            <td>
+              <%= link_to 'View', previous_snippet_history_record_path(@snippet, record), class: 'bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-500 transition ease-in-out duration-300' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
 
-<%= link_to 'Back to Snippet', snippet_path(@snippet), class: 'btn btn-secondary' %>
+    <div class="btn-back">
+      <%= link_to 'Back to Snippet', snippet_path(@snippet), class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
+</div>

@@ -1,22 +1,29 @@
-<!-- app/views/badges/index.html.erb -->
-<h1>Your Badges</h1>
-
-<% if @badges.any? %>
-  <ul>
-  <% @badges.each do |badge| %>
-    <li>
-      <% if badge.icon_url.present? %>
-        <%= image_tag badge.icon_url, alt: badge.name, size: "50x50" %>
-      <% else %>
-        <%= image_tag 'default_badge.png', alt: 'Default Badge', size: "50x50" %> <!-- Immagine predefinita -->
-      <% end %>
-      <p><%= badge.name %></p>
-      <p><%= badge.description %></p>
-    </li>
-  <% end %>
-  </ul>
-<% else %>
-  <p>You have no badges yet.</p>
-<% end %>
-
 <%= link_to 'My Profile', profile_path, class: 'btn btn-primary' %>
+
+<!-- Titolo della pagina centrato -->
+<h1 class="page-title text-4xl font-extrabold text-teal-400 mb-8">Your Badges</h1>
+
+<div class="badges-page">
+  <ul class="flex space-x-6 flex-wrap justify-start">
+    <% Badge.all.each do |badge| %>
+      <li class="relative group <%= 'unlocked' if @badges.include?(badge) %> badge-container">
+        <% if badge.icon_url.present? %>
+          <%= image_tag(asset_path(badge.icon), alt: badge.name, size: "100x100", class: "badge-image") %>
+        <% else %>
+          <%= image_tag('default_badge.png', alt: 'Default Badge', size: "100x100", class: "badge-image") %>
+        <% end %>
+        <p class="badge-name mt-4">
+          <%= badge.name %>
+        </p>
+        <% if @badges.include?(badge) %>
+          <p class="badge-status text-gray-400 text-sm mt-1">Sbloccato</p>
+        <% else %>
+          <p class="badge-status text-gray-400 text-sm mt-1">Non ancora sbloccato</p>
+        <% end %>
+        <div class="badge-description hidden absolute bottom-12 left-1/2 transform -translate-x-1/2 bg-gray-700 text-white text-sm p-2 rounded shadow-lg group-hover:block w-64 text-center">
+          <p><%= badge.description %></p>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

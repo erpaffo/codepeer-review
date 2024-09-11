@@ -1,0 +1,5 @@
+<% if current_user.notifications.unread.empty? %>
+  document.querySelector(".notifications-link .notification-dot").style.display = "none";
+<% else %>
+  document.querySelector(".notifications-link .notification-dot").style.display = "block";
+<% end %>

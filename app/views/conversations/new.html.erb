@@ -1,0 +1,5 @@
+<%= form_with url: conversations_path, local: true do |f| %>
+  <%= label_tag :recipient_id, "Seleziona un utente (puoi selezionare solo utenti che segui)" %>
+  <%= select_tag :recipient_id, options_from_collection_for_select(@recipients, :id, :name), include_blank: "Nessun utente selezionato" %>
+  <%= f.submit "Inizia Chat" %>
+<% end %>

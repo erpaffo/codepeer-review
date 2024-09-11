@@ -8,10 +8,13 @@
         <%= link_to "Profile", profile_path, class: "text-gray-200 hover:text-teal-300" %>
         <%= link_to "My Snippets", my_snippets_path, class: "text-gray-200 hover:text-teal-300" %>
         <%= link_to "My Projects", projects_path, class: "text-gray-200 hover:text-teal-300" %>
-        <%= link_to "Notifications", notifications_path, class: "notifications-link text-gray-200 hover:text-teal-300 relative" %>
-        <% if current_user.notifications.unread.any? %>
-          <span class="notification-dot w-2 h-2 bg-red-600 rounded-full"></span>
-        <% end %>
+        <div class="relative inline-block">
+          <%= link_to "Notifications", notifications_path, class: "notifications-link text-gray-200 hover:text-teal-300" %>
+          <% if current_user.notifications.unread.any? %>
+            <span class="notification-dot w-2 h-2 bg-red-600 rounded-full absolute top-0 right-0 transform translate-x-2 -translate-y-2"></span>
+          <% end %>
+        </div>
+        <%= link_to 'Chat', user_chats_path, class: "text-gray-200 hover:text-teal-300 ml-6" %>
         <%= link_to 'Search', search_path, class: 'text-gray-200 hover:text-teal-300' %>
         <%= link_to "Logout", logout_path, method: :delete, class: "text-red-400 hover:text-red-300" %>
       <% else %>
@@ -19,7 +22,6 @@
         <%= link_to "Sign Up", new_user_registration_path, class: "text-gray-200 hover:text-teal-300" %>
       <% end %>
     </nav>
-    <!-- Hamburger Menu for Mobile -->
     <div class="md:hidden">
       <button id="menu-toggle" class="text-gray-200 hover:text-teal-300 focus:outline-none">
         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -28,17 +30,19 @@
       </button>
     </div>
   </div>
-  <!-- Mobile Menu -->
   <div id="mobile-menu" class="hidden md:hidden bg-gray-800 py-4">
     <div class="container mx-auto px-4">
       <% if user_signed_in? %>
         <%= link_to "Profile", profile_path, class: "block text-gray-200 hover:text-teal-300 mb-2" %>
         <%= link_to "My Snippets", my_snippets_path, class: "block text-gray-200 hover:text-teal-300 mb-2" %>
         <%= link_to "My Projects", projects_path, class: "block text-gray-200 hover:text-teal-300 mb-2" %>
-        <%= link_to "Notifications", notifications_path, class: "block text-gray-200 hover:text-teal-300 relative mb-2" %>
-        <% if current_user.notifications.unread.any? %>
-          <span class="notification-dot w-2 h-2 bg-red-600 rounded-full"></span>
-        <% end %>
+        <div class="relative inline-block">
+          <%= link_to "Notifications", notifications_path, class: "block text-gray-200 hover:text-teal-300 relative mb-2" %>
+          <% if current_user.notifications.unread.any? %>
+            <span class="notification-dot w-2 h-2 bg-red-600 rounded-full absolute top-0 right-0 transform translate-x-2 -translate-y-2"></span>
+          <% end %>
+        </div>
+        <%= link_to 'Chat', user_chats_path, class: "text-gray-200 hover:text-teal-300" %>
         <%= link_to 'Search', search_path, class: 'block text-gray-200 hover:text-teal-300 mb-2' %>
         <%= link_to "Logout", logout_path, method: :delete, class: "block text-red-400 hover:text-red-300 mb-2" %>
       <% else %>

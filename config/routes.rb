@@ -1,12 +1,16 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => '/cable'
   resources :badges, only: [:index]
-  resources :notifications, only: [:index]
-  resources :notifications do
+  resources :conversations, only: [:index, :new, :create, :show, :destroy] do
+    resources :messages, only: [:create, :index]
+  end
+  resources :notifications, only: [:index, :destroy] do
     member do
       patch :mark_as_read
     end
   end
-
+  get 'dashboard/chats', to: 'conversations#index', as: 'user_chats'
+  post 'conversations/create_direct', to: 'conversations#create_direct', as: :create_direct_conversations
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
@@ -40,8 +44,6 @@ Rails.application.routes.draw do
     end
 
     resources :follows, only: [:create, :destroy]
-
-    get 'user_profile/:id', to: 'users#profile', as: :user_profile
 
     get '/users/:id/followers', to: 'users#show_followers', as: :user_followers
     get 'users/:id/following', to: 'users#show_following', as: :user_following

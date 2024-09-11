@@ -1,0 +1,43 @@
+<body class="chat-page">
+  <% sender = User.find_by(id: @conversation.sender_id) %>
+  <% recipient = User.find_by(id: @conversation.recipient_id) %>
+
+  <h1>
+    Conversazione con
+    <% other_participant = @conversation.other_participant(current_user) %>
+    <%= link_to other_participant.name, user_profile_from_community_path(other_participant), class: 'chat-participant-link' %>
+  </h1>
+
+  <div id="messages" data-chat-room-id="<%= @conversation.id %>" style="max-height: 70vh; overflow-y: auto;">
+    <% @messages.each do |message| %>
+      <% message_class = message.user == current_user ? 'my-message' : 'other-message' %>
+      <div class="<%= message_class %>">
+        <p><%= message.user.nickname %>: <%= message.body %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <%= render 'messages/form', conversation: @conversation %>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var messagesContainer = document.getElementById("messages");
+
+      function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      scrollToBottom();
+
+      var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'childList') {
+            scrollToBottom();
+          }
+        });
+      });
+
+      observer.observe(messagesContainer, { childList: true, subtree: true });
+    });
+  </script>
+</body>

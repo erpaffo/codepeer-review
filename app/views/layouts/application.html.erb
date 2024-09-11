@@ -10,7 +10,7 @@
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   <%= javascript_pack_tag 'application', 'data-turbolinks-track': 'reload' %>
   <%= stylesheet_link_tag 'flash', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld66CwqAAAAANYIsBtGugIN0C9QtbpekQg9bjL2"></script>  
+  <script src="https://www.google.com/recaptcha/enterprise.js?render=6Ld66CwqAAAAANYIsBtGugIN0C9QtbpekQg9bjL2"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
@@ -27,8 +27,8 @@
 
     <%= yield %>
 
-    <%= render 'layouts/footer' %>
   </div>
+  <%= render 'layouts/footer' %>
 
   <script>
     document.getElementById('menu-toggle').addEventListener('click', function() {

@@ -1,32 +1,10 @@
-/*import consumer from "./consumer"
+// chat_channel.js (ripristinato)
 
-// Supponendo che la funzione sia definita correttamente e restituisca un valore
-//const chatRoomId = someFunctionThatReturnsChatRoomId();
+document.addEventListener('turbolinks:load', () => {
+  const chatListContainer = document.querySelector('.chat-dashboard');
 
-//if (chatRoomId) {
-  //consumer.subscriptions.create({ channel: "ChatChannel", chat_room_id: chatRoomId }, {
-    //connected() {
-      //console.log("Connected to the chat room with ID:", chatRoomId);
-    //},
-
-    //disconnected() {
-      //console.log("Disconnected from the chat room with ID:", chatRoomId);
-    //},
-
-   // received(data) {
-      // Gestisce i dati ricevuti dal WebSocket
-    //},
-
-    //speak(message) {
-      //this.perform('speak', { message: message });
-    //}
-  //});
-//} else {
-  //console.error("Chat Room ID is undefined. Cannot establish a subscription.");
-//}
-
-  speak(message) {
-    this.perform('speak', { message: message })
+  if (chatListContainer) {
+    // Mantieni il rendering statico senza WebSocket
+    console.log("Rendering della lista delle chat statiche");
   }
 });
-*/

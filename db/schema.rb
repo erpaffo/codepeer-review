@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_08_23_151730) do
+ActiveRecord::Schema.define(version: 2024_09_04_155624) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
-    t.bigint "record_id", null: false
-    t.bigint "blob_id", null: false
+    t.integer "record_id", null: false
+    t.integer "blob_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   end
 
   create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
+    t.integer "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
@@ -76,14 +76,22 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
 
   create_table "commit_logs", force: :cascade do |t|
     t.integer "project_id", null: false
-    t.integer "file_id", null: false
     t.text "description"
-    t.text "diff"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "user_id"
     t.string "message"
-    t.index ["file_id"], name: "index_commit_logs_on_file_id"
     t.index ["project_id"], name: "index_commit_logs_on_project_id"
+    t.index ["user_id"], name: "index_commit_logs_on_user_id"
+  end
+
+  create_table "conversations", force: :cascade do |t|
+    t.integer "sender_id", null: false
+    t.integer "recipient_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["recipient_id"], name: "index_conversations_on_recipient_id"
+    t.index ["sender_id"], name: "index_conversations_on_sender_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -126,6 +134,16 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "modified_by"
     t.index ["snippet_id"], name: "index_history_records_on_snippet_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "conversation_id", null: false
+    t.text "body"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["user_id"], name: "index_messages_on_user_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -244,14 +262,18 @@ ActiveRecord::Schema.define(version: 2024_08_23_151730) do
   add_foreign_key "collaborator_invitations", "users"
   add_foreign_key "collaborators", "projects"
   add_foreign_key "collaborators", "users"
-  add_foreign_key "commit_logs", "project_files", column: "file_id"
   add_foreign_key "commit_logs", "projects"
+  add_foreign_key "commit_logs", "users"
+  add_foreign_key "conversations", "users", column: "recipient_id"
+  add_foreign_key "conversations", "users", column: "sender_id"
   add_foreign_key "favorites", "projects"
   add_foreign_key "favorites", "users"
   add_foreign_key "feedbacks", "snippets"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "feedbacks", "users", column: "user_profile_id"
   add_foreign_key "history_records", "snippets"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users"
   add_foreign_key "notifications", "badges"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "notifier_id"

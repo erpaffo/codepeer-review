@@ -1,1 +1,5 @@
-document.querySelector(`.notification[data-id="<%= @notification.id %>"]`).remove();
+$('.notification[data-id="<%= @notification.id %>"]').fadeOut('slow', function() { $(this).remove(); });
+
+if ($('.notification:not(.read)').length === 0) {
+  $('.notifications-link .notification-dot').remove();
+}

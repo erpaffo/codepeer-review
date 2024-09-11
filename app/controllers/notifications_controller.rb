@@ -1,4 +1,3 @@
-# app/controllers/notifications_controller.rb
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
 
@@ -12,7 +11,7 @@ class NotificationsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to notifications_path }
-      format.js   # Per rispondere con un template JS se necessario
+      format.json { render json: { success: true } } # Risposta JSON per AJAX
     end
   end
 
@@ -22,7 +21,8 @@ class NotificationsController < ApplicationController
 
     respond_to do |format|
       format.html { redirect_to notifications_path, notice: 'Notification was successfully deleted.' }
-      format.js   # Per rispondere con un template JS se necessario
+      format.js { render inline: "location.reload();" } # Reload per aggiornare la vista
+      format.json { render json: { success: true } } # Risposta JSON per AJAX
     end
   end
 end

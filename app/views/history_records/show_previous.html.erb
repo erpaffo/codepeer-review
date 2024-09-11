@@ -1,8 +1,20 @@
 <!-- app/views/history_records/show_previous.html.erb -->
-<h1><%= @previous_snippet.title %></h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white mb-4"><%= @previous_snippet.title %></h1>
 
-<p><%= @previous_snippet.content %></p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Content</h2>
+      <textarea readonly class="w-full p-4 bg-gray-700 text-gray-300 rounded-lg"><%= @previous_snippet.content %></textarea>
+    </div>
 
-<p><%= @previous_snippet.comment %></p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Comment</h2>
+      <p class="text-gray-300 leading-relaxed"><%= @previous_snippet.comment %></p>
+    </div>
 
-<%= link_to 'Back', snippet_path(@snippet), class: 'btn btn-secondary' %>
+    <div class="flex justify-center mt-6">
+      <%= link_to 'Back', snippet_history_records_path(@snippet), class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
+</div>

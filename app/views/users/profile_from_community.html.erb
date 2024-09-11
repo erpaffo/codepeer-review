@@ -21,6 +21,10 @@
       <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-secondary' %>
     </div>
   <% end %>
+  <% if current_user != @user %>
+<%= link_to 'Avvia Chat', create_direct_conversations_path(recipient_id: @user.id), method: :post, class: "btn btn-primary" %>
+<% end %>
+
 
   <div class="mt-6 text-center">
     <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>

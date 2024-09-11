@@ -1,2 +1,2 @@
 $('.notification[data-id="<%= @notification.id %>"]').addClass('read');
-$('.mark-as-read').remove(); 
+$('.notification[data-id="<%= @notification.id %>"] .mark-as-read').remove();

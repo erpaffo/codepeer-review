@@ -1,15 +1,35 @@
-<h1><%= @snippet.title %></h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <!-- Titolo Snippet -->
+    <h1 class="text-3xl font-bold text-white mb-4"><%= @snippet.title %></h1>
 
-<p><%= @snippet.content %></p>
+    <!-- Contenuto dello Snippet -->
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Content</h2>
+      <textarea readonly class="w-full p-4 bg-gray-700 text-gray-300 rounded-lg"><%= @snippet.content %></textarea>
+    </div>
 
-<p><%= @snippet.comment %></p>
+    <!-- Commento dello Snippet -->
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-gray-300">Comment</h2>
+      <p class="text-gray-300 leading-relaxed"><%= @snippet.comment %></p>
+    </div>
 
-<p>By: <%= @snippet.user.first_name %> <%= @snippet.user.last_name %></p>
+    <!-- Dettagli Utente -->
+    <p class="text-gray-300 mb-4">By: <%= @snippet.user.first_name %> <%= @snippet.user.last_name %></p>
 
-<!-- Pulsante per modificare lo snippet -->
-<%= link_to 'Edit Snippet', edit_snippet_path(@snippet), class: "btn btn-warning" %>
+    <!-- Pulsanti per Azioni -->
+    <div class="flex space-x-4 mb-4">
+      <% if @snippet.user == current_user %>
+        <%= link_to 'Edit Snippet', edit_snippet_path(@snippet), class: 'bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition ease-in-out duration-300' %>
+      <% end %>
+      <%= link_to 'Send Feedback', feedback_community_activity_path(@snippet), class: 'bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition ease-in-out duration-300' %>
+      <%= link_to 'Share via Email', new_share_snippet_path(@snippet), class: 'bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition ease-in-out duration-300' %>
+    </div>
 
-<!-- Altri link esistenti -->
-<%= link_to 'Send Feedback', feedback_community_activity_path(@snippet), class: "btn btn-primary" %>
-<%= link_to 'Condividi via email', new_share_snippet_path(@snippet), class: 'btn btn-primary' %>
-<%= link_to 'Back to Community Snippets', community_activity_index_path, class: "btn btn-secondary" %>
+    <!-- Altri Link -->
+    <div class="flex space-x-4">
+      <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300' %>
+    </div>
+  </div>
+</div>

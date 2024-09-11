@@ -8,7 +8,7 @@
         <ul class="space-y-2">
           <% @users.each do |user| %>
             <li>
-              <%= link_to user.nickname, user_profile_path(user), class: "block text-lg text-teal-300 hover:text-teal-200 transition ease-in-out duration-300" %>
+              <%= link_to user.nickname, user_profile_from_community_path(user), class: "block text-lg text-teal-300 hover:text-teal-200 transition ease-in-out duration-300" %>
             </li>
           <% end %>
         </ul>

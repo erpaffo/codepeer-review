@@ -1,28 +1,29 @@
-<h1 class="text-2xl font-semibold mb-4">Your Notifications</h1>
+<div class="container mx-auto p-6">
+  <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold text-white mb-6">Your Notifications</h1>
 
-<% if @notifications.empty? %>
-  <p>No notifications found.</p>
-<% else %>
-  <ul>
-    <% @notifications.each do |notification| %>
-      <li class="mb-2 notification <%= 'read' if notification.read %>" data-id="<%= notification.id %>">
-        <% # Determina il percorso corretto per l'utente che ha scatenato la notifica %>
-        <% notifier = User.find_by(id: notification.notifier_id) %>
-        <% if notifier && current_user.following?(notifier) %>
-          <% link_path = user_profile_with_details_path(notifier) %>
-        <% else %>
-          <% link_path = user_profile_from_community_path(notifier) %>
+    <% if @notifications.empty? %>
+      <p class="text-gray-400">No notifications found.</p>
+    <% else %>
+      <ul class="space-y-4">
+        <% @notifications.each do |notification| %>
+          <li class="flex justify-between items-center bg-gray-700 p-4 rounded-lg shadow-sm hover:bg-gray-600 transition" data-id="<%= notification.id %>">
+            <p class="text-gray-300">
+              <%= notification.message %>
+            </p>
+
+            <div class="flex space-x-4">
+              <%# unless notification.read %>
+                <%# = link_to mark_as_read_notification_path(notification), method: :patch, remote: true, class: 'text-blue-400 hover:text-blue-300 underline transition', title: 'Mark as Read' do %>
+                  <%# <i class="fas fa-envelope-open"></i> %>
+                <%# end %>
+              <%= link_to notification_path(notification), method: :delete, remote: true, class: 'text-red-400 hover:text-red-300 transition', title: 'Delete Notification' do %>
+                <i class="fas fa-trash-alt"></i>
+              <% end %>
+            </div>
+          </li>
         <% end %>
-
-        <% # Mostra il messaggio con il nome o l'email cliccabile %>
-        <%= link_to notification.message.gsub(notifier.email, "<strong>#{notifier.email}</strong>").html_safe, link_path, class: 'text-blue-600 hover:underline' %>
-
-        <% unless notification.read %>
-          <%= link_to 'Mark as Read', mark_as_read_notification_path(notification), method: :patch, remote: true, class: 'text-blue-600 hover:underline mark-as-read' %>
-        <% end %>
-
-        <%= link_to 'Delete', notification_path(notification), method: :delete, remote: true, class: 'text-red-600 hover:underline delete-notification' %>
-      </li>
+      </ul>
     <% end %>
-  </ul>
-<% end %>
+  </div>
+</div>

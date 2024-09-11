@@ -1,19 +1,10 @@
-# app/channels/chat_channel.rb
 class ChatChannel < ApplicationCable::Channel
   def subscribed
-    # stream_from permette di abbonarsi ad un particolare stream
-    stream_from "chat_#{params['chat_room_id']}_channel"
+    # Esempio: sottoscrivi all'intero canale di chat o a una chat specifica
+    stream_from "chat_channel"
   end
 
   def unsubscribed
-    # Qualsiasi pulizia necessaria quando il canale viene disabbonato
-  end
-
-  def speak(data)
-    Message.create!(
-      content: data['message'],
-      user: current_user,
-      chat_room_id: params['chat_room_id']
-    )
+    # Cleanup quando l'utente si disconnette
   end
 end

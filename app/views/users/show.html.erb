@@ -20,10 +20,56 @@
     <%= link_to 'My Favorite Snippets', favorite_snippets_path, class: "bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition" %>
   </div>
 
-  <div class="profile-feedback">
-    <h2>Feedback on My Profile</h2>
+  <h2>Feedback on My Snippets</h2>
+<% if @snippets.any? %>
+  <ul class="feedback-list">
+    <% @snippets.each do |snippet| %>
+      <li class="snippet-item">
+        <p><strong>Snippet:</strong> <%= link_to snippet.title, snippet_path(snippet) %></p>
+        <% if snippet.feedbacks.any? %>
+          <ul class="feedbacks">
+            <% snippet.feedbacks.each do |feedback| %>
+              <li class="feedback-item">
+                <div class="feedback-content">
+                  <p><strong>Feedback:</strong> <%= feedback.content %></p>
+                  <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
+                </div>
+                <div class="feedback-actions">
+                  <%= link_to destroy_feedback_snippet_path(snippet, feedback_id: feedback.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete-feedback' do %>
+                    <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p>No feedback yet.</p>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No snippets created yet.</p>
+<% end %>
+
+<div class="profile-feedback">
+  <h2>Feedback on My Profile</h2>
+  <% if @received_feedbacks.any? %>
+    <ul class="profile-feedback-list">
+      <% @received_feedbacks.each do |feedback| %>
+        <li class="feedback-item">
+          <div class="feedback-content">
+            <p><strong>Feedback:</strong> <%= feedback.content %></p>
+            <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
     <p>No feedback on your profile yet.</p>
-  </div>
+  <% end %>
+</div>
+
 
   <!-- Improved Followers and Following Section -->
   <div class="profile-followers-following grid grid-cols-2 gap-4 text-center mb-6">
@@ -41,11 +87,17 @@
 
   <h3 class="text-xl font-bold text-white mb-4 text-center">Badges</h3>
   <div class="badge-container grid grid-cols-3 gap-4 text-center">
-    <% @user.badges.each do |badge| %>
-      <div class="badge">
-        <img src="<%= badge.icon_url %>" alt="<%= badge.name %>" class="w-16 h-16 rounded-full border border-gray-600 mb-2 mx-auto">
-        <p class="text-teal-400"><%= badge.name %></p>
-      </div>
-    <% end %>
+  <% @user.badges.each do |badge| %>
+    <div class="badge-item"> <!-- Usa 'div' invece di 'li' -->
+      <% if badge.icon_url.present? %>
+        <%= image_tag(badge.icon_url, alt: badge.name, class: "badge-image") %> <!-- Rimuovi il parametro size qui -->
+      <% else %>
+        <%= image_tag('default_badge.png', alt: 'Default Badge', class: "badge-image") %> <!-- Usa classi invece del parametro size -->
+      <% end %>
+      <p class="badge-name text-teal-400"><%= badge.name %></p> <!-- Aggiungi una classe per il nome -->
+    </div>
+  <% end %>
+</div>
+
   </div>
 </div>
