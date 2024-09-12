@@ -71,7 +71,7 @@
 </div>
 
 
-  <!-- Improved Followers and Following Section -->
+
   <div class="profile-followers-following grid grid-cols-2 gap-4 text-center mb-6">
     <div>
       <h2 class="text-lg font-bold text-white mb-2">Followers</h2>
@@ -88,13 +88,13 @@
   <h3 class="text-xl font-bold text-white mb-4 text-center">Badges</h3>
   <div class="badge-container grid grid-cols-3 gap-4 text-center">
   <% @user.badges.each do |badge| %>
-    <div class="badge-item"> <!-- Usa 'div' invece di 'li' -->
-      <% if badge.icon_url.present? %>
-        <%= image_tag(badge.icon_url, alt: badge.name, class: "badge-image") %> <!-- Rimuovi il parametro size qui -->
+    <div class="badge-item">
+      <% if badge.icon.present? %>
+        <%= image_tag(asset_path(badge.icon), alt: badge.name, class: "badge-image") %>
       <% else %>
-        <%= image_tag('default_badge.png', alt: 'Default Badge', class: "badge-image") %> <!-- Usa classi invece del parametro size -->
+        <%= image_tag('default_badge.png', alt: 'Default Badge', class: "badge-image") %>
       <% end %>
-      <p class="badge-name text-teal-400"><%= badge.name %></p> <!-- Aggiungi una classe per il nome -->
+      <p class="badge-name text-teal-400"><%= badge.name %></p>
     </div>
   <% end %>
 </div>

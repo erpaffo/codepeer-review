@@ -165,16 +165,36 @@ textarea {
 /* Profile */
 .profile-container {
   padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
+  max-width: 600px; /* Limita la larghezza massima */
+  width: 90%; /* Larghezza relativa per adattarsi a diverse dimensioni dello schermo */
+  margin: 2rem auto; /* Centra il contenitore e aggiunge margine */
   background-color: var(--color-profile-bg);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: var(--color-text-light);
 }
 
 .profile-header {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.profile-header img {
+  width: 120px; /* Dimensioni ridotte dell'immagine del profilo */
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.profile-header h1 {
+  font-size: 1.8rem; /* Dimensione del font più compatta */
+  font-weight: bold;
+  margin: 0.5rem 0;
+}
+
+.profile-header p {
+  margin: 0.2rem 0; /* Spaziatura ridotta */
 }
 
 .profile-info,
@@ -187,7 +207,7 @@ textarea {
 .profile-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1rem;
   justify-content: center;
   margin-bottom: 2rem;
 }
@@ -198,6 +218,40 @@ textarea {
   border-radius: 0.375rem;
   text-align: center;
   text-decoration: none;
+}
+
+.feedback-list,
+.profile-feedback-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.feedback-item,
+.badge-item {
+  background-color: var(--color-bg-light);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-content {
+  margin-bottom: 0.5rem;
+}
+
+.feedback-actions {
+  text-align: right;
+}
+
+.delete-feedback {
+  color: #e53e3e;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.delete-feedback:hover {
+  color: #cc0000;
 }
 
 .profile-followers-following {
@@ -396,10 +450,20 @@ textarea {
 }
 
 /* Oauth buttons */
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
 .oauth-btn {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  max-width: 300px;
   padding: 10px 20px;
   font-size: 1rem;
   font-weight: 500;
@@ -780,4 +844,75 @@ textarea {
 .btn-back .btn {
   margin-top: 20px;
   color: #fff; 
+}
+
+.user-profile-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.user-profile-container {
+  max-width: 600px;
+  width: 100%;
+  background-color: var(--color-profile-bg);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center; 
+  color: var(--color-text-light);
+}
+
+.user-profile-header {
+  margin-bottom: 1.5rem;
+}
+
+.user-profile-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.user-profile-image {
+  width: 150px; 
+  height: 150px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border-light);
+  object-fit: cover;
+  margin: 0 auto 1rem;
+}
+
+.user-profile-info {
+  margin-bottom: 1.5rem;
+}
+
+.user-profile-stats p {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+}
+
+.user-profile-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+
+.user-profile-snippets,
+.user-profile-projects {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.user-profile-subtitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--color-text-light);
+}
+
+.user-back-link {
+  margin-top: 1.5rem;
 }

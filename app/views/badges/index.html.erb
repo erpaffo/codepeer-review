@@ -1,13 +1,10 @@
-<%= link_to 'My Profile', profile_path, class: 'btn btn-primary' %>
-
-<!-- Titolo della pagina centrato -->
 <h1 class="page-title text-4xl font-extrabold text-teal-400 mb-8">Your Badges</h1>
 
 <div class="badges-page">
   <ul class="flex space-x-6 flex-wrap justify-start">
     <% Badge.all.each do |badge| %>
       <li class="relative group <%= 'unlocked' if @badges.include?(badge) %> badge-container">
-        <% if badge.icon_url.present? %>
+        <% if badge.icon.present? %>
           <%= image_tag(asset_path(badge.icon), alt: badge.name, size: "100x100", class: "badge-image") %>
         <% else %>
           <%= image_tag('default_badge.png', alt: 'Default Badge', size: "100x100", class: "badge-image") %>

@@ -1,32 +1,35 @@
-<div class="profile-container">
-  <div class="profile-header text-center">
-    <h1 class="text-3xl font-bold mb-6 text-white"><%= @user.nickname %>'s Profile</h1>
-    <% if @user.profile_image.attached? %>
-      <%= image_tag @user.profile_image.variant(resize: '200x200'), class: "rounded-full border border-gray-600" %>
-    <% elsif @user.profile_image_url.present? %>
-      <%= image_tag @user.profile_image_url, size: '200x200', class: "rounded-full border border-gray-600" %>
-    <% end %>
-  </div>
-
-  <div class="profile-info text-center mb-6">
-    <p><strong>Number of Snippets:</strong> <%= @user.snippets.count %></p>
-    <p><strong>Number of Projects:</strong> <%= @user.projects.count %></p>
-    <p><strong>Number of Followers:</strong> <%= @user.followers.count %></p>
-    <p><strong>Number of Following:</strong> <%= @user.following.count %></p>
-  </div>
-
-  <% if user_signed_in? %>
-    <div class="profile-buttons text-center">
-      <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-primary', data: { turbo: false } %>
-      <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-secondary' %>
+<div class="user-profile-page">
+  <div class="user-profile-container">
+    <div class="user-profile-header">
+      <h1 class="user-profile-title"><%= @user.nickname %>'s Profile</h1>
+      <% if @user.profile_image.attached? %>
+        <%= image_tag @user.profile_image.variant(resize: '200x200'), class: "user-profile-image" %>
+      <% elsif @user.profile_image_url.present? %>
+        <%= image_tag @user.profile_image_url, size: '200x200', class: "user-profile-image" %>
+      <% end %>
     </div>
-  <% end %>
-  <% if current_user != @user %>
-<%= link_to 'Avvia Chat', create_direct_conversations_path(recipient_id: @user.id), method: :post, class: "btn btn-primary" %>
-<% end %>
 
+    <div class="user-profile-info">
+      <div class="user-profile-stats">
+        <p><strong>Number of Snippets:</strong> <%= @user.snippets.count %></p>
+        <p><strong>Number of Projects:</strong> <%= @user.projects.count %></p>
+        <p><strong>Number of Followers:</strong> <%= @user.followers.count %></p>
+        <p><strong>Number of Following:</strong> <%= @user.following.count %></p>
+      </div>
+    </div>
 
-  <div class="mt-6 text-center">
-    <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+    <% if user_signed_in? %>
+      <div class="user-profile-buttons">
+        <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-primary' %>
+        <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-secondary' %>
+        <% if current_user != @user %>
+          <%= link_to 'Avvia Chat', create_direct_conversations_path(recipient_id: @user.id), method: :post, class: 'btn btn-primary' %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="user-back-link">
+      <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
+    </div>
   </div>
 </div>

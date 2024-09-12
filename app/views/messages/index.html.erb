@@ -1,4 +1,16 @@
-<%= form_for [@conversation, @message] do |f| %>
-  <%= f.text_area :body %>
-  <%= f.submit "Send" %>
-<% end %>
+<div class="chat-container">
+  <div class="chat-header">
+    <h2>Chat con <% other_participant = @conversation.other_participant(current_user) %>
+    <%= link_to other_participant.name, user_profile_from_community_path(other_participant), class: 'chat-participant-link' %></h2>
+  </div>
+  <div class="chat-form">
+    <%= form_for [@conversation, @message] do |f| %>
+      <div class="message-input-container">
+        <%= f.text_area :body, placeholder: "Scrivi un messaggio...", class: "message-input" %>
+      </div>
+      <div class="send-button-container">
+        <%= f.submit "Send", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
