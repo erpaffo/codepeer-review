@@ -17,7 +17,7 @@ class ConversationsController < ApplicationController
     @recipient = User.find_by(id: @conversation.recipient_id)
   end
 
-  def create_direct
+  def create
     recipient = User.find_by(id: params[:recipient_id])
 
     if recipient.nil?
