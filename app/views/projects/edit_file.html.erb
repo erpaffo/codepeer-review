@@ -64,7 +64,7 @@
     <%= f.hidden_field :file, id: 'file-content' %>
   <% end %>
 
-  <div id="code-editor" class="bg-gray-800 text-white p-4 rounded-lg"></div>
+  <div id="code-editor" class="bg-gray-800 text-white p-4 rounded-lg" data-content="<%= @file_content %>"></div>
 
   <div id="output" class="mt-4 bg-gray-800 text-white p-4 rounded-lg"></div>
 

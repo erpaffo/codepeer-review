@@ -42,9 +42,6 @@ function initializeMonacoEditor() {
 
     let content = editorElement.dataset.content;
 
-    console.log('Original content:', content);
-    console.log('Processed content:', content);
-
     try {
         monacoEditor = monaco.editor.create(editorElement, {
             value: content,
@@ -58,7 +55,12 @@ function initializeMonacoEditor() {
             lineDecorationsWidth: document.getElementById('highlight-line').checked ? '2px' : '0px',
             autoClosingBrackets: document.getElementById('auto-close-brackets').checked ? 'always' : 'never'
         });
-        console.log('Monaco Editor initialized');
+
+        // Rileva ridimensionamenti e chiama layout per aggiornare l'editor
+        new ResizeObserver(() => {
+            monacoEditor.layout();
+        }).observe(editorElement);
+
     } catch (error) {
         console.error('Error initializing Monaco Editor:', error);
     }
