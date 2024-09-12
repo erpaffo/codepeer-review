@@ -16,7 +16,9 @@
       <div class="flex space-x-4 mb-4">
         <%= link_to 'Edit', edit_snippet_path(@snippet), class: 'bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-500 transition ease-in-out duration-300' %>
         <% if @snippet.draft %>
-          <%= link_to 'Make Public', make_public_snippet_path(@snippet), method: :post, class: 'bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500 transition ease-in-out duration-300' %>
+          <%= form_with url: make_public_snippet_path(@snippet), method: :post, local: true do %>
+            <%= submit_tag 'Make Public', class: 'bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-500 transition ease-in-out duration-300' %>
+          <% end %>
         <% end %>
       </div>
     <% end %>
