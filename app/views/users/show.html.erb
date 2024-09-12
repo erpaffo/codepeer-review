@@ -1,6 +1,10 @@
 <div class="profile-container">
   <div class="profile-header">
-    <%= image_tag @user.profile_image_url || @user.profile_image, class: "rounded-full w-32 h-32" %>
+    <% if @user.profile_image.attached? %>
+      <%= image_tag @user.profile_image.variant(resize_to_limit: [200, 200]), class: "rounded-full w-32 h-32" %>
+    <% else %>
+      <%= image_tag 'no_image_available.jpg', class: "rounded-full w-32 h-32" %>
+    <% end %>
     <h1><%= @user.nickname %>'s Profile</h1>
     <p><%= @user.first_name %> <%= @user.last_name %></p>
     <p><%= @user.email %></p>
@@ -21,57 +25,57 @@
   </div>
 
   <h2>Feedback on My Snippets</h2>
-<% if @snippets.any? %>
-  <ul class="feedback-list">
-    <% @snippets.each do |snippet| %>
-      <li class="snippet-item">
-        <p><strong>Snippet:</strong> <%= link_to snippet.title, snippet_path(snippet) %></p>
-        <% if snippet.feedbacks.any? %>
-          <ul class="feedbacks">
-            <% snippet.feedbacks.each do |feedback| %>
-              <li class="feedback-item">
-                <div class="feedback-content">
-                  <p><strong>Feedback:</strong> <%= feedback.content %></p>
-                  <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-                </div>
-                <div class="feedback-actions">
-                  <%= link_to destroy_feedback_snippet_path(snippet, feedback_id: feedback.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete-feedback' do %>
-                    <i class="fas fa-trash-alt"></i> <!-- Icona cestino -->
-                  <% end %>
-                </div>
-              </li>
-            <% end %>
-          </ul>
-        <% else %>
-          <p>No feedback yet.</p>
-        <% end %>
-      </li>
-    <% end %>
-  </ul>
-<% else %>
-  <p>No snippets created yet.</p>
-<% end %>
-
-<div class="profile-feedback">
-  <h2>Feedback on My Profile</h2>
-  <% if @received_feedbacks.any? %>
-    <ul class="profile-feedback-list">
-      <% @received_feedbacks.each do |feedback| %>
-        <li class="feedback-item">
-          <div class="feedback-content">
-            <p><strong>Feedback:</strong> <%= feedback.content %></p>
-            <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
-          </div>
+  <% if @snippets.any? %>
+    <ul class="feedback-list">
+      <% @snippets.each do |snippet| %>
+        <li class="snippet-item">
+          <p><strong>Snippet:</strong> <%= link_to snippet.title, snippet_path(snippet) %></p>
+          <% if snippet.feedbacks.any? %>
+            <ul class="feedbacks">
+              <% snippet.feedbacks.each do |feedback| %>
+                <li class="feedback-item">
+                  <div class="feedback-content">
+                    <p><strong>Feedback:</strong> <%= feedback.content %></p>
+                    <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
+                  </div>
+                  <div class="feedback-actions">
+                    <%= link_to destroy_feedback_snippet_path(snippet, feedback_id: feedback.id), method: :delete, data: { confirm: 'Are you sure?' }, class: 'delete-feedback' do %>
+                      <i class="fas fa-trash-alt"></i>
+                    <% end %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p>No feedback yet.</p>
+          <% end %>
         </li>
       <% end %>
     </ul>
   <% else %>
-    <p>No feedback on your profile yet.</p>
+    <p>No snippets created yet.</p>
   <% end %>
-</div>
+
+  <div class="profile-feedback">
+    <h2>Feedback on My Profile</h2>
+    <% if @received_feedbacks.any? %>
+      <ul class="profile-feedback-list">
+        <% @received_feedbacks.each do |feedback| %>
+          <li class="feedback-item">
+            <div class="feedback-content">
+              <p><strong>Feedback:</strong> <%= feedback.content %></p>
+              <p><strong>From:</strong> <%= feedback.user.first_name %> <%= feedback.user.last_name %></p>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>No feedback on your profile yet.</p>
+    <% end %>
+  </div>
 
 
-
+  <!-- Improved Followers and Following Section -->
   <div class="profile-followers-following grid grid-cols-2 gap-4 text-center mb-6">
     <div>
       <h2 class="text-lg font-bold text-white mb-2">Followers</h2>

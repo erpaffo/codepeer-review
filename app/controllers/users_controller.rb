@@ -203,7 +203,9 @@ class UsersController < ApplicationController
   def handle_profile_image_update
     if params[:user][:remove_profile_image] == '1'
       @user.profile_image.purge if @user.profile_image.attached?
-    elsif params[:user][:profile_image].present?
+    end
+
+    if params[:user][:profile_image].present?
       @user.profile_image.attach(params[:user][:profile_image])
     end
   end

@@ -82,10 +82,12 @@ ActiveRecord::Schema.define(version: 2024_09_04_155624) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "message"
+<<<<<<< HEAD
     t.integer "user_id", null: false
+=======
+>>>>>>> RamoEdo
     t.index ["file_id"], name: "index_commit_logs_on_file_id"
     t.index ["project_id"], name: "index_commit_logs_on_project_id"
-    t.index ["user_id"], name: "index_commit_logs_on_user_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -269,7 +271,6 @@ ActiveRecord::Schema.define(version: 2024_09_04_155624) do
   add_foreign_key "collaborators", "users"
   add_foreign_key "commit_logs", "project_files", column: "file_id"
   add_foreign_key "commit_logs", "projects"
-  add_foreign_key "commit_logs", "users"
   add_foreign_key "conversations", "users", column: "recipient_id"
   add_foreign_key "conversations", "users", column: "sender_id"
   add_foreign_key "favorites", "projects"
