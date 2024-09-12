@@ -56,6 +56,8 @@ group :test do
   gem 'warden', '~> 1.2.9'
   gem 'database_cleaner'
   gem 'factory_bot_rails', '~> 6.1.0'
+  gem 'shoulda-matchers', '~> 5.0'
+  gem 'rails-controller-testing'
   gem 'faker'
   gem 'capybara-email'
   # Easy installation and use of web drivers to run system tests with browsers

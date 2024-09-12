@@ -926,3 +926,37 @@ textarea {
   min-height: 300px;
   max-height: 80vh;
 }
+
+.chat-page .relative.flex.items-center {
+  max-height: 70px;
+  overflow: hidden;
+  padding: 10px;
+  border-radius: 8px;
+  background-color: #1f2937;
+  transition: background-color 0.3s ease;
+}
+
+.chat-page .relative.flex.items-center:hover {
+  background-color: var(--color-bg-teal-light);
+}
+
+.chat-page .chat-name {
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--color-text-light);
+}
+
+.chat-page .chat-preview {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  opacity: 0.75;
+}
+
+.chat-page .delete-icon i {
+  font-size: 1.2rem;
+}
+
+.chat-page .flex-1 {
+  margin-left: 0px; 
+}
+

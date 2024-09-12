@@ -1,4 +1,4 @@
-<div class="container mx-auto p-6">
+<div class="chat-page container mx-auto p-6">
   <div class="flex justify-between items-center bg-gray-800 p-4 rounded-lg shadow-lg mb-6">
     <h1 class="text-3xl font-bold text-white">Le tue conversazioni</h1>
     <a href="/conversations/new" title="Avvia una nuova conversazione" class="text-teal-400 hover:text-teal-300 transition">
@@ -10,7 +10,7 @@
     <% @conversations.each do |conversation| %>
       <div class="relative flex items-center bg-gray-700 p-3 rounded-lg hover:bg-gray-600 transition">
         <%= link_to conversation_path(conversation), class: 'flex-1 no-underline' do %>
-          <div class="flex flex-col">
+          <div class="flex flex-col text-left">
             <% other_participant = conversation.other_participant(current_user) %>
             <div class="chat-name text-xl font-semibold text-white">
               <%= other_participant ? other_participant.nickname : "Utente sconosciuto" %>

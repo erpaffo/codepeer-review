@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
-
+ 
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations',
