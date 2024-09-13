@@ -109,6 +109,9 @@ GEM
     capybara-email (3.0.2)
       capybara (>= 2.4, < 4.0)
       mail
+    capybara-screenshot (1.0.26)
+      capybara (>= 1.0, < 4)
+      launchy
     carrierwave (2.2.6)
       activemodel (>= 5.0.0)
       activesupport (>= 5.0.0)
@@ -119,6 +122,8 @@ GEM
       ssrf_filter (~> 1.0)
     cgi (0.4.1)
     cgi (0.4.1-java)
+    childprocess (5.1.0)
+      logger (~> 1.5)
     chunky_png (1.4.0)
     concurrent-ruby (1.3.4)
     crass (1.0.6)
@@ -278,6 +283,9 @@ GEM
       thor (>= 0.14, < 2.0)
     jwt (2.8.2)
       base64
+    launchy (3.0.1)
+      addressable (~> 2.8)
+      childprocess (~> 5.0)
     listen (3.9.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -564,9 +572,11 @@ DEPENDENCIES
   cancancan
   capybara
   capybara-email
+  capybara-screenshot
   carrierwave (~> 2.0)
   cucumber-rails
   database_cleaner
+  database_cleaner-active_record
   devise
   diffy
   dotenv-rails
@@ -578,6 +588,7 @@ DEPENDENCIES
   google_drive (~> 3.0)
   jbuilder (~> 2.7)
   jquery-rails
+  launchy
   listen (~> 3.3)
   omniauth-github
   omniauth-gitlab
@@ -614,4 +625,4 @@ RUBY VERSION
    ruby 2.7.2p137
 
 BUNDLED WITH
-   2.1.4
+   2.4.22

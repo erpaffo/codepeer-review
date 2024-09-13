@@ -96,7 +96,7 @@ RSpec.describe SnippetsController, type: :controller do
     end
   end
 
-  # 8. Drafts: Mostra solo le bozze dell'utente
+  # . Drafts: Mostra solo le bozze dell'utente
   describe "GET #drafts" do
     it "mostra solo le bozze dell'utente" do
       draft_snippet = create(:snippet, user: user, draft: true)

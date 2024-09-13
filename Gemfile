@@ -48,6 +48,9 @@ group :development do
   gem 'spring'
 end
 
+gem 'factory_bot_rails', '~> 6.1.0'
+gem 'shoulda-matchers', '~> 5.0'
+
 group :test do
   gem 'rspec-rails'
   gem 'cucumber-rails', require: false
@@ -56,13 +59,15 @@ group :test do
   gem 'warden', '~> 1.2.9'
   gem 'database_cleaner'
   gem 'factory_bot_rails', '~> 6.1.0'
-  gem 'shoulda-matchers', '~> 5.0'
   gem 'rails-controller-testing'
   gem 'faker'
   gem 'capybara-email'
+  gem 'database_cleaner-active_record'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
   gem 'omniauth-test'
+  gem 'launchy'
+  gem 'capybara-screenshot'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem

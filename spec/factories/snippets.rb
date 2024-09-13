@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :snippet do
-    title { "Test Snippet" }
-    content { "This is some test content for the snippet." }
-    comment { "This is a test comment." }
-    favorite { false }
+    sequence(:title) { |n| "Snippet Title #{n}" }
+    content { "Sample content for the snippet." }
+    comment { "This is a comment for the snippet." }
     draft { false }
+    favorite { false }
     association :user
 
     trait :draft do
