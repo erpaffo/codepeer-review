@@ -28,7 +28,7 @@ class CommunityActivityController < ApplicationController
       @feedback.destroy
       redirect_to @snippet, notice: 'Feedback was successfully deleted.'
     end
-    
+
   def show
     @snippet = Snippet.find(params[:id])
   end

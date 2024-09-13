@@ -4,5 +4,4 @@ class CommitLog < ApplicationRecord
   belongs_to :user
 
   validates :message, presence: true
-  validates :diff, presence: true
 end
