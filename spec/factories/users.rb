@@ -11,7 +11,7 @@ FactoryBot.define do
       after(:create) do |user|
         user.profile_image.attach(
           io: File.open(Rails.root.join('spec', 'support', 'assets', 'profile_image.png')),
-          filename: 'no_image_available.jpg', content_type: 'image/png'
+          filename: 'no_image_available.png', content_type: 'image/png'
         )
       end
     end
