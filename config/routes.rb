@@ -117,7 +117,7 @@ Rails.application.routes.draw do
 
         get 'run_shell', to: 'projects#run_shell', as: 'run_shell'
 
-        post 'run_code', to: 'projects#run_code', as: 'run_code'
+        post 'run_code', to: 'projects#run_code', as: 'run_code_project'
       end
     end
 

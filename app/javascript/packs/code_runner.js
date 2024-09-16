@@ -9,11 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     runButton.addEventListener('click', (e) => {
         e.preventDefault();
-        
-        // Prendi il codice e il linguaggio dalla vista
         const code = window.monacoEditor ? window.monacoEditor.getValue() : '';
-        const language = document.getElementById('language-select').value; // Ora abbiamo il linguaggio dal campo hidden
-        const projectId = window.location.pathname.split('/')[2]; // Assumendo che la rotta sia /projects/:id/edit_file
+        const fileIdentifier = document.getElementById('file-identifier').value;
+        const projectId = window.location.pathname.split('/')[2]; // Assumendo che la rotta sia /projects/:id
 
         if (!code.trim()) {
             outputContainer.innerHTML = `<pre style="color: red;">Code is empty.</pre>`;
@@ -24,13 +22,14 @@ document.addEventListener('DOMContentLoaded', () => {
         runButton.disabled = true;
         runButton.innerText = 'Running...';
 
+        // Invia il codice al server per eseguirlo
         fetch(`/projects/${projectId}/run_code`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
             },
-            body: JSON.stringify({ code: code, language: language })
+            body: JSON.stringify({ code: code, file_identifier: fileIdentifier })
         })
         .then(response => response.json())
         .then(data => {

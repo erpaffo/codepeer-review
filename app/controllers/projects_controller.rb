@@ -151,12 +151,10 @@ class ProjectsController < ApplicationController
 
   def run_code
     code = params[:code]
-    language = params[:language]
+    file_identifier = params[:file_identifier]
+    language = detect_language_from_identifier(file_identifier)
 
-    # Validazione dei parametri
-    unless code.present? && supported_language?(language)
-      render json: { error: 'Invalid code or language.' }, status: :unprocessable_entity and return
-    end
+    return render json: { error: 'Invalid code or language.' }, status: :unprocessable_entity unless code.present? && supported_language?(language)
 
     begin
       output, error, status = execute_code_in_docker(code, language)
@@ -165,13 +163,27 @@ class ProjectsController < ApplicationController
       else
         render json: { error: error }, status: :unprocessable_entity
       end
-    rescue Timeout::Error
-      render json: { error: 'Code execution timed out.' }, status: :unprocessable_entity
     rescue => e
-      Rails.logger.error "Errore durante l'esecuzione del codice: #{e.message}"
-      render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+      Rails.logger.error "Error during code execution: #{e.message}"
+      render json: { error: e.message }, status: :internal_server_error
     end
   end
+
+  # Funzione per rilevare il linguaggio basato sull'estensione del file
+  def detect_language_from_identifier(file_identifier)
+    file_extension = file_identifier.split('.').last.downcase
+    case file_extension
+    when 'py' then 'python'
+    when 'rb' then 'ruby'
+    when 'js' then 'javascript'
+    when 'c' then 'c'
+    when 'cpp' then 'cpp'
+    when 'java' then 'java'
+    when 'rs' then 'rust'
+    else 'plaintext'
+    end
+  end
+
 
   def new_file
     @project_file = @project.project_files.build
@@ -479,6 +491,29 @@ class ProjectsController < ApplicationController
     end
   end
 
+  def download_file_from_s3(file)
+    user_folder_name = file.project.user.email.split('@').first
+    project_folder_name = file.project.title.parameterize
+    local_dir = Rails.root.join('tmp', 's3_files')
+
+    # Creare la directory locale se non esiste
+    FileUtils.mkdir_p(local_dir)
+
+    local_path = File.join(local_dir, File.basename(file.file.url))
+
+    s3 = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+
+    # Scarica il file da S3 e salvalo localmente
+    File.open(local_path, 'wb') do |file_obj|
+      s3.get_object(bucket: ENV['AWS_BUCKET'], key: file.file.path) do |chunk|
+        file_obj.write(chunk)
+      end
+    end
+
+    local_path # Restituisce il percorso locale dove il file è stato scaricato
+  end
+
+
   private
 
   def set_project
@@ -529,7 +564,7 @@ class ProjectsController < ApplicationController
     end
   end
 
-  def execute_code_in_docker(code, language)
+  def execute_code_in_docker(file_content, language)
     docker_image = select_docker_image(language)
     file_extension = language_extension(language)
 
@@ -538,9 +573,10 @@ class ProjectsController < ApplicationController
         file_name = "main.#{file_extension}"
         file_path = File.join(dir, file_name)
 
-        File.write(file_path, code, encoding: 'UTF-8')
+        # Scrive il contenuto del file temporaneo
+        File.write(file_path, file_content, encoding: 'UTF-8')
 
-        # Costruzione del comando Docker con restrizioni di sicurezza
+        # Costruisce il comando Docker con restrizioni di sicurezza
         docker_cmd = [
           'docker', 'run', '--rm',
           '--network', 'none',                        # Disabilita l'accesso alla rete
@@ -552,7 +588,7 @@ class ProjectsController < ApplicationController
           docker_image
         ]
 
-        # Comando specifico per il linguaggio
+        # Comando specifico per eseguire il file nel container
         language_cmd = case language
                        when 'python'
                          ["python3", file_name]
@@ -574,7 +610,7 @@ class ProjectsController < ApplicationController
 
         full_command = docker_cmd + language_cmd
 
-        # Esecuzione del comando e cattura di stdout, stderr e status
+        # Esegue il comando e cattura stdout, stderr e status
         stdout_str, stderr_str, status = Open3.capture3(*full_command)
 
         # Restituisce l'output, l'errore e lo status del comando
