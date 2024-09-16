@@ -48,6 +48,15 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :users do
+      collection do
+        get 'manage_permissions'
+      end
+      patch :update_role, on: :member
+    end
+
+    get 'search_users', to: 'search#results', as: 'search_users'
+
     resources :follows, only: [:create, :destroy]
 
     get '/users/:id/followers', to: 'users#show_followers', as: :user_followers

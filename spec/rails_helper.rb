@@ -7,6 +7,7 @@ require 'spec_helper'
 require 'rspec/rails'
 require 'devise'
 require 'database_cleaner/active_record'
+require 'faker'
 
 # Add additional requires below this line. Rails is not loaded until this point!
 

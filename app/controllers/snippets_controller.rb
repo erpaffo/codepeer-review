@@ -2,6 +2,7 @@
 class SnippetsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_snippet, only: [:show, :edit, :update, :destroy, :toggle_favorite, :make_public]
+  before_action :authorize_user!, only: [:edit, :update, :destroy]
 
   # Mostra solo snippet pubblici per l'utente
   def index
@@ -120,6 +121,13 @@ class SnippetsController < ApplicationController
   def snippet_params
     params.require(:snippet).permit(:title, :content, :comment, :favorite, :project_file_id)
   end
+
+ def authorize_user!
+  unless @snippet.user == current_user || current_user.moderator?
+    redirect_to snippets_path, alert: 'Non sei autorizzato ad eseguire questa azione.'
+  end
+end
+
 
   def log_history_changes(snippet)
     changes = snippet.previous_changes
