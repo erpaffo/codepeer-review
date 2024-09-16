@@ -1,5 +1,7 @@
 FROM rust:latest
 
-WORKDIR /app
+# Installa Cargo se non già incluso
+RUN rustup update stable
 
-CMD ["sh", "-c", "rustc main.rs && ./main"]
+# Imposta la directory di lavoro
+WORKDIR /workspace

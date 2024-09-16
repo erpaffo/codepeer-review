@@ -1,30 +1,24 @@
 module ProjectsHelper
-  def detect_language(filename)
-    case File.extname(filename)
-    when '.js'
-      'javascript'
-    when '.rb'
-      'ruby'
-    when '.py'
-      'python'
-    when '.md'
-      'markdown'
-    when '.c'
-      'c'
-    when '.cpp'
-      'cpp'
-    when '.rs'
-      'rust'
-    when '.html'
-      'html'
-    when '.css'
-      'css'
-    when '.xml'
-      'xml'
-    when '.txt'
-      'plaintext'
+  LANGUAGE_DETECTION = {
+    '.c'     => 'c',
+    '.cpp'   => 'cpp',
+    '.py'    => 'python',
+    '.js'    => 'javascript',
+    '.rb'    => 'ruby',
+    '.rs'    => 'rust',
+    '.java'  => 'java'
+  }.freeze
+
+  def detect_languages
+    detector = LanguageDetector.new(self)
+    detected_languages = detector.detect_languages
+
+    if detected_languages.any?
+      self.update(languages: detected_languages)
     else
-      'plaintext'
+      errors.add(:base, 'No languages detected')
     end
+
+    detected_languages # Assicurati di restituire l'array di linguaggi rilevati
   end
 end

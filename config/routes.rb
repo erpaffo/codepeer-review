@@ -1,20 +1,25 @@
 Rails.application.routes.draw do
   mount ActionCable.server => '/cable'
+
   resources :badges, only: [:index]
+
   resources :conversations, only: [:index, :new, :create, :show, :destroy] do
     resources :messages, only: [:create, :index]
   end
+
   resources :notifications, only: [:index, :destroy] do
     member do
       patch :mark_as_read
     end
   end
+
   get 'dashboard/chats', to: 'conversations#index', as: 'user_chats'
   post 'conversations/create_direct', to: 'conversations#create_direct', as: :create_direct_conversations
+
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
- 
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations',
@@ -99,12 +104,13 @@ Rails.application.routes.draw do
         post 'upload_to_github'
         post 'upload_to_gitlab'
 
-        # Aggiungi questa rotta per gestire la pagina di caricamento dei file
         get 'upload_files', to: 'projects#upload_files', as: 'upload_files'
+
+        get 'run_shell', to: 'projects#run_shell', as: 'run_shell'
+
+        post 'run_code', to: 'projects#run_code', as: 'run_code'
       end
     end
-
-    post 'run_code', to: 'projects#run_code'
 
     resources :snippets do
       resources :history_records, only: [:index] do
@@ -146,6 +152,7 @@ Rails.application.routes.draw do
     # User's Snippets Routes
     get 'my_snippets', to: 'users#my_snippets', as: :my_snippets
     get 'favorite_snippets', to: 'users#favorite_snippets', as: :favorite_snippets
+
     # config/routes.rb
     get 'snippets/:id/from_profile', to: 'snippets#show_from_profile', as: :snippet_from_profile
 
@@ -161,5 +168,4 @@ Rails.application.routes.draw do
     get 'accept_invitation/:token', to: 'collaborator_invitations#accept', as: :accept_invitation
     get '/oauth2callback', to: 'projects#google_drive_auth'
   end
-
 end

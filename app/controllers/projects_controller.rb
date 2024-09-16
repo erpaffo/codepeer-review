@@ -1,6 +1,8 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab, :run_shell]
+
+  SUPPORTED_LANGUAGES = %w[python c cpp javascript ruby java rust].freeze
 
   def index
     @projects = current_user.projects + current_user.collaborated_projects
@@ -17,7 +19,6 @@ class ProjectsController < ApplicationController
 
     record_view
   end
-
 
   def new
     @project = current_user.projects.build
@@ -44,7 +45,6 @@ class ProjectsController < ApplicationController
     end
   end
 
-
   def upload_file
     @project = Project.find(params[:id])
     @file = @project.project_files.build(file: params[:file])
@@ -57,16 +57,17 @@ class ProjectsController < ApplicationController
   end
 
   def upload_files
+    # Logica per l'upload multiplo dei file
   end
 
   def edit
-    if @project.user != current_user && !@project.collaborating_users.include?(current_user)
+    unless authorized_to_edit?
       redirect_to projects_path, alert: 'You are not authorized to edit this project.'
     end
   end
 
   def update
-    if @project.user != current_user && !@project.collaborating_users.include?(current_user)
+    unless authorized_to_edit?
       redirect_to projects_path, alert: 'You are not authorized to update this project.'
     else
       if @project.update(project_params)
@@ -78,7 +79,7 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    if @project.user != current_user
+    unless @project.user == current_user
       redirect_to projects_path, alert: 'You are not authorized to delete this project.'
     else
       @project.destroy
@@ -88,8 +89,8 @@ class ProjectsController < ApplicationController
 
   def show_file
     @file = @project.project_files.find(params[:file_id])
-    local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
-    download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
+    local_path = download_file_from_s3(@file)
+
     @file_content = read_file_content(local_path)
 
     respond_to do |format|
@@ -100,16 +101,15 @@ class ProjectsController < ApplicationController
 
   def edit_file
     @file = @project.project_files.find(params[:file_id])
-    local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
-    download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
+    local_path = download_file_from_s3(@file)
+
     @file_content = read_file_content(local_path)
 
-    # Debug the file content
     Rails.logger.debug "File content being passed to the view: #{@file_content.inspect}"
 
     respond_to do |format|
-        format.html
-        format.json { render json: { file_content: @file_content } }
+      format.html
+      format.json { render json: { file_content: @file_content } }
     end
   end
 
@@ -123,8 +123,7 @@ class ProjectsController < ApplicationController
       new_file_content_utf8 = new_file_content.encode('UTF-8')
 
       # Download the original file content from S3
-      local_path = "#{Rails.root}/tmp/#{File.basename(@file.file.url)}"
-      download_file_from_s3(ENV['AWS_BUCKET'], @file.file.path, local_path)
+      local_path = download_file_from_s3(@file)
       original_file_content = read_file_content(local_path)
 
       # Calculate the diff between the original and new content
@@ -154,9 +153,24 @@ class ProjectsController < ApplicationController
     code = params[:code]
     language = params[:language]
 
-    output = execute_code_in_docker(code, language)
+    # Validazione dei parametri
+    unless code.present? && supported_language?(language)
+      render json: { error: 'Invalid code or language.' }, status: :unprocessable_entity and return
+    end
 
-    render json: { output: output }
+    begin
+      output, error, status = execute_code_in_docker(code, language)
+      if status.success?
+        render json: { output: output }, status: :ok
+      else
+        render json: { error: error }, status: :unprocessable_entity
+      end
+    rescue Timeout::Error
+      render json: { error: 'Code execution timed out.' }, status: :unprocessable_entity
+    rescue => e
+      Rails.logger.error "Errore durante l'esecuzione del codice: #{e.message}"
+      render json: { error: 'An unexpected error occurred.' }, status: :internal_server_error
+    end
   end
 
   def new_file
@@ -175,6 +189,7 @@ class ProjectsController < ApplicationController
     full_file_name = "#{file_name}.#{extension}"
     file_path = "#{Rails.root}/tmp/#{full_file_name}"
 
+    FileUtils.mkdir_p(File.dirname(file_path))
     File.open(file_path, "w") {}
 
     @project_file = @project.project_files.build(file: File.open(file_path))
@@ -193,6 +208,31 @@ class ProjectsController < ApplicationController
       redirect_to root_path, alert: "This project is not public."
     end
   end
+
+  def download_project_files_from_s3(project)
+    user_folder_name = project.user.email.split('@').first
+    project_folder_name = project.title.parameterize
+    local_dir = Rails.root.join('tmp', 'projects', "#{project.id}_files")
+
+    FileUtils.mkdir_p(local_dir)
+
+    s3 = Aws::S3::Client.new(region: ENV['AWS_REGION'])
+
+    project.project_files.each do |file|
+      s3_file_path = "uploads/#{user_folder_name}/#{project_folder_name}/#{file.file_identifier}"
+      local_file_path = File.join(local_dir, file.file_identifier)
+
+      # Scarica il file da S3 e salva nel percorso locale
+      File.open(local_file_path, 'wb') do |local_file|
+        s3.get_object(bucket: ENV['AWS_BUCKET'], key: s3_file_path) do |chunk|
+          local_file.write(chunk)
+        end
+      end
+    end
+
+    local_dir # Restituisce il percorso locale dove i file sono stati scaricati
+  end
+
 
   def download_project
     project = Project.find(params[:id])
@@ -381,7 +421,6 @@ class ProjectsController < ApplicationController
     redirect_to upload_to_google_drive_project_path(@project)
   end
 
-
   def upload_to_github
     @project = Project.find(params[:id])
 
@@ -427,6 +466,18 @@ class ProjectsController < ApplicationController
     redirect_to edit_project_path(@project)
   end
 
+  def run_shell
+    # Scarica i file del progetto da S3
+    project_files_path = download_project_files_from_s3(@project)
+
+    if project_files_path
+      # Inizializza la shell nel container Docker
+      ShellProcessManager.initialize_shell(@project, project_files_path)
+    else
+      flash[:error] = "Failed to download project files."
+      redirect_to project_path(@project)
+    end
+  end
 
   private
 
@@ -479,108 +530,90 @@ class ProjectsController < ApplicationController
   end
 
   def execute_code_in_docker(code, language)
-    docker_image = case language
-                   when 'python'
-                     'python:3.8-slim'
-                   when 'c'
-                     'gcc:latest'
-                   when 'java'
-                     'openjdk:11'
-                   when 'javascript'
-                     'node:14'
-                   when 'ruby'
-                     'ruby:latest'
-                   when 'go'
-                     'golang:latest'
-                   when 'php'
-                     'php:latest'
-                   when 'swift'
-                     'swift:latest'
-                   when 'kotlin'
-                     'openjdk:11'
-                   when 'rust'
-                     'rust:latest'
-                   else
-                     'python:3.8-slim'
-                   end
+    docker_image = select_docker_image(language)
+    file_extension = language_extension(language)
 
-    Dir.mktmpdir do |dir|
-      file_name = "main.#{language_extension(language)}"
-      file_path = "#{dir}/#{file_name}"
+    Timeout.timeout(5) do  # Timeout di 5 secondi per l'esecuzione del codice
+      Dir.mktmpdir do |dir|
+        file_name = "main.#{file_extension}"
+        file_path = File.join(dir, file_name)
 
-      File.write(file_path, code, encoding: 'UTF-8')
+        File.write(file_path, code, encoding: 'UTF-8')
 
-      command = case language
-                when 'python'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} python3 #{file_name}"
-                when 'c'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'gcc -o main main.c && ./main'"
-                when 'java'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'javac Main.java && java Main'"
-                when 'javascript'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} node #{file_name}"
-                when 'ruby'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} ruby #{file_name}"
-                when 'go'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'go build -o main main.go && ./main'"
-                when 'php'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} php #{file_name}"
-                when 'swift'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'swiftc -o main main.swift && ./main'"
-                when 'kotlin'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'kotlinc main.kt -include-runtime -d main.jar && java -jar main.jar'"
-                when 'rust'
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} sh -c 'rustc main.rs && ./main'"
-                else
-                  "docker run --rm -v #{dir}:/app -w /app #{docker_image} python3 #{file_name}"
-                end
+        # Costruzione del comando Docker con restrizioni di sicurezza
+        docker_cmd = [
+          'docker', 'run', '--rm',
+          '--network', 'none',                        # Disabilita l'accesso alla rete
+          '--memory', '256m',                          # Limite di memoria
+          '--cpus', '0.5',                             # Limite di CPU
+          '--read-only',                               # Filesystem di sola lettura
+          '-v', "#{dir}:/app:rw",                      # Monta la directory in modalità read-write
+          '-w', '/app',
+          docker_image
+        ]
 
-      output = `#{command}`
-      output
+        # Comando specifico per il linguaggio
+        language_cmd = case language
+                       when 'python'
+                         ["python3", file_name]
+                       when 'c'
+                         ["sh", "-c", "gcc -o main main.c && ./main"]
+                       when 'cpp'
+                         ["sh", "-c", "g++ -o main main.cpp && ./main"]
+                       when 'java'
+                         ["sh", "-c", "javac Main.java && java Main"]
+                       when 'javascript'
+                         ["node", file_name]
+                       when 'ruby'
+                         ["ruby", file_name]
+                       when 'rust'
+                         ["sh", "-c", "rustc main.rs && ./main"]
+                       else
+                         ["python3", file_name]
+                       end
+
+        full_command = docker_cmd + language_cmd
+
+        # Esecuzione del comando e cattura di stdout, stderr e status
+        stdout_str, stderr_str, status = Open3.capture3(*full_command)
+
+        # Restituisce l'output, l'errore e lo status del comando
+        [stdout_str, stderr_str, status]
+      end
     end
+  end
+
+  def supported_language?(language)
+    SUPPORTED_LANGUAGES.include?(language)
+  end
+
+  def select_docker_image(language)
+    {
+      'python'      => 'code-executor/python:latest',
+      'c'           => 'code-executor/c:latest',
+      'cpp'         => 'code-executor/cpp:latest',
+      'javascript'  => 'code-executor/javascript:latest',
+      'ruby'        => 'code-executor/ruby:latest',
+      'java'        => 'code-executor/java:latest',
+      'rust'        => 'code-executor/rust:latest'
+    }.fetch(language, 'code-executor/python:latest')
   end
 
   def language_extension(language)
-    case language
-    when 'python'
-      'py'
-    when 'c'
-      'c'
-    when 'java'
-      'java'
-    when 'javascript'
-      'js'
-    when 'ruby'
-      'rb'
-    when 'go'
-      'go'
-    when 'php'
-      'php'
-    when 'swift'
-      'swift'
-    when 'kotlin'
-      'kt'
-    when 'rust'
-      'rs'
-    else
-      'txt'
-    end
-  end
-
-  def download_file_from_s3(bucket, key, local_path)
-    s3 = Aws::S3::Client.new(region: ENV['AWS_REGION'])
-    File.open(local_path, 'wb') do |file|
-      s3.get_object(bucket: bucket, key: key) do |chunk|
-        file.write(chunk)
-      end
-    end
-    local_path
+    {
+      'python'      => 'py',
+      'c'           => 'c',
+      'cpp'         => 'cpp',
+      'javascript'  => 'js',
+      'ruby'        => 'rb',
+      'java'        => 'java',
+      'rust'        => 'rs'
+    }.fetch(language, 'txt')
   end
 
   def read_file_content(file_path)
     File.read(file_path, encoding: 'UTF-8')
   end
-
 
   def calculate_diff(original_content, new_content)
     original_lines = original_content.split("\n")
@@ -593,5 +626,9 @@ class ProjectsController < ApplicationController
   def record_view
     return if ProjectView.exists?(project: @project, user: current_user)
     @project.project_views.create(user: current_user)
+  end
+
+  def authorized_to_edit?
+    @project.user == current_user || @project.collaborating_users.include?(current_user)
   end
 end

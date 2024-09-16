@@ -1,0 +1,11 @@
+services:
+  project_executor:
+    build:
+      context: .  
+      dockerfile: Dockerfile
+    image: code-executor/ubuntu:latest
+    container_name: project_executor_${PROJECT_ID}
+    volumes:
+      - ../tmp/projects/${PROJECT_ID}_files:/app/  # Usa un percorso corretto per la cartella dei file del progetto
+    stdin_open: true  # Per eseguire comandi interattivi
+    tty: true

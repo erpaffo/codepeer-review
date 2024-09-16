@@ -1,0 +1,27 @@
+<% if @project %>
+  <div class="p-6">
+    <h1 class="text-2xl font-semibold mb-4">Interactive Shell for <%= @project.title %></h1>
+
+    <!-- Campo di Input per i Comandi -->
+    <div class="mb-4">
+      <label for="command-input" class="block text-white mb-2">Enter Command:</label>
+      <input type="text" id="command-input" class="form-control w-full p-2 rounded bg-gray-700 text-white" placeholder="e.g., gcc main.c -o main" />
+      <button id="execute-command" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Execute</button>
+    </div>
+
+    <!-- Terminal Container -->
+    <div id="terminal" data-project-id="<%= @project.id %>" class="bg-gray-800 text-white p-4 rounded-lg" style="height: 500px;"></div>
+  </div>
+
+  <!-- Includi xterm.js e gli addon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.4.0/lib/xterm-addon-fit.js"></script>
+
+  <!-- Includi il Pacchetto JavaScript per la Shell Interattiva -->
+  <%= javascript_pack_tag 'interactive_shell' %>
+<% else %>
+  <div class="p-6">
+    <p>Project not found.</p>
+  </div>
+<% end %>

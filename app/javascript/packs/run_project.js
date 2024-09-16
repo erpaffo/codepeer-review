@@ -1,28 +1,64 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const logOutput = document.getElementById('log-output');
-  
-    function fetchLogs() {
-      fetch(window.location.href)
-        .then(response => response.text())
-        .then(html => {
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-          const newLogs = doc.getElementById('log-output').innerHTML;
-  
-          logOutput.innerHTML = newLogs;
-          logOutput.scrollTop = logOutput.scrollHeight;
-        })
-        .catch(error => console.error('Error fetching logs:', error));
-    }
-  
-    setInterval(fetchLogs, 3000); // Poll every 3 seconds
-  });
+    const runButton = document.getElementById('run-code'); // Assicurati che l'ID corrisponda
+    const outputContainer = document.getElementById('output');
 
-  document.addEventListener('turbo:load', function() {
-    document.getElementById('run-project-btn').addEventListener('click', function() {
-      this.disabled = true;
-      this.innerText = 'Running...';
+    if (!runButton) {
+        console.error('Run Code button not found!');
+        return;
+    }
+
+    runButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        const code = window.monacoEditor ? window.monacoEditor.getValue() : '';
+        const language = document.getElementById('language-select').value;
+        const projectId = window.location.pathname.split('/')[2]; // Assumendo che la rotta sia /projects/:id/edit_file
+
+        if (!code.trim()) {
+            outputContainer.innerHTML = `<pre style="color: red;">Code is empty.</pre>`;
+            return;
+        }
+
+        // Disabilita il pulsante per prevenire clic multipli
+        runButton.disabled = true;
+        runButton.innerText = 'Running...';
+
+        fetch(`/projects/${projectId}/run_code`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ code: code, language: language })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.output) {
+                outputContainer.innerHTML = `<pre>${escapeHtml(data.output)}</pre>`;
+            } else if (data.error) {
+                outputContainer.innerHTML = `<pre style="color: red;">${escapeHtml(data.error)}</pre>`;
+            } else {
+                outputContainer.innerHTML = `<pre style="color: red;">Unknown response from server.</pre>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            outputContainer.innerHTML = `<pre style="color: red;">An error occurred while running the code.</pre>`;
+        })
+        .finally(() => {
+            runButton.disabled = false;
+            runButton.innerText = 'Run Code';
+        });
     });
-  });
-  
-  
+
+    // Funzione per sanificare l'output e prevenire XSS
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+});

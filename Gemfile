@@ -124,3 +124,6 @@ gem "turbo-rails", "~> 2.0"
 gem 'cancancan'
 
 gem 'jquery-rails'
+
+gem 'rugged'
+

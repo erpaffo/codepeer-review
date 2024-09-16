@@ -4,6 +4,7 @@ module ApplicationCable
 
     def connect
       self.current_user = find_verified_user
+      Rails.logger.info "User connected: #{current_user.id}"
     end
 
     private

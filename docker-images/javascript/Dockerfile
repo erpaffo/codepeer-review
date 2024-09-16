@@ -1,5 +1,5 @@
-FROM node:14
+FROM node:latest
 
-WORKDIR /app
+# Imposta la directory di lavoro
+WORKDIR /workspace
 
-CMD ["node"]

@@ -5,6 +5,7 @@ import Turbolinks from 'turbolinks';
 import Rails from '@rails/ujs';
 import Dropzone from 'dropzone';
 import '../packs/notification'; 
+import "controllers"
 
 import { Application } from '@hotwired/stimulus';
 import { definitionsFromContext } from '@hotwired/stimulus-webpack-helpers';

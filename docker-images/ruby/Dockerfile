@@ -1,5 +1,7 @@
 FROM ruby:latest
 
-WORKDIR /app
+# Installa Bundler e altri pacchetti necessari
+RUN gem install bundler
 
-CMD ["ruby"]
+# Imposta la directory di lavoro
+WORKDIR /workspace

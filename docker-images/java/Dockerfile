@@ -1,5 +1,6 @@
-FROM openjdk:11
+FROM openjdk:latest
 
-WORKDIR /app
+# Imposta la directory di lavoro
+WORKDIR /workspace
 
-CMD ["sh", "-c", "javac Main.java && java Main"]
+

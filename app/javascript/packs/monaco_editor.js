@@ -1,21 +1,15 @@
-let monacoEditor = null;
+window.monacoEditor = null; // Definisci monacoEditor globalmente
 
 function getLanguageFromFileExtension(fileName) {
     const extension = fileName.split('.').pop().toLowerCase();
     switch (extension) {
         case 'py': return 'python';
         case 'js': return 'javascript';
-        case 'html': return 'html';
-        case 'css': return 'css';
         case 'rb': return 'ruby';
         case 'c': return 'c';
         case 'cpp': return 'cpp';
         case 'java': return 'java';
-        case 'ts': return 'typescript';
-        case 'go': return 'go';
-        case 'php': return 'php';
-        case 'swift': return 'swift';
-        case 'sh': return 'shell';
+        case 'rs': return 'rust';
         default: return 'plaintext';
     }
 }
@@ -36,14 +30,14 @@ function initializeMonacoEditor() {
     const language = getLanguageFromFileExtension(fileIdentifierElement.value);
     const theme = document.getElementById('theme-select').value;
 
-    if (monacoEditor) {
-        monacoEditor.dispose();
+    if (window.monacoEditor) {
+        window.monacoEditor.dispose();
     }
 
-    let content = editorElement.dataset.content;
+    let content = editorElement.getAttribute('data-content') || '';
 
     try {
-        monacoEditor = monaco.editor.create(editorElement, {
+        window.monacoEditor = monaco.editor.create(editorElement, {
             value: content,
             language: language,
             theme: theme,
@@ -51,14 +45,13 @@ function initializeMonacoEditor() {
             minimap: { enabled: document.getElementById('minimap-select').checked },
             automaticLayout: true,
             lineNumbers: document.getElementById('highlight-line').checked ? 'on' : 'off',
-            multiCursorModifier: document.getElementById('multi-cursor').checked ? 'alt' : null,
-            lineDecorationsWidth: document.getElementById('highlight-line').checked ? '2px' : '0px',
+            multiCursorModifier: document.getElementById('multi-cursor').checked ? 'alt' : 'ctrlCmd',
             autoClosingBrackets: document.getElementById('auto-close-brackets').checked ? 'always' : 'never'
         });
 
         // Rileva ridimensionamenti e chiama layout per aggiornare l'editor
         new ResizeObserver(() => {
-            monacoEditor.layout();
+            window.monacoEditor.layout();
         }).observe(editorElement);
 
     } catch (error) {
@@ -83,28 +76,45 @@ function loadMonacoEditor() {
 document.addEventListener('DOMContentLoaded', () => {
     loadMonacoEditor();
 
-    document.getElementById('theme-select').addEventListener('change', initializeMonacoEditor);
-    document.getElementById('font-size').addEventListener('input', initializeMonacoEditor);
-    document.getElementById('minimap-select').addEventListener('change', initializeMonacoEditor);
-    document.getElementById('multi-cursor').addEventListener('change', initializeMonacoEditor);
-    document.getElementById('highlight-line').addEventListener('change', initializeMonacoEditor);
-    document.getElementById('auto-close-brackets').addEventListener('change', initializeMonacoEditor);
+    // Aggiungi Event Listeners per i controlli dell'editor
+    const controls = [
+        'theme-select',
+        'font-size',
+        'minimap-select',
+        'multi-cursor',
+        'highlight-line',
+        'auto-close-brackets'
+    ];
 
-    // Save the content of the editor to the hidden input field when the "Save File" button is clicked
-    document.getElementById('save-file').addEventListener('click', () => {
-        if (monacoEditor) {
-            const content = monacoEditor.getValue();
-            console.log('Content to be saved:', content);  // Debug log
-
-            document.getElementById('file-content').value = content;
-            document.getElementById('edit-file-form').submit();
+    controls.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('change', initializeMonacoEditor);
+            if (element.type === 'number') {
+                element.addEventListener('input', initializeMonacoEditor);
+            }
         }
     });
+
+    // Save the content of the editor to the hidden input field when the "Save File" button is clicked
+    const saveButton = document.getElementById('save-file');
+    if (saveButton) {
+        saveButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (window.monacoEditor) {
+                const content = window.monacoEditor.getValue();
+                console.log('Content to be saved:', content);  // Debug log
+
+                document.getElementById('file-content').value = content;
+                document.getElementById('edit-file-form').submit();
+            }
+        });
+    }
 });
 
 window.addEventListener('beforeunload', () => {
-    if (monacoEditor) {
-        monacoEditor.dispose();
-        monacoEditor = null;
+    if (window.monacoEditor) {
+        window.monacoEditor.dispose();
+        window.monacoEditor = null;
     }
 });

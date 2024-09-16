@@ -11,25 +11,13 @@
   <div class="editor-controls mb-6 p-4 bg-gray-800 rounded-lg shadow-lg">
     <label for="language-select">Language:</label>
     <select id="language-select">
-      <option value="python">Python</option>
-      <option value="javascript">JavaScript</option>
-      <option value="html">HTML</option>
-      <option value="css">CSS</option>
-      <option value="ruby">Ruby</option>
-      <option value="c">C</option>
-      <option value="cpp">C++</option>
-      <option value="java">Java</option>
-      <option value="typescript">TypeScript</option>
-      <option value="go">Go</option>
-      <option value="php">PHP</option>
-      <option value="swift">Swift</option>
-      <option value="kotlin">Kotlin</option>
-      <option value="shell">Shell</option>
-      <option value="rust">Rust</option>
-      <option value="perl">Perl</option>
-      <option value="r">R</option>
-      <option value="scala">Scala</option>
-      <option value="haskell">Haskell</option>
+      <option value="python" <%= 'selected' if detect_language(@file.file_identifier) == 'python' %>>Python</option>
+      <option value="javascript" <%= 'selected' if detect_language(@file.file_identifier) == 'javascript' %>>JavaScript</option>
+      <option value="ruby" <%= 'selected' if detect_language(@file.file_identifier) == 'ruby' %>>Ruby</option>
+      <option value="c" <%= 'selected' if detect_language(@file.file_identifier) == 'c' %>>C</option>
+      <option value="cpp" <%= 'selected' if detect_language(@file.file_identifier) == 'cpp' %>>C++</option>
+      <option value="java" <%= 'selected' if detect_language(@file.file_identifier) == 'java' %>>Java</option>
+      <option value="rust" <%= 'selected' if detect_language(@file.file_identifier) == 'rust' %>>Rust</option>
     </select>
 
     <label for="theme-select">Theme:</label>
@@ -73,5 +61,7 @@
   </div>
 </div>
 
+<!-- Carica Monaco Editor -->
 <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
 <%= javascript_pack_tag 'monaco_editor' %>
+<%= javascript_pack_tag 'run_project' %>
