@@ -59,7 +59,11 @@ class SnippetsController < ApplicationController
         )
       end
 
-      redirect_to snippet_path(@snippet), notice: 'Snippet was successfully updated.'
+      if current_user.moderator?
+        redirect_to community_activity_path(@snippet), notice: 'Snippet was successfully updated.'
+      else
+        redirect_to snippet_path(@snippet), notice: 'Snippet was successfully updated.'
+      end
     else
       render :edit
     end
@@ -67,7 +71,13 @@ class SnippetsController < ApplicationController
 
   def destroy
     @snippet.destroy
-    redirect_to my_snippets_path, notice: 'Snippet was successfully deleted.'
+    if current_user.moderator?
+      redirect_to community_activity_index_path, notice: 'Snippet was successfully deleted.'
+    elsif current_user.admin?
+    redirect_to community_activity_index_path, notice: 'Snippet was successfully deleted.'
+    else
+      redirect_to my_snippets_path, notice: 'Snippet was successfully deleted.'
+    end
   end
 
   def toggle_favorite
