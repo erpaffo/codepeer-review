@@ -14,7 +14,7 @@ Rails.application.routes.draw do
   unauthenticated do
     root 'welcome#index', as: :unauthenticated_root
   end
- 
+
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'registrations',
@@ -42,6 +42,15 @@ Rails.application.routes.draw do
         post 'create_feedback'
       end
     end
+
+    resources :users do
+      collection do
+        get 'manage_permissions'
+      end
+      patch :update_role, on: :member
+    end
+
+    get 'search_users', to: 'search#results', as: 'search_users'
 
     resources :follows, only: [:create, :destroy]
 

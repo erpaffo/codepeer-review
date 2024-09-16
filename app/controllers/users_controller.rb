@@ -1,6 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow]
+  before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow ,:update_role]
+  before_action :ensure_admin, only: [:manage_permissions]
 
   include UsersHelper
 
@@ -17,6 +18,22 @@ class UsersController < ApplicationController
     else
       render :complete_profile
     end
+  end
+
+  def update_role
+    if current_user.admin?
+      if @user.update(user_params)
+        redirect_to manage_permissions_users_path, notice: "User role updated successfully."
+      else
+        redirect_to manage_permissions_users_path, alert: "Failed to update user role."
+      end
+    else
+      redirect_to root_path, alert: "Unauthorized access."
+    end
+  end
+
+  def manage_permissions
+    @users = User.all
   end
 
   def show
@@ -197,7 +214,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image, :remove_profile_image)
+    params.require(:user).permit(:first_name, :last_name, :nickname, :phone_number, :otp_enabled, :profile_image, :remove_profile_image, :role)
   end
 
   def handle_profile_image_update
@@ -208,6 +225,10 @@ class UsersController < ApplicationController
     if params[:user][:profile_image].present?
       @user.profile_image.attach(params[:user][:profile_image])
     end
+  end
+
+  def ensure_admin
+    redirect_to authenticated_root_path, alert: 'Unauthorized access.' unless current_user.admin?
   end
 
   def feedback_params

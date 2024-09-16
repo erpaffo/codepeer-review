@@ -1,0 +1,35 @@
+<div class="container mx-auto p-6">
+  <h1 class="text-3xl font-bold mb-6 text-white">Manage Permissions</h1>
+
+  <!-- Mostra i risultati per tutti gli utenti -->
+  <% if @users.present? %>
+    <table class="min-w-full bg-gray-800 text-gray-300 rounded-lg shadow-lg">
+      <thead>
+        <tr>
+          <th class="py-3 px-4">Nickname</th>
+          <th class="py-3 px-4">Email</th>
+          <th class="py-3 px-4">Current Role</th>
+          <th class="py-3 px-4">New Role</th>
+          <th class="py-3 px-4">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="py-3 px-4"><%= user.nickname %></td>
+            <td class="py-3 px-4"><%= user.email %></td>
+            <td class="py-3 px-4"><%= user.role %></td>
+            <td class="py-3 px-4">
+              <%= form_with model: user, url: update_role_user_path(user), method: :patch, local: true do |f| %>
+                <%= f.select :role, User.roles.keys.map { |role| [role.humanize, role] }, {}, class: "p-2 bg-gray-800 text-gray-300 rounded-lg border border-gray-700" %>
+                <%= f.submit "Update Role", class: "ml-2 bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-400 transition duration-300" %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  <% else %>
+    <p class="text-gray-400">No users found.</p>
+  <% end %>
+</div>

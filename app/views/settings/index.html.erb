@@ -21,5 +21,13 @@
       <% end %>
     </div>
 
+    <!-- Gestisci Permessi (Mostra solo agli Admin) -->
+    <% if current_user.admin? %>
+      <div class="bg-gray-800 p-4 rounded-lg shadow-lg">
+        <h2 class="text-xl font-semibold text-teal-400 mb-4">Manage Permissions</h2>
+        <p class="mb-4 text-gray-400">Manage user roles and permissions.</p>
+        <%= link_to 'Gestisci Permessi', manage_permissions_users_path, class: 'bg-teal-500 text-white py-2 px-4 rounded-lg hover:bg-teal-400 transition duration-300' %>
+      </div>
+    <% end %>
   </div>
 </div>

@@ -26,6 +26,7 @@ class User < ApplicationRecord
   has_many :favorite_projects, through: :favorites, source: :project
   has_many :user_badges
   has_many :badges, through: :user_badges
+  enum role: { user: 0, moderator: 1, admin: 2 }
 
   attr_accessor :remove_profile_image
 
@@ -42,6 +43,14 @@ class User < ApplicationRecord
     else
       favorite_projects << project
     end
+  end
+
+ def admin?
+    role == 'admin'
+  end
+
+  def moderator?
+    role == 'moderator'
   end
 
   def name
