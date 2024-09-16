@@ -74,7 +74,7 @@ class SnippetsController < ApplicationController
     if current_user.moderator?
       redirect_to community_activity_index_path, notice: 'Snippet was successfully deleted.'
     elsif current_user.admin?
-    redirect_to community_activity_index_path, notice: 'Snippet was successfully deleted.'
+      redirect_to community_activity_index_path, notice: 'Snippet was successfully deleted.'
     else
       redirect_to my_snippets_path, notice: 'Snippet was successfully deleted.'
     end
@@ -133,7 +133,7 @@ class SnippetsController < ApplicationController
   end
 
  def authorize_user!
-  unless @snippet.user == current_user || current_user.moderator?
+  unless @snippet.user == current_user || current_user.moderator? || current_user.admin?
     redirect_to snippets_path, alert: 'Non sei autorizzato ad eseguire questa azione.'
   end
 end
