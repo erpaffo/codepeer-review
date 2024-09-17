@@ -30,7 +30,7 @@
         <% end %>
       <% elsif current_user.admin?%>
         <% if current_user.following?(@user) %>
-          <%= button_to 'Unfollow', unfollow_admin_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
+          <%= button_to 'Unfollow', unfollow_admin_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
         <% else %>
           <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-danger' %>
         <% end %>
@@ -68,7 +68,12 @@
       <% end %>
     </div>
 
+    
+
     <div class="user-back-link">
+      <% if current_user.admin?%>
+        <%= link_to 'Assign Badges', community_activity_index_path, class: 'btn btn-secondary' %>
+      <% end %> 
       <%= link_to 'Back to Community Snippets', community_activity_index_path, class: 'btn btn-secondary' %>
     </div>
   </div>

@@ -55,7 +55,8 @@ Rails.application.routes.draw do
       patch :update_role, on: :member
     end
 
-    delete '/users/:id/unfollow_admin', to: 'users#unfollow_admin', as: 'unfollow_admin_user'
+    delete '/users/:id/unfollow_admin', to: 'users#unfollow_admin', as: 'unfollow_admin'
+
 
     get 'search_users', to: 'search#results', as: 'search_users'
 
@@ -114,7 +115,7 @@ Rails.application.routes.draw do
         post 'upload_to_google_drive'
         post 'upload_to_github'
         post 'upload_to_gitlab'
-
+        delete 'projects/:user_id', to: 'projects#destroy', as: 'destroy'
         get 'upload_files', to: 'projects#upload_files', as: 'upload_files'
 
         get 'run_shell', to: 'projects#run_shell', as: 'run_shell'
