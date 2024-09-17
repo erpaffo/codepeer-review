@@ -55,6 +55,8 @@ Rails.application.routes.draw do
       patch :update_role, on: :member
     end
 
+    delete '/users/:id/unfollow_admin', to: 'users#unfollow_admin', as: 'unfollow_admin_user'
+
     get 'search_users', to: 'search#results', as: 'search_users'
 
     resources :follows, only: [:create, :destroy]

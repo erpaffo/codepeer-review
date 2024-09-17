@@ -22,11 +22,19 @@
 
     <% if user_signed_in? %>
       <div class="user-profile-buttons">
+      <% if !(current_user.admin?)%>
         <%= button_to 'Unfollow', unfollow_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
         <%= link_to 'Leave Feedback', leave_feedback_user_path(@user), class: 'btn btn-secondary' %>
         <% if current_user != @user %>
           <%= link_to 'Avvia Chat', create_direct_conversations_path(recipient_id: @user.id), method: :post, class: 'btn btn-primary' %>
         <% end %>
+      <% elsif current_user.admin?%>
+        <% if current_user.following?(@user) %>
+          <%= button_to 'Unfollow', unfollow_admin_user_path(@user), method: :delete, remote: true, class: 'btn btn-danger' %>
+        <% else %>
+          <%= button_to 'Follow', follow_user_path(@user), method: :post, remote: true, class: 'btn btn-danger' %>
+        <% end %>
+      <% end %>
       </div>
     <% end %>
 

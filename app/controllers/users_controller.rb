@@ -205,6 +205,13 @@ class UsersController < ApplicationController
     end
   end
 
+  def unfollow_admin
+    current_user.unfollow(@user)
+    respond_to do |format|
+      format.js { render 'follows/create' }
+    end
+  end
+
   private
 
   def set_user
