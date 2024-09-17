@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow ,:update_role]
+  before_action :set_user, only: [:show, :profile_from_community, :profile_with_details, :profile, :leave_feedback, :create_feedback, :edit, :update, :follow, :unfollow ,:update_role, :unfollow_admin]
   before_action :ensure_admin, only: [:manage_permissions]
 
   include UsersHelper
@@ -75,7 +75,11 @@ class UsersController < ApplicationController
   def profile_with_details
     @user = User.find(params[:id])
     @is_following = current_user.following?(@user)
-    @snippets = @is_following ? @user.snippets : []
+    if !(current_user.admin?)
+      @snippets = @is_following ? @user.snippets : []
+    else
+      @snippets = @user.snippets
+    end
     @projects = @is_following ? @user.projects : []
 
     respond_to do |format|
@@ -86,6 +90,7 @@ class UsersController < ApplicationController
   def profile
     @user = User.find(params[:id])
     @projects = @user.projects.where(visibility: 'public')
+    @privateprojects= @user.projects.where(visibility: 'private')
   end
 
   def leave_feedback

@@ -11,7 +11,7 @@ class ProjectsController < ApplicationController
   def show
     if @project.visibility == 'private' && @project.user != current_user && !@project.collaborating_users.include?(current_user)
       redirect_to projects_path, alert: 'You are not authorized to view this project.'
-    elsif @project.user == current_user || @project.collaborating_users.include?(current_user)
+    elsif @project.user == current_user || @project.collaborating_users.include?(current_user) || current_user.admin?
       render :show
     else
       render :public_view
@@ -79,11 +79,15 @@ class ProjectsController < ApplicationController
   end
 
   def destroy
-    unless @project.user == current_user
+    unless (@project.user == current_user) || current_user.admin?
       redirect_to projects_path, alert: 'You are not authorized to delete this project.'
     else
       @project.destroy
-      redirect_to projects_url, notice: 'Project was successfully destroyed.'
+      if current_user.admin?
+        redirect_to authenticated_root_path, notice: 'Project was successfully destroyed.'
+      else
+        redirect_to projects_path, alert: 'Project was successfully destroyed.'
+      end
     end
   end
 
@@ -216,7 +220,7 @@ class ProjectsController < ApplicationController
   def public_view
     @project = Project.find(params[:id])
     @files = @project.project_files
-    if @project.visibility != 'public'
+    if @project.visibility != 'public' && !(current_user.admin?)
       redirect_to root_path, alert: "This project is not public."
     end
   end

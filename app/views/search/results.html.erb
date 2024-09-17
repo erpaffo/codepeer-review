@@ -26,6 +26,13 @@
               <%= link_to project.title, project_public_path(project), class: "block text-lg text-teal-300 hover:text-teal-200 transition ease-in-out duration-300" %>
             </li>
           <% end %>
+          <% if current_user.admin?%>
+            <% @privateprojects.each do |project| %>
+            <li>
+              <%= link_to project.title, project_public_path(project), class: "block text-lg text-teal-300 hover:text-teal-200 transition ease-in-out duration-300" %>
+            </li>
+            <% end %>
+          <% end %>
         </ul>
       </div>
     <% else %>
