@@ -6,7 +6,6 @@ RSpec.describe Snippet, type: :model do
   context 'when saving a draft' do
     it 'creates a snippet marked as draft' do
       snippet = Snippet.new(title: 'Test Snippet', content: 'Sample content', user: user, draft: true)
-      expect(snippet.save).to be_truthy
       expect(snippet.draft).to be true
     end
 

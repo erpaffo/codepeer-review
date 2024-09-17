@@ -5,34 +5,36 @@
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <% @snippets.each do |snippet| %>
-      <% if snippet.user != current_user %>
-        <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
-          <h2 class="text-2xl font-semibold text-white mb-4"><%= snippet.title %></h2>
+      <% if snippet.draft == false %>
+        <% if snippet.user != current_user %>
+          <div class="bg-gray-700 p-6 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold text-white mb-4"><%= snippet.title %></h2>
 
-          <p class="text-gray-300 mb-4"><%= snippet.content.truncate(150) %></p>
+            <p class="text-gray-300 mb-4"><%= snippet.content.truncate(150) %></p>
 
 
-          <p class="text-gray-400 mb-4">
-            By:
-              <% if current_user.admin? %>
-                <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_with_details_path(snippet.user), class: 'text-blue-400 hover:text-blue-300 underline' %>
-              <% end %>
-              <% if !(current_user.admin?) %>             
-                <% if current_user.following?(snippet.user) %>
+            <p class="text-gray-400 mb-4">
+              By:
+                <% if current_user.admin? %>
                   <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_with_details_path(snippet.user), class: 'text-blue-400 hover:text-blue-300 underline' %>
-                <% else %>
-                  <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_from_community_path(snippet.user), class: 'text-blue-400 hover:text-blue-300 underline' %>
                 <% end %>
-              <% end %>
-          </p>
+                <% if !(current_user.admin?) %>             
+                  <% if current_user.following?(snippet.user) %>
+                    <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_with_details_path(snippet.user), class: 'text-blue-400 hover:text-blue-300 underline' %>
+                  <% else %>
+                    <%= link_to "#{snippet.user.first_name} #{snippet.user.last_name}", user_profile_from_community_path(snippet.user), class: 'text-blue-400 hover:text-blue-300 underline' %>
+                  <% end %>
+                <% end %>
+            </p>
 
-        
-          <div class="flex space-x-4">
-            <%= link_to 'View Snippet', community_activity_path(snippet), class: "bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition ease-in-out duration-300" %>
-            <%= link_to 'Send Feedback', feedback_community_activity_path(snippet), class: "bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300" %>
+          
+            <div class="flex space-x-4">
+              <%= link_to 'View Snippet', community_activity_path(snippet), class: "bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-500 transition ease-in-out duration-300" %>
+              <%= link_to 'Send Feedback', feedback_community_activity_path(snippet), class: "bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300" %>
+            </div>
           </div>
-        </div>
-      <% end %>
+        <% end %>
+      <%end%>
     <% end %>
   </div>
 </div>

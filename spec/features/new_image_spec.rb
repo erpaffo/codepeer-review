@@ -33,7 +33,7 @@ RSpec.feature 'Profile Image Update', type: :feature do
     click_button 'Update Profile'
 
     click_link 'Profile'
-    
+
     # Verifica che la nuova immagine del profilo sia visibile
     expect(page).to have_css("img[src*='new_profile_image.jpg']")
   end
