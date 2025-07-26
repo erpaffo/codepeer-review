@@ -9,16 +9,22 @@
       <button id="execute-command" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Execute</button>
     </div>
 
+    <!-- Loading Spinner -->
+    <div id="terminal-loading" class="flex items-center justify-center bg-gray-800 text-white p-4 rounded-lg" style="height: 500px;">
+      <svg class="animate-spin h-8 w-8 text-blue-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+      </svg>
+      <span>Loading terminal...</span>
+    </div>
     <!-- Terminal Container -->
-    <div id="terminal" data-project-id="<%= @project.id %>" class="bg-gray-800 text-white p-4 rounded-lg" style="height: 500px;"></div>
+    <div id="terminal" data-project-id="<%= @project.id %>" class="bg-gray-800 text-white p-4 rounded-lg" style="height: 500px; display: none;"></div>
   </div>
 
   <!-- Includi xterm.js e gli addon -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
   <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.4.0/lib/xterm-addon-fit.js"></script>
-
-  <!-- Includi il Pacchetto JavaScript per la Shell Interattiva -->
   <%= javascript_pack_tag 'interactive_shell' %>
 <% else %>
   <div class="p-6">
