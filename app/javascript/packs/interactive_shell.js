@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!projectId) return;
 
   const PROMPT = '$ ';
+  const HISTORY_KEY = `shell_history_${projectId}`;
+  const MAX_HISTORY_SIZE = 1000;
 
   // Mostra spinner, nascondi terminale
   terminalContainer.style.display = 'none';
@@ -18,9 +20,33 @@ document.addEventListener('DOMContentLoaded', () => {
   const term = new Terminal({
     cursorBlink: true,
     fontFamily: 'monospace',
-    theme: { background: '#1e1e1e' },
+    theme: { 
+      background: '#1e1e1e',
+      foreground: '#ffffff',
+      cursor: '#ffffff',
+      selection: '#264f78',
+      black: '#000000',
+      red: '#cd3131',
+      green: '#0dbc79',
+      yellow: '#e5e510',
+      blue: '#2472c8',
+      magenta: '#bc3fbc',
+      cyan: '#11a8cd',
+      white: '#e5e5e5',
+      brightBlack: '#666666',
+      brightRed: '#f14c4c',
+      brightGreen: '#23d18b',
+      brightYellow: '#f5f543',
+      brightBlue: '#3b8eea',
+      brightMagenta: '#d670d6',
+      brightCyan: '#29b8db',
+      brightWhite: '#ffffff'
+    },
     rows: 30,
-    cols: 80
+    cols: 80,
+    allowTransparency: true,
+    convertEol: true,
+    scrollback: 1000
   });
 
   const fitAddon = new FitAddon();
@@ -37,8 +63,228 @@ document.addEventListener('DOMContentLoaded', () => {
   }, 100);
 
   let currentCommand = '';
-  let commandHistory = [];
+  let commandHistory = loadHistory();
   let historyIndex = -1;
+  let cursorPosition = 0;
+  let isSearching = false;
+  let searchQuery = '';
+  let searchResults = [];
+  let currentSearchIndex = -1;
+
+  // Funzione per caricare la cronologia dal localStorage
+  function loadHistory() {
+    try {
+      const saved = localStorage.getItem(HISTORY_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch (error) {
+      console.warn('Failed to load command history:', error);
+      return [];
+    }
+  }
+
+  // Funzione per salvare la cronologia nel localStorage
+  function saveHistory() {
+    try {
+      // Mantieni solo gli ultimi MAX_HISTORY_SIZE comandi
+      const historyToSave = commandHistory.slice(-MAX_HISTORY_SIZE);
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(historyToSave));
+    } catch (error) {
+      console.warn('Failed to save command history:', error);
+    }
+  }
+
+  // Funzione per aggiungere un comando alla cronologia
+  function addToHistory(command) {
+    // Rimuovi duplicati consecutivi
+    if (commandHistory.length === 0 || commandHistory[commandHistory.length - 1] !== command) {
+      commandHistory.push(command);
+      saveHistory();
+    }
+  }
+
+  // Comandi disponibili per l'autocompletamento
+  const availableCommands = [
+    'ls', 'cd', 'pwd', 'cat', 'cp', 'mv', 'rm', 'mkdir', 'rmdir', 'touch',
+    'grep', 'find', 'chmod', 'chown', 'ps', 'top', 'kill', 'nano', 'vim',
+    'python3', 'python', 'node', 'npm', 'git', 'gcc', 'g++', 'make',
+    'echo', 'export', 'source', 'alias', 'unalias', 'history', 'clear',
+    'head', 'tail', 'less', 'more', 'wc', 'sort', 'uniq', 'cut', 'sed', 'awk',
+    'curl', 'wget', 'tar', 'gzip', 'gunzip', 'zip', 'unzip',
+    'whoami', 'id', 'groups', 'date', 'cal', 'uptime', 'free', 'df', 'du',
+    'ping', 'traceroute', 'netstat', 'ss', 'htop', 'tree', 'tmux', 'screen'
+  ];
+
+  // Funzione per ottenere i file nella directory corrente
+  async function getFilesInCurrentDirectory() {
+    return new Promise((resolve) => {
+      const tempChannel = consumer.subscriptions.create(
+        { channel: 'ShellChannel', project_id: projectId },
+        {
+          received(data) {
+            if (data.output) {
+              const files = data.output.trim().split('\n').filter(line => line.trim());
+              resolve(files);
+            }
+            this.unsubscribe();
+          }
+        }
+      );
+      tempChannel.perform('send_input', { input: 'ls -1' });
+    });
+  }
+
+  // Funzione per autocompletamento
+  async function handleTabCompletion() {
+    const words = currentCommand.split(' ');
+    const currentWord = words[words.length - 1] || '';
+    
+    if (currentWord.startsWith('./') || currentWord.startsWith('/')) {
+      // Completamento file/directory
+      try {
+        const files = await getFilesInCurrentDirectory();
+        const matches = files.filter(file => 
+          file.startsWith(currentWord.replace('./', ''))
+        );
+        
+        if (matches.length === 1) {
+          // Completamento unico
+          words[words.length - 1] = currentWord.startsWith('./') ? 
+            './' + matches[0] : '/' + matches[0];
+          currentCommand = words.join(' ');
+          cursorPosition = currentCommand.length;
+          
+          // Cancella riga e riscrivi
+          term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+          term.write(currentCommand);
+        } else if (matches.length > 1) {
+          // Mostra opzioni
+          term.write('\r\n');
+          matches.forEach(match => term.write(match + '  '));
+          term.write('\r\n' + PROMPT + currentCommand);
+        }
+      } catch (error) {
+        // Fallback al completamento comandi
+        const matches = availableCommands.filter(cmd => 
+          cmd.startsWith(currentWord)
+        );
+        if (matches.length === 1) {
+          words[words.length - 1] = matches[0];
+          currentCommand = words.join(' ');
+          cursorPosition = currentCommand.length;
+          
+          term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+          term.write(currentCommand);
+        }
+      }
+    } else {
+      // Completamento comandi
+      const matches = availableCommands.filter(cmd => 
+        cmd.startsWith(currentWord)
+      );
+      
+      if (matches.length === 1) {
+        words[words.length - 1] = matches[0];
+        currentCommand = words.join(' ');
+        cursorPosition = currentCommand.length;
+        
+        term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+        term.write(currentCommand);
+      } else if (matches.length > 1) {
+        term.write('\r\n');
+        matches.forEach(match => term.write(match + '  '));
+        term.write('\r\n' + PROMPT + currentCommand);
+      }
+    }
+  }
+
+  // Funzione per ricerca nella cronologia
+  function startHistorySearch() {
+    isSearching = true;
+    searchQuery = '';
+    searchResults = [];
+    currentSearchIndex = -1;
+    term.write('\r\n(reverse-i-search)`\': ');
+  }
+
+  function handleHistorySearch(char) {
+    if (char === '\r') { // Enter
+      if (searchResults.length > 0 && currentSearchIndex >= 0) {
+        currentCommand = searchResults[currentSearchIndex];
+        cursorPosition = currentCommand.length;
+        isSearching = false;
+        term.write('\r\n' + PROMPT + currentCommand);
+      } else {
+        isSearching = false;
+        term.write('\r\n' + PROMPT);
+      }
+      return;
+    }
+    
+    if (char === '\x1b') { // Escape
+      isSearching = false;
+      term.write('\r\n' + PROMPT + currentCommand);
+      return;
+    }
+    
+    if (char === '\x7f') { // Backspace
+      if (searchQuery.length > 0) {
+        searchQuery = searchQuery.slice(0, -1);
+        term.write('\b \b');
+      }
+    } else if (char >= ' ') {
+      searchQuery += char;
+      term.write(char);
+    }
+    
+    // Filtra la cronologia
+    searchResults = commandHistory.filter(cmd => 
+      cmd.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    currentSearchIndex = searchResults.length - 1;
+  }
+
+  // Funzione per cancellare parola
+  function deleteWord() {
+    const beforeCursor = currentCommand.slice(0, cursorPosition);
+    const afterCursor = currentCommand.slice(cursorPosition);
+    
+    const words = beforeCursor.split(' ');
+    if (words.length > 1) {
+      words.pop();
+      const newBeforeCursor = words.join(' ');
+      currentCommand = newBeforeCursor + afterCursor;
+      const newCursorPosition = newBeforeCursor.length;
+      
+      // Cancella dalla posizione del cursore alla fine della parola
+      term.write('\b'.repeat(cursorPosition - newCursorPosition) + 
+                 ' '.repeat(cursorPosition - newCursorPosition) + 
+                 '\b'.repeat(cursorPosition - newCursorPosition));
+      cursorPosition = newCursorPosition;
+    }
+  }
+
+  // Funzione per cancellare tutto prima del cursore
+  function deleteLineBeforeCursor() {
+    const afterCursor = currentCommand.slice(cursorPosition);
+    currentCommand = afterCursor;
+    
+    // Cancella tutto prima del cursore
+    term.write('\r' + PROMPT + ' '.repeat(cursorPosition) + '\r' + PROMPT);
+    cursorPosition = 0;
+    term.write(afterCursor);
+  }
+
+  // Funzione per pulire lo schermo
+  function clearScreen() {
+    term.clear();
+    term.write(PROMPT);
+  }
+
+  // Funzione per gestire l'output colorato
+  function writeColoredOutput(output) {
+    // xterm.js gestisce automaticamente i codici ANSI per i colori
+    term.write(output);
+  }
 
   const shellChannel = consumer.subscriptions.create(
     { channel: 'ShellChannel', project_id: projectId },
@@ -53,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
       },
       received(data) {
         if (data.output) {
-          term.write(data.output);
+          writeColoredOutput(data.output);
         }
         if (data.error) {
           term.write(`\r\nError: ${data.error}\r\n`);
@@ -69,56 +315,130 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Gestione input del terminale
   term.onData((data) => {
+    if (isSearching) {
+      handleHistorySearch(data);
+      return;
+    }
+
     const code = data.charCodeAt(0);
 
     if (code === 13) { // Enter
-      if (currentCommand.trim()) {
-        // Aggiungi comando alla cronologia
-        commandHistory.push(currentCommand);
+      if (currentCommand.trim() === 'clear') {
+        // Cancella la riga corrente (prompt + comando)
+        term.write('\r' + ' '.repeat(PROMPT.length + currentCommand.length) + '\r');
+        clearScreen();
+        currentCommand = '';
+        cursorPosition = 0;
         historyIndex = commandHistory.length;
-
-        // Invia comando al server
+        return;
+      }
+      if (currentCommand.trim()) {
+        addToHistory(currentCommand);
+        historyIndex = commandHistory.length;
         shellChannel.sendInput(currentCommand);
         term.write('\r\n');
         currentCommand = '';
+        cursorPosition = 0;
       } else {
         term.write('\r\n' + PROMPT);
+        historyIndex = commandHistory.length;
       }
     } else if (code === 8 || code === 127) { // Backspace o DEL
-      if (currentCommand.length > 0) {
-        currentCommand = currentCommand.slice(0, -1);
+      if (currentCommand.length > 0 && cursorPosition > 0) {
+        const beforeCursor = currentCommand.slice(0, cursorPosition - 1);
+        const afterCursor = currentCommand.slice(cursorPosition);
+        currentCommand = beforeCursor + afterCursor;
+        cursorPosition--;
         term.write('\b \b');
+        if (afterCursor.length > 0) {
+          term.write(afterCursor + ' \b'.repeat(afterCursor.length + 1));
+        }
       }
-      // NON permettere di cancellare il prompt
+      historyIndex = commandHistory.length;
+    } else if (code === 9) { // Tab
+      handleTabCompletion();
     } else if (code === 38) { // Up arrow
-      if (historyIndex > 0) {
+      if (historyIndex === commandHistory.length) {
+        // Primo tasto su: salva la riga corrente temporaneamente
+        this._tempCurrent = currentCommand;
+      }
+      if (commandHistory.length > 0 && historyIndex > 0) {
         historyIndex--;
-        // Cancella riga corrente
         term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
         currentCommand = commandHistory[historyIndex];
+        cursorPosition = currentCommand.length;
         term.write(currentCommand);
       }
     } else if (code === 40) { // Down arrow
       if (historyIndex < commandHistory.length - 1) {
         historyIndex++;
-        // Cancella riga corrente
         term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
         currentCommand = commandHistory[historyIndex];
+        cursorPosition = currentCommand.length;
         term.write(currentCommand);
       } else if (historyIndex === commandHistory.length - 1) {
         historyIndex++;
-        // Cancella riga corrente
         term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
-        currentCommand = '';
+        currentCommand = this._tempCurrent || '';
+        cursorPosition = currentCommand.length;
+        term.write(currentCommand);
       }
+    } else if (code === 37) { // Left arrow
+      if (cursorPosition > 0) {
+        cursorPosition--;
+        term.write('\b');
+      }
+      historyIndex = commandHistory.length;
+    } else if (code === 39) { // Right arrow
+      if (cursorPosition < currentCommand.length) {
+        cursorPosition++;
+        term.write(currentCommand[cursorPosition - 1]);
+      }
+      historyIndex = commandHistory.length;
+    } else if (data === '\x03') { // Ctrl+C
+      term.write('^C\r\n' + PROMPT);
+      currentCommand = '';
+      cursorPosition = 0;
+      historyIndex = commandHistory.length;
+    } else if (data === '\x0c') { // Ctrl+L
+      clearScreen();
+    } else if (data === '\x17') { // Ctrl+W
+      deleteWord();
+      historyIndex = commandHistory.length;
+    } else if (data === '\x15') { // Ctrl+U
+      deleteLineBeforeCursor();
+      historyIndex = commandHistory.length;
+    } else if (data === '\x12') { // Ctrl+R
+      startHistorySearch();
+    } else if (data === '\x01') { // Ctrl+A (Home)
+      term.write('\r' + PROMPT);
+      cursorPosition = 0;
+      historyIndex = commandHistory.length;
+    } else if (data === '\x05') { // Ctrl+E (End)
+      const remaining = currentCommand.slice(cursorPosition);
+      term.write(remaining);
+      cursorPosition = currentCommand.length;
+      historyIndex = commandHistory.length;
     } else if (code >= 32) { // Caratteri stampabili
-      currentCommand += data;
+      const beforeCursor = currentCommand.slice(0, cursorPosition);
+      const afterCursor = currentCommand.slice(cursorPosition);
+      currentCommand = beforeCursor + data + afterCursor;
+      cursorPosition++;
       term.write(data);
+      if (afterCursor.length > 0) {
+        term.write(afterCursor + '\b'.repeat(afterCursor.length));
+      }
+      historyIndex = commandHistory.length;
     }
   });
 
   // Ridimensiona il terminale quando la finestra cambia dimensione
   window.addEventListener('resize', () => {
     fitAddon.fit();
+  });
+
+  // Salva la cronologia quando la pagina viene chiusa
+  window.addEventListener('beforeunload', () => {
+    saveHistory();
   });
 }); 
