@@ -52,15 +52,76 @@ document.addEventListener('DOMContentLoaded', () => {
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
 
-  // Quando il terminale è pronto, mostra terminale e nascondi spinner
-  setTimeout(() => {
-    if (loadingSpinner) loadingSpinner.style.display = 'none';
-    terminalContainer.style.display = '';
-    term.open(terminalContainer);
-    fitAddon.fit();
-    // Mostra prompt iniziale
-    term.write('\r\n' + PROMPT);
-  }, 100);
+  // Funzione per verificare se il container è pronto
+  function checkContainerStatus() {
+    return new Promise((resolve) => {
+      const tempChannel = consumer.subscriptions.create(
+        { channel: 'ShellChannel', project_id: projectId },
+        {
+          received(data) {
+            if (data.output && data.output.includes('✅ Container')) {
+              this.unsubscribe();
+              resolve(true);
+            } else if (data.output && data.output.includes('❌ Container')) {
+              this.unsubscribe();
+              resolve(false);
+            }
+          }
+        }
+      );
+      
+      // Invia comando di verifica dopo un breve delay
+      setTimeout(() => {
+        tempChannel.perform('send_input', { input: 'docker-status' });
+      }, 500);
+    });
+  }
+
+  // Funzione per aggiornare il messaggio di caricamento
+  function updateLoadingMessage(message) {
+    if (loadingSpinner) {
+      const messageElement = loadingSpinner.querySelector('span');
+      if (messageElement) {
+        messageElement.textContent = message;
+      }
+    }
+  }
+
+  // Funzione per inizializzare il terminale quando il container è pronto
+  async function initializeTerminal() {
+    updateLoadingMessage('Starting Docker container...');
+    
+    // Aspetta che il container sia pronto (max 30 secondi)
+    let attempts = 0;
+    const maxAttempts = 60; // 30 secondi con 500ms di intervallo
+    
+    while (attempts < maxAttempts) {
+      const isReady = await checkContainerStatus();
+      
+      if (isReady) {
+        // Container pronto, mostra il terminale
+        if (loadingSpinner) loadingSpinner.style.display = 'none';
+        terminalContainer.style.display = '';
+        term.open(terminalContainer);
+        fitAddon.fit();
+        term.write('Connected to shell...\r\n' + PROMPT);
+        return;
+      }
+      
+      attempts++;
+      updateLoadingMessage(`Starting Docker container... (attempt ${attempts}/${maxAttempts})`);
+      
+      // Aspetta 500ms prima del prossimo tentativo
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Timeout raggiunto
+    updateLoadingMessage('Failed to start Docker container. Please refresh the page.');
+    console.error('Docker container failed to start within 30 seconds');
+  }
+
+  // Avvia l'inizializzazione del terminale
+  initializeTerminal();
 
   let currentCommand = '';
   let commandHistory = loadHistory();
@@ -292,7 +353,6 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       connected() {
         console.log(`Connected to ShellChannel for project ID: ${projectId}`);
-        term.write('Connected to shell...\r\n');
       },
       disconnected() {
         console.log(`Disconnected from ShellChannel for project ID: ${projectId}`);
@@ -305,8 +365,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.error) {
           term.write(`\r\nError: ${data.error}\r\n`);
         }
-        // Mostra nuovo prompt dopo l'output
-        term.write('\r\n' + PROMPT);
+        // Aggiungi prompt solo se l'output non termina già con un prompt
+        const output = data.output || '';
+        if (!output.trim().endsWith('$') && !output.trim().endsWith('#')) {
+          term.write('\r\n' + PROMPT);
+        }
       },
       sendInput(input) {
         this.perform('send_input', { input });

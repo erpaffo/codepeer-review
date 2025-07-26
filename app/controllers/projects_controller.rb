@@ -489,6 +489,7 @@ class ProjectsController < ApplicationController
     if project_files_path
       # Inizializza la shell nel container Docker
       ShellProcessManager.initialize_shell(@project, project_files_path)
+      render layout: 'terminal'
     else
       flash[:error] = "Failed to download project files."
       redirect_to project_path(@project)

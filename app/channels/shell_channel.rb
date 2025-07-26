@@ -58,6 +58,10 @@ class ShellChannel < ApplicationCable::Channel
       # Mostra la cronologia dei comandi (gestita lato client)
       transmit({ output: "History command - use Ctrl+R to search in history\r\n" })
       return true
+    when 'docker-status'
+      # Mostra lo stato dei container Docker
+      show_docker_status
+      return true
     when /^alias\s+(\w+)=(.+)$/
       # Gestisci alias
       alias_name = $1
@@ -92,6 +96,38 @@ class ShellChannel < ApplicationCable::Channel
       return true
     end
     false
+  end
+
+  def show_docker_status
+    container_name = "project_executor_#{@project.id}"
+    
+    # Verifica se Docker è disponibile
+    unless system("docker --version > /dev/null 2>&1")
+      transmit({ output: "Docker is not installed or not available\r\n" })
+      return
+    end
+    
+    # Mostra solo i container rilevanti per questo progetto
+    project_containers = `docker ps --filter "name=project_executor_#{@project.id}" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"`.strip
+    
+    if project_containers.include?("NAMES")
+      transmit({ output: "Project containers:\r\n#{project_containers}\r\n\r\n" })
+    else
+      transmit({ output: "No project containers found.\r\n\r\n" })
+    end
+    
+    # Verifica se il container specifico è in esecuzione
+    if ShellProcessManager.container_running?(container_name)
+      transmit({ output: "✅ Container #{container_name} is running\r\n" })
+    else
+      transmit({ output: "❌ Container #{container_name} is not running\r\n" })
+      
+      # Mostra container fermati
+      stopped_containers = `docker ps -a --filter "name=#{container_name}" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"`.strip
+      if stopped_containers.include?(container_name)
+        transmit({ output: "Stopped containers:\r\n#{stopped_containers}\r\n" })
+      end
+    end
   end
 
   def store_alias(name, value)
