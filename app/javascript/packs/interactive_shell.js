@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let searchQuery = '';
   let searchResults = [];
   let currentSearchIndex = -1;
+  let tempCurrent = ''; // Variabile per salvare il comando corrente durante la navigazione
 
   // Funzione per caricare la cronologia dal localStorage
   function loadHistory() {
@@ -320,6 +321,55 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // Gestione sequenze di escape per le frecce direzionali
+    if (data.startsWith('\x1b[')) {
+      const code = data.slice(2);
+      if (code === 'A') { // Up arrow
+        if (commandHistory.length === 0) return;
+        if (historyIndex > 0) {
+          if (historyIndex === commandHistory.length) {
+            tempCurrent = currentCommand;
+          }
+          historyIndex--;
+          term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+          currentCommand = commandHistory[historyIndex];
+          cursorPosition = currentCommand.length;
+          term.write(currentCommand);
+        }
+        return;
+      } else if (code === 'B') { // Down arrow
+        if (commandHistory.length === 0) return;
+        if (historyIndex < commandHistory.length - 1) {
+          historyIndex++;
+          term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+          currentCommand = commandHistory[historyIndex];
+          cursorPosition = currentCommand.length;
+          term.write(currentCommand);
+        } else if (historyIndex === commandHistory.length - 1) {
+          historyIndex++;
+          term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
+          currentCommand = tempCurrent || '';
+          cursorPosition = currentCommand.length;
+          term.write(currentCommand);
+        }
+        return;
+      } else if (code === 'C') { // Right arrow
+        if (cursorPosition < currentCommand.length) {
+          cursorPosition++;
+          term.write(currentCommand[cursorPosition - 1]);
+        }
+        historyIndex = commandHistory.length;
+        return;
+      } else if (code === 'D') { // Left arrow
+        if (cursorPosition > 0) {
+          cursorPosition--;
+          term.write('\b');
+        }
+        historyIndex = commandHistory.length;
+        return;
+      }
+    }
+
     const code = data.charCodeAt(0);
 
     if (code === 13) { // Enter
@@ -357,44 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
       historyIndex = commandHistory.length;
     } else if (code === 9) { // Tab
       handleTabCompletion();
-    } else if (code === 38) { // Up arrow
-      if (historyIndex === commandHistory.length) {
-        // Primo tasto su: salva la riga corrente temporaneamente
-        this._tempCurrent = currentCommand;
-      }
-      if (commandHistory.length > 0 && historyIndex > 0) {
-        historyIndex--;
-        term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
-        currentCommand = commandHistory[historyIndex];
-        cursorPosition = currentCommand.length;
-        term.write(currentCommand);
-      }
-    } else if (code === 40) { // Down arrow
-      if (historyIndex < commandHistory.length - 1) {
-        historyIndex++;
-        term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
-        currentCommand = commandHistory[historyIndex];
-        cursorPosition = currentCommand.length;
-        term.write(currentCommand);
-      } else if (historyIndex === commandHistory.length - 1) {
-        historyIndex++;
-        term.write('\r' + PROMPT + ' '.repeat(currentCommand.length) + '\r' + PROMPT);
-        currentCommand = this._tempCurrent || '';
-        cursorPosition = currentCommand.length;
-        term.write(currentCommand);
-      }
-    } else if (code === 37) { // Left arrow
-      if (cursorPosition > 0) {
-        cursorPosition--;
-        term.write('\b');
-      }
-      historyIndex = commandHistory.length;
-    } else if (code === 39) { // Right arrow
-      if (cursorPosition < currentCommand.length) {
-        cursorPosition++;
-        term.write(currentCommand[cursorPosition - 1]);
-      }
-      historyIndex = commandHistory.length;
     } else if (data === '\x03') { // Ctrl+C
       term.write('^C\r\n' + PROMPT);
       currentCommand = '';
