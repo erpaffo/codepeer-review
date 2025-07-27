@@ -42,9 +42,9 @@ class ShellProcessManager
     end
   end
 
-  def self.send_input(project, input)
+    def self.send_input(project, input)
     container_name = "project_executor_#{project.id}"
-    
+
     # Se il container non è in esecuzione, prova a riavviarlo
     unless container_running?(container_name)
       Rails.logger.warn("Container #{container_name} not running, attempting to restart...")
@@ -61,20 +61,37 @@ class ShellProcessManager
       end
     end
 
-    # Esegui il comando nel container
-    command = "docker exec #{container_name} bash -c '#{input.gsub("'", "'\"'\"'")}'"
-    Rails.logger.info("Executing command in Docker container: #{command}")
+    # Controlla se il comando è un editor interattivo
+    interactive_commands = ['nano', 'vim', 'vi', 'emacs', 'pico']
+    is_interactive = interactive_commands.any? { |cmd| input.strip.start_with?(cmd) }
 
-    # Cattura l'output del comando
-    stdout, stderr, status = Open3.capture3(command)
-
-    output = stdout.empty? ? stderr : stdout
-    Rails.logger.info("Command output: #{output}")
-
-    if status.success?
-      ShellChannel.broadcast_to(project, { output: output })
+    if is_interactive
+      # Per comandi interattivi, usa docker exec con -it per TTY
+      command = "docker exec -it #{container_name} bash -c '#{input.gsub("'", "'\"'\"'")}'"
+      Rails.logger.info("Executing interactive command in Docker container: #{command}")
+      
+      # Per comandi interattivi, invia un messaggio informativo
+      ShellChannel.broadcast_to(project, { output: "⚠️  Editor interattivo rilevato: #{input.split.first}\r\n" })
+      ShellChannel.broadcast_to(project, { output: "💡 Suggerimento: Usa l'editor Monaco integrato per modificare i file\r\n" })
+      ShellChannel.broadcast_to(project, { output: "   Oppure usa comandi non interattivi come: cat, head, tail, grep\r\n" })
+      ShellChannel.broadcast_to(project, { output: "   Per creare file: echo 'contenuto' > filename.txt\r\n" })
+      ShellChannel.broadcast_to(project, { output: "   Per modificare file: sed -i 's/old/new/g' filename.txt\r\n" })
     else
-      ShellChannel.broadcast_to(project, { output: "Error executing command: #{stderr}" })
+      # Per comandi non interattivi, usa il metodo normale
+      command = "docker exec #{container_name} bash -c '#{input.gsub("'", "'\"'\"'")}'"
+      Rails.logger.info("Executing command in Docker container: #{command}")
+
+      # Cattura l'output del comando
+      stdout, stderr, status = Open3.capture3(command)
+
+      output = stdout.empty? ? stderr : stdout
+      Rails.logger.info("Command output: #{output}")
+
+      if status.success?
+        ShellChannel.broadcast_to(project, { output: output })
+      else
+        ShellChannel.broadcast_to(project, { output: "Error executing command: #{stderr}" })
+      end
     end
   end
 

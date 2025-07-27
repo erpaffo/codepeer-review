@@ -52,31 +52,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const fitAddon = new FitAddon();
   term.loadAddon(fitAddon);
 
-  // Funzione per verificare se il container è pronto
-  function checkContainerStatus() {
-    return new Promise((resolve) => {
-      const tempChannel = consumer.subscriptions.create(
-        { channel: 'ShellChannel', project_id: projectId },
-        {
-          received(data) {
-            if (data.output && data.output.includes('✅ Container')) {
-              this.unsubscribe();
-              resolve(true);
-            } else if (data.output && data.output.includes('❌ Container')) {
-              this.unsubscribe();
-              resolve(false);
-            }
-          }
-        }
-      );
-      
-      // Invia comando di verifica dopo un breve delay
-      setTimeout(() => {
-        tempChannel.perform('send_input', { input: 'docker-status' });
-      }, 500);
-    });
-  }
-
   // Funzione per aggiornare il messaggio di caricamento
   function updateLoadingMessage(message) {
     if (loadingSpinner) {
@@ -87,37 +62,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Funzione per inizializzare il terminale quando il container è pronto
+  // Funzione per inizializzare il terminale
   async function initializeTerminal() {
-    updateLoadingMessage('Starting Docker container...');
+    updateLoadingMessage('Connecting to shell...');
+    updateTerminalStatus('connecting', 'Connecting...');
     
-    // Aspetta che il container sia pronto (max 30 secondi)
-    let attempts = 0;
-    const maxAttempts = 60; // 30 secondi con 500ms di intervallo
+    // Aspetta un momento per permettere al server di inizializzare il container
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
-    while (attempts < maxAttempts) {
-      const isReady = await checkContainerStatus();
-      
-      if (isReady) {
-        // Container pronto, mostra il terminale
-        if (loadingSpinner) loadingSpinner.style.display = 'none';
-        terminalContainer.style.display = '';
-        term.open(terminalContainer);
-        fitAddon.fit();
-        term.write('Connected to shell...\r\n' + PROMPT);
-        return;
-      }
-      
-      attempts++;
-      updateLoadingMessage(`Starting Docker container... (attempt ${attempts}/${maxAttempts})`);
-      
-      // Aspetta 500ms prima del prossimo tentativo
-      await new Promise(resolve => setTimeout(resolve, 500));
+    // Mostra il terminale direttamente
+    if (loadingSpinner) loadingSpinner.style.display = 'none';
+    terminalContainer.style.display = 'flex';
+    terminalContainer.style.flexDirection = 'column';
+    term.open(terminalContainer);
+    fitAddon.fit();
+    term.write('Welcome to CodePeer Terminal!\r\n');
+    term.write('Type "help" for available commands.\r\n');
+    term.write('Connected to shell...\r\n' + PROMPT);
+    updateTerminalStatus('connected', 'Connected');
+    
+    // Test automatico del container dopo 3 secondi
+    setTimeout(() => {
+      shellChannel.sendInput('docker-status');
+    }, 3000);
+  }
+
+  // Funzione per aggiornare lo stato del terminale
+  function updateTerminalStatus(status, text) {
+    const statusIndicator = document.getElementById('terminal-status');
+    const statusText = document.getElementById('terminal-status-text');
+    
+    if (statusIndicator && statusText) {
+      statusIndicator.className = `status-indicator ${status}`;
+      statusText.textContent = text;
     }
-    
-    // Timeout raggiunto
-    updateLoadingMessage('Failed to start Docker container. Please refresh the page.');
-    console.error('Docker container failed to start within 30 seconds');
   }
 
   // Avvia l'inizializzazione del terminale
@@ -353,12 +331,22 @@ document.addEventListener('DOMContentLoaded', () => {
     {
       connected() {
         console.log(`Connected to ShellChannel for project ID: ${projectId}`);
+        // Aggiorna lo stato quando il canale si connette
+        updateTerminalStatus('connected', 'Connected');
       },
       disconnected() {
         console.log(`Disconnected from ShellChannel for project ID: ${projectId}`);
         term.write('\r\nDisconnected from shell.\r\n');
+        updateTerminalStatus('disconnected', 'Disconnected');
+      },
+      rejected() {
+        console.error(`ShellChannel subscription rejected for project ID: ${projectId}`);
+        term.write('\r\nFailed to connect to shell.\r\n');
+        updateTerminalStatus('disconnected', 'Connection failed');
       },
       received(data) {
+        console.log('Received data from ShellChannel:', data);
+        
         if (data.output) {
           writeColoredOutput(data.output);
         }

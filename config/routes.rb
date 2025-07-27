@@ -121,6 +121,7 @@ Rails.application.routes.draw do
         get 'run_shell', to: 'projects#run_shell', as: 'run_shell'
 
         post 'run_code', to: 'projects#run_code', as: 'run_code_project'
+        post 'sync_files', to: 'projects#sync_files', as: 'sync_files'
       end
     end
 

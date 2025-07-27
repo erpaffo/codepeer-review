@@ -1,0 +1,151 @@
+/* Project Editor Styles */
+
+/* File list styling */
+.file-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.file-item:hover {
+  transform: translateX(4px);
+}
+
+.file-item.selected {
+  background-color: #2563eb !important;
+  border-left: 4px solid #60a5fa;
+}
+
+/* Editor container */
+#code-editor {
+  min-height: 400px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Output panel */
+#code-output {
+  border-top: 1px solid #374151;
+  background-color: #1f2937;
+}
+
+#output-content {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  line-height: 1.4;
+}
+
+/* Modal styling */
+#new-file-modal {
+  backdrop-filter: blur(4px);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Terminal styling */
+#terminal {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+/* Button hover effects */
+.btn-hover-effect {
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-hover-effect:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* File type icons */
+.file-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .flex.h-screen {
+    flex-direction: column;
+  }
+  
+  .w-1/2 {
+    width: 100%;
+  }
+  
+  #code-editor {
+    min-height: 300px;
+  }
+}
+
+/* Loading animation */
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '';
+  animation: dots 1.5s steps(5, end) infinite;
+}
+
+@keyframes dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+/* Status indicators */
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.status-indicator.connected {
+  background-color: #10b981;
+}
+
+.status-indicator.disconnected {
+  background-color: #ef4444;
+}
+
+.status-indicator.connecting {
+  background-color: #f59e0b;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+} 

@@ -82,6 +82,20 @@ GITLAB_CLIENT_ID=your_gitlab_client_id
 GITLAB_CLIENT_SECRET=your_gitlab_client_secret
 ```
 
+### Start the server
+
+The application runs on HTTP by default:
+
+```bash
+rails server
+```
+
+Access the application at: http://localhost:3000
+
+**Note**: The application is configured to run on HTTP for development. All SSL/HTTPS configurations have been removed to avoid connection issues.
+GITLAB_CLIENT_SECRET=your_gitlab_client_secret
+```
+
 ### Start the application
 
 ```bash

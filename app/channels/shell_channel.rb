@@ -62,6 +62,23 @@ class ShellChannel < ApplicationCable::Channel
       # Mostra lo stato dei container Docker
       show_docker_status
       return true
+    when /^create-file\s+(\S+)$/
+      # Crea un nuovo file vuoto
+      filename = $1
+      create_empty_file(filename)
+      return true
+    when /^edit-file\s+(\S+)\s+(.+)$/
+      # Modifica un file con contenuto specifico
+      filename = $1
+      content = $2
+      edit_file_content(filename, content)
+      return true
+    when /^append-file\s+(\S+)\s+(.+)$/
+      # Aggiunge contenuto a un file
+      filename = $1
+      content = $2
+      append_to_file(filename, content)
+      return true
     when /^alias\s+(\w+)=(.+)$/
       # Gestisci alias
       alias_name = $1
@@ -184,14 +201,62 @@ class ShellChannel < ApplicationCable::Channel
     transmit({ output: env_vars.join("\r\n") + "\r\n" })
   end
 
+  def create_empty_file(filename)
+    container_name = "project_executor_#{@project.id}"
+    command = "docker exec #{container_name} touch #{filename}"
+    
+    if system(command)
+      transmit({ output: "✅ File '#{filename}' created successfully\r\n" })
+    else
+      transmit({ output: "❌ Error creating file '#{filename}'\r\n" })
+    end
+  end
+
+  def edit_file_content(filename, content)
+    container_name = "project_executor_#{@project.id}"
+    # Escapa il contenuto per evitare problemi con caratteri speciali
+    escaped_content = content.gsub("'", "'\"'\"'")
+    command = "docker exec #{container_name} bash -c 'echo \"#{escaped_content}\" > #{filename}'"
+    
+    if system(command)
+      transmit({ output: "✅ File '#{filename}' updated successfully\r\n" })
+    else
+      transmit({ output: "❌ Error updating file '#{filename}'\r\n" })
+    end
+  end
+
+  def append_to_file(filename, content)
+    container_name = "project_executor_#{@project.id}"
+    # Escapa il contenuto per evitare problemi con caratteri speciali
+    escaped_content = content.gsub("'", "'\"'\"'")
+    command = "docker exec #{container_name} bash -c 'echo \"#{escaped_content}\" >> #{filename}'"
+    
+    if system(command)
+      transmit({ output: "✅ Content appended to '#{filename}' successfully\r\n" })
+    else
+      transmit({ output: "❌ Error appending to file '#{filename}'\r\n" })
+    end
+  end
+
   def show_help
     help_text = <<~HELP
       Available commands:
       - ls, cd, pwd, cat, cp, mv, rm, mkdir, rmdir, touch
       - grep, find, chmod, chown, ps, top, kill
-      - nano, vim, python3, python, node, npm
+      - python3, python, node, npm
       - git, gcc, g++, make, echo, export, source
       - alias, unalias, history, clear, env, help
+      
+      File management commands:
+      - create-file filename: Create empty file
+      - edit-file filename content: Create/overwrite file with content
+      - append-file filename content: Append content to file
+      - echo "content" > filename: Create file with content
+      - echo "content" >> filename: Append to file
+      - cat filename: View file content
+      
+      Note: Interactive editors (nano, vim) are not supported in this terminal.
+      Use the Monaco Editor in the left panel for interactive file editing.
       
       Keyboard shortcuts:
       - Tab: Auto-completion

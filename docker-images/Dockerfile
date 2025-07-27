@@ -23,80 +23,16 @@ RUN apt-get update && apt-get install -y \
     tmux \
     screen \
     less \
-    more \
     grep \
     sed \
-    awk \
-    find \
-    locate \
+    gawk \
+    findutils \
     which \
-    whereis \
     file \
-    stat \
-    lsblk \
-    df \
-    du \
-    free \
-    top \
-    ps \
-    kill \
-    pkill \
-    killall \
-    nice \
-    renice \
-    chmod \
-    chown \
-    chgrp \
-    umask \
-    touch \
-    mkdir \
-    rmdir \
-    cp \
-    mv \
-    rm \
-    ln \
-    cat \
-    tac \
-    head \
-    tail \
-    nl \
-    wc \
-    sort \
-    uniq \
-    cut \
-    paste \
-    join \
-    split \
-    tr \
-    expand \
-    unexpand \
-    fmt \
-    pr \
-    fold \
-    column \
-    col \
-    expand \
-    unexpand \
-    nl \
-    od \
-    hexdump \
-    xxd \
-    base64 \
-    md5sum \
-    sha1sum \
-    sha256sum \
-    sha512sum \
-    cksum \
-    sum \
-    b2sum \
-    tee \
-    sponge \
-    dd \
-    convmv \
-    iconv \
-    recode \
-    dos2unix \
-    unix2dos \
+    procps \
+    sysstat \
+    util-linux \
+    coreutils \
     && apt-get clean
 
 # Installa strumenti di rete
@@ -108,31 +44,21 @@ RUN apt-get update && apt-get install -y \
     mtr \
     nmap \
     telnet \
-    netcat \
+    netcat-traditional \
     socat \
     openssh-client \
     openssh-server \
     rsync \
-    scp \
-    sftp \
+    openssh-sftp-server \
     && apt-get clean
 
 # Installa strumenti di sistema
 RUN apt-get update && apt-get install -y \
     procps \
     sysstat \
-    iotop \
-    iostat \
-    vmstat \
-    mpstat \
-    sar \
     strace \
     ltrace \
     lsof \
-    fuser \
-    pstree \
-    pgrep \
-    pidof \
     && apt-get clean
 
 # Installa strumenti di sviluppo aggiuntivi
@@ -151,35 +77,10 @@ RUN apt-get update && apt-get install -y \
     fakeroot \
     && apt-get clean
 
-# Installa Python packages comuni
-RUN pip3 install --no-cache-dir \
-    ipython \
-    jupyter \
-    numpy \
-    pandas \
-    matplotlib \
-    requests \
-    beautifulsoup4 \
-    flask \
-    django \
-    pytest \
-    black \
-    flake8 \
-    mypy
-
 # Installa Node.js packages comuni
 RUN npm install -g \
     yarn \
-    nodemon \
-    pm2 \
-    eslint \
-    prettier \
-    typescript \
-    ts-node \
-    jest \
-    mocha \
-    chai \
-    sinon
+    nodemon
 
 # Configura bash con colori e alias
 RUN echo 'export PS1="\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ "' >> /root/.bashrc && \
