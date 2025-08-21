@@ -469,6 +469,16 @@ textarea {
   margin-top: 1.5rem;
 }
 
+/* Hide scrollbars inside xterm viewport (keep scroll by wheel/keyboard) */
+#terminal .xterm-viewport {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
+}
+#terminal .xterm-viewport::-webkit-scrollbar { /* Chrome/Safari */
+  width: 0 !important;
+  height: 0 !important;
+}
+
 .oauth-btn {
   display: flex;
   align-items: center;
