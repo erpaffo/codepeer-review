@@ -1,6 +1,7 @@
 import consumer from "../channels/consumer"
 import { Terminal } from "xterm"
 import { FitAddon } from "xterm-addon-fit"
+import 'xterm/css/xterm.css'
 
 document.addEventListener('DOMContentLoaded', () => {
   const terminalContainer = document.getElementById('terminal');
@@ -100,6 +101,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Avvia l'inizializzazione del terminale
   initializeTerminal();
+
+  // Refitting when split resizes
+  window.addEventListener('split:resized', () => {
+    try { fitAddon.fit(); } catch(e) {}
+  });
 
   let currentCommand = '';
   let commandHistory = loadHistory();

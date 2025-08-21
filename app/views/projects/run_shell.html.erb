@@ -1,46 +1,21 @@
 <% content_for :title, @project.title %>
 <% if @project %>
-  <div class="flex h-screen bg-gray-900">
-    <!-- Sidebar con lista file e editor -->
-    <div class="w-1/2 flex flex-col bg-gray-800 border-r border-gray-700">
-      <!-- Header del progetto -->
+  <div id="run-shell-root" class="bg-gray-900 select-none" data-turbo-cache="false" style="display: flex; flex-direction: row; flex-wrap: nowrap; width: 100%; height: auto; flex: 1 1 auto; min-height: 0; overflow: hidden;">
+    <div id="left-panel" class="flex flex-col bg-gray-800 border-r border-gray-700" style="flex: 1 1 60%; overflow: hidden; min-height: 0;">
       <div class="p-4 bg-gray-700 border-b border-gray-600">
         <h1 class="text-xl font-semibold text-white mb-2"><%= @project.title %></h1>
         <p class="text-gray-300 text-sm"><%= @project.description %></p>
       </div>
 
-      <!-- Lista dei file -->
-      <div class="flex-1 overflow-y-auto">
-        <div class="p-4 border-b border-gray-600">
-          <h2 class="text-lg font-semibold text-white mb-3">Project Files</h2>
-          <div class="space-y-2">
-            <% @project.project_files.each do |file| %>
-              <div class="file-item bg-gray-700 hover:bg-gray-600 rounded-lg p-3 cursor-pointer transition-colors duration-200" 
-                   data-file-id="<%= file.id %>" 
-                   data-file-name="<%= file.file_identifier %>">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center space-x-2">
-                    <svg class="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="text-gray-300 font-medium"><%= file.file_identifier %></span>
-                  </div>
-                  <div class="flex space-x-2">
-                    <button class="edit-file-btn bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-500 transition-colors duration-200">
-                      Edit
-                    </button>
-                    <button class="run-file-btn bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-500 transition-colors duration-200">
-                      Run
-                    </button>
-                  </div>
-                </div>
-              </div>
-            <% end %>
-          </div>
+      <div class="max-h-72 overflow-y-auto border-b border-gray-600" id="file-explorer">
+        <div class="p-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-white">Project Files</h2>
+          <button id="toggle-file-tree" class="text-sm text-gray-300 hover:text-white">Toggle</button>
         </div>
+        <div id="file-tree" class="px-4 pb-2" data-files='<%= @project.project_files.map { |f| {id: f.id, path: f.file_identifier} }.to_json %>'></div>
+      </div>
 
-        <!-- Editor di testo -->
-        <div class="flex-1 flex flex-col">
+      <div id="editor-area" class="flex-1 flex flex-col" style="min-height: 0;">
           <div class="p-4 border-b border-gray-600">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-lg font-semibold text-white">Code Editor</h3>
@@ -61,11 +36,13 @@
             </div>
           </div>
           
-          <!-- Container dell'editor -->
-          <div id="code-editor" class="flex-1 bg-gray-900"></div>
-          
-          <!-- Output del codice -->
-          <div id="code-output" class="h-32 bg-gray-800 border-t border-gray-600 p-3 hidden">
+          <div id="code-editor-wrapper" style="flex: 1 1 auto; height: auto; min-height: 200px; overflow: auto;">
+            <div id="code-editor" class="bg-gray-900" style="height: 100%;"></div>
+          </div>
+
+          <div id="h-divider" class="bg-gray-700 hover:bg-blue-600 cursor-row-resize" style="height: 6px;"></div>
+
+          <div id="code-output" class="bg-gray-800 border-t border-gray-600 p-3 hidden" style="min-height: 140px; flex: 0 0 auto;">
             <div class="flex items-center justify-between mb-2">
               <h4 class="text-sm font-semibold text-white">Code Output</h4>
               <button id="clear-output" class="text-gray-400 hover:text-white text-sm">Clear</button>
@@ -73,12 +50,11 @@
             <div id="output-content" class="text-gray-300 text-sm font-mono overflow-y-auto h-full"></div>
           </div>
         </div>
-      </div>
     </div>
 
-    <!-- Terminal -->
-    <div class="w-1/2 flex flex-col bg-gray-900">
-      <!-- Header del terminale -->
+    <div id="drag-divider" class="bg-gray-700 hover:bg-blue-600 cursor-col-resize" style="width: 6px; flex: 0 0 6px;"></div>
+
+    <div id="right-panel" class="flex flex-col bg-gray-900" style="flex: 1 1 40%; overflow: hidden; min-height: 0;">
       <div class="p-4 bg-gray-800 border-b border-gray-700">
         <div class="flex items-center justify-between mb-2">
           <h2 class="text-lg font-semibold text-white">Interactive Terminal</h2>
@@ -90,8 +66,7 @@
         <p class="text-gray-300 text-sm">Execute commands and run your project files</p>
       </div>
 
-      <!-- Loading Spinner -->
-      <div id="terminal-loading" class="flex items-center justify-center bg-gray-800 text-white p-4" style="height: 500px;">
+      <div id="terminal-loading" class="flex items-center justify-center bg-gray-800 text-white p-4 flex-1">
         <svg class="animate-spin h-8 w-8 text-blue-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
@@ -99,12 +74,10 @@
         <span>Loading terminal...</span>
       </div>
 
-      <!-- Terminal Container -->
-      <div id="terminal" data-project-id="<%= @project.id %>" class="flex-1 bg-gray-800 text-white p-4" style="display: none;"></div>
+      <div id="terminal" data-project-id="<%= @project.id %>" class="flex-1 bg-gray-800 text-white p-4" style="display: none; min-height: 0;"></div>
     </div>
   </div>
 
-  <!-- Modal per nuovo file -->
   <div id="new-file-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
       <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
@@ -136,8 +109,10 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
   <%= javascript_pack_tag 'interactive_shell' %>
   <%= javascript_pack_tag 'project_editor' %>
+  <%= javascript_pack_tag 'split_pane' %>
 <% else %>
   <div class="p-6">
     <p>Project not found.</p>

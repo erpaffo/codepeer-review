@@ -4,19 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentFileId = null;
   let currentFileName = null;
   const projectId = window.location.pathname.split('/')[2];
+  const editorContainer = document.getElementById('code-editor-wrapper') || document.getElementById('code-editor');
 
   // Inizializza Monaco Editor
   function initializeMonacoEditor() {
-    if (typeof window.require === 'undefined') {
-      setTimeout(initializeMonacoEditor, 100);
+    // Ensure AMD loader exists (from loader.js)
+    if (typeof window.require === 'undefined' || !window.require) {
+      setTimeout(initializeMonacoEditor, 150);
       return;
     }
 
     if (!window.require.monacoConfigured) {
       window.require.config({ 
-        paths: { 
-          'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' 
-        }
+        paths: { 'vs': 'https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs' }
       });
       window.require.monacoConfigured = true;
     }
@@ -42,11 +42,70 @@ document.addEventListener('DOMContentLoaded', () => {
         wordWrap: 'on'
       });
 
+      // Esponi l'istanza per split_pane.js
+      editorElement._monacoInstance = monacoEditor;
+
       // Ridimensiona l'editor quando cambia la dimensione della finestra
-      new ResizeObserver(() => { 
-        if (monacoEditor) monacoEditor.layout(); 
-      }).observe(editorElement);
+      try {
+        new ResizeObserver(() => { 
+          if (monacoEditor) monacoEditor.layout(); 
+        }).observe(editorContainer);
+      } catch(e) {
+        window.addEventListener('resize', () => { if (monacoEditor) monacoEditor.layout(); });
+      }
     });
+  }
+
+  // Render file tree (simple, flat path -> nested UL)
+  function renderFileTree() {
+    const tree = document.getElementById('file-tree');
+    if (!tree) return;
+    const files = JSON.parse(tree.dataset.files || '[]');
+    // Build nested structure
+    const root = {};
+    files.forEach(({id, path}) => {
+      const parts = path.split('/');
+      let node = root;
+      parts.forEach((part, idx) => {
+        node.children = node.children || {};
+        node.children[part] = node.children[part] || {};
+        if (idx === parts.length - 1) {
+          node.children[part].__file = { id, name: path };
+        }
+        node = node.children[part];
+      });
+    });
+
+    function createList(node, basePath = '') {
+      const ul = document.createElement('ul');
+      ul.className = 'text-gray-300 text-sm pl-3';
+      const entries = Object.entries(node.children || {});
+      entries.forEach(([name, child]) => {
+        const li = document.createElement('li');
+        const isFile = !!child.__file;
+        if (isFile) {
+          li.innerHTML = `<button class="file-item text-left hover:text-white" data-file-id="${child.__file.id}" data-file-name="${child.__file.name}">📄 ${name}</button>`;
+        } else {
+          li.innerHTML = `<details open class="group">
+            <summary class="cursor-pointer select-none hover:text-white">📁 ${name}</summary>
+          </details>`;
+          const details = li.querySelector('details');
+          details.appendChild(createList(child, basePath + name + '/'));
+        }
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+
+    tree.innerHTML = '';
+    const ul = createList(root);
+    tree.appendChild(ul);
+
+    // Auto-seleziona il primo file disponibile e caricalo
+    const firstBtn = tree.querySelector('.file-item[data-file-id]');
+    if (firstBtn && firstBtn.dataset.fileId && firstBtn.dataset.fileName) {
+      loadFileContent(firstBtn.dataset.fileId, firstBtn.dataset.fileName);
+    }
   }
 
   // Carica il contenuto di un file
@@ -67,16 +126,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         // Evidenzia il file selezionato
-        document.querySelectorAll('.file-item').forEach(item => {
-          item.classList.remove('bg-blue-600');
-          item.classList.add('bg-gray-700');
-        });
-        
+        // Evidenziazione minimale tramite title
         const selectedFile = document.querySelector(`[data-file-id="${fileId}"]`);
-        if (selectedFile) {
-          selectedFile.classList.remove('bg-gray-700');
-          selectedFile.classList.add('bg-blue-600');
-        }
+        if (selectedFile) selectedFile.title = 'Selected';
       }
     } catch (error) {
       console.error('Error loading file:', error);
@@ -265,11 +317,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Event listeners
   document.addEventListener('click', (e) => {
+    // Toggle file tree
+    if (e.target && e.target.id === 'toggle-file-tree') {
+      const ft = document.getElementById('file-tree');
+      if (ft) ft.style.display = (ft.style.display === 'none' ? '' : 'none');
+    }
+
     // Edit file button
     if (e.target.classList.contains('edit-file-btn')) {
       const fileItem = e.target.closest('.file-item');
+      if (!fileItem || !fileItem.dataset) return;
       const fileId = fileItem.dataset.fileId;
       const fileName = fileItem.dataset.fileName;
+      if (fileId && fileName) loadFileContent(fileId, fileName);
+    }
+
+    // Click dal tree
+    if (e.target.classList.contains('file-item') && e.target.dataset && e.target.dataset.fileId) {
+      const fileId = e.target.dataset.fileId;
+      const fileName = e.target.dataset.fileName;
       loadFileContent(fileId, fileName);
     }
 
@@ -367,7 +433,43 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Inizializza l'editor quando la pagina è caricata
   initializeMonacoEditor();
+  renderFileTree();
+
+  // Resize verticale tra editor e console
+  (function initVerticalResize() {
+    const divider = document.getElementById('h-divider');
+    if (!divider || !editorContainer) return;
+    const output = document.getElementById('code-output');
+    let dragging = false;
+    let startY = 0;
+    let startEditorHeight = 0;
+
+    divider.addEventListener('mousedown', (e) => {
+      dragging = true;
+      startY = e.clientY;
+      startEditorHeight = editorContainer.getBoundingClientRect().height;
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const dy = e.clientY - startY;
+      let newH = startEditorHeight + dy;
+      const minH = 200;
+      const maxH = Math.max(minH, window.innerHeight - 220);
+      newH = Math.max(minH, Math.min(maxH, newH));
+      editorContainer.style.height = `${newH}px`;
+      if (monacoEditor) monacoEditor.layout();
+      window.dispatchEvent(new Event('split:resized'));
+    });
+    window.addEventListener('mouseup', () => {
+      if (!dragging) return;
+      dragging = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    });
+  })();
 
   // Mostra messaggio di benvenuto
-  showOutput('Project editor loaded. Select a file to start editing or create a new one.', 'info');
+  showOutput('Project editor loaded. Select a file from the tree or create a new one.', 'info');
 }); 
