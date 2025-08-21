@@ -41,3 +41,20 @@ pidfile ENV.fetch("PIDFILE") { "tmp/pids/server.pid" }
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
+
+# Optional HTTPS for development/local testing
+if ENV.fetch("USE_SSL", "false").to_s.downcase == "true"
+  ssl_key_path  = ENV.fetch("SSL_KEY_PATH",  "config/ssl/server.key")
+  ssl_cert_path = ENV.fetch("SSL_CERT_PATH", "config/ssl/server.crt")
+  ssl_port      = Integer(ENV.fetch("SSL_PORT", 3001))
+
+  begin
+    ssl_bind "0.0.0.0", ssl_port, {
+      key: ssl_key_path,
+      cert: ssl_cert_path,
+      verify_mode: "none"
+    }
+  rescue => e
+    warn "[puma ssl] SSL disabled: #{e.message}"
+  end
+end

@@ -49,19 +49,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_152509) do
     t.string "icon_url"
   end
 
-  create_table "branches", force: :cascade do |t|
-    t.string "name", null: false
-    t.integer "project_id", null: false
-    t.integer "latest_commit_id"
-    t.integer "base_commit_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["base_commit_id"], name: "index_branches_on_base_commit_id"
-    t.index ["latest_commit_id"], name: "index_branches_on_latest_commit_id"
-    t.index ["project_id", "name"], name: "index_branches_on_project_id_and_name", unique: true
-    t.index ["project_id"], name: "index_branches_on_project_id"
-  end
-
   create_table "collaborator_invitations", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id"
@@ -86,18 +73,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_152509) do
     t.index ["user_id"], name: "index_collaborators_on_user_id"
   end
 
-  create_table "commit_files", force: :cascade do |t|
-    t.integer "commit_id", null: false
-    t.integer "project_file_id", null: false
-    t.string "status", null: false
-    t.text "diff"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["commit_id", "project_file_id"], name: "index_commit_files_on_commit_id_and_project_file_id", unique: true
-    t.index ["commit_id"], name: "index_commit_files_on_commit_id"
-    t.index ["project_file_id"], name: "index_commit_files_on_project_file_id"
-  end
-
   create_table "commit_logs", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "file_id", null: false
@@ -110,23 +85,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_152509) do
     t.index ["file_id"], name: "index_commit_logs_on_file_id"
     t.index ["project_id"], name: "index_commit_logs_on_project_id"
     t.index ["user_id"], name: "index_commit_logs_on_user_id"
-  end
-
-  create_table "commits", force: :cascade do |t|
-    t.string "message", null: false
-    t.string "sha", null: false
-    t.integer "project_id", null: false
-    t.integer "user_id", null: false
-    t.integer "branch_id", null: false
-    t.integer "parent_commit_id"
-    t.boolean "merge_commit", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["branch_id"], name: "index_commits_on_branch_id"
-    t.index ["parent_commit_id"], name: "index_commits_on_parent_commit_id"
-    t.index ["project_id"], name: "index_commits_on_project_id"
-    t.index ["sha"], name: "index_commits_on_sha", unique: true
-    t.index ["user_id"], name: "index_commits_on_user_id"
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -306,22 +264,13 @@ ActiveRecord::Schema[7.1].define(version: 2025_07_23_152509) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "branches", "commits", column: "base_commit_id"
-  add_foreign_key "branches", "commits", column: "latest_commit_id"
-  add_foreign_key "branches", "projects"
   add_foreign_key "collaborator_invitations", "projects"
   add_foreign_key "collaborator_invitations", "users"
   add_foreign_key "collaborators", "projects"
   add_foreign_key "collaborators", "users"
-  add_foreign_key "commit_files", "commits"
-  add_foreign_key "commit_files", "project_files"
   add_foreign_key "commit_logs", "project_files", column: "file_id"
   add_foreign_key "commit_logs", "projects"
   add_foreign_key "commit_logs", "users"
-  add_foreign_key "commits", "branches"
-  add_foreign_key "commits", "commits", column: "parent_commit_id"
-  add_foreign_key "commits", "projects"
-  add_foreign_key "commits", "users"
   add_foreign_key "conversations", "users", column: "recipient_id"
   add_foreign_key "conversations", "users", column: "sender_id"
   add_foreign_key "favorites", "projects"

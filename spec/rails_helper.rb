@@ -1,6 +1,6 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require File.expand_path('../../config/environment', __FILE__)
 ENV['RAILS_ENV'] ||= 'test'
+require File.expand_path('../../config/environment', __FILE__)
 # Prevent database truncation if the environment is production
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require 'spec_helper'
@@ -83,7 +83,8 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
-  Dir[Rails.root.join('spec', 'factories', '**', '*.rb')].each { |f| require f }
+  # FactoryBot definitions are loaded via support/factory_bot or on demand;
+  # avoid requiring factories twice to prevent DuplicateDefinitionError
 
   Shoulda::Matchers.configure do |config|
     config.integrate do |with|

@@ -26,6 +26,8 @@ class User < ApplicationRecord
   has_many :favorite_projects, through: :favorites, source: :project
   has_many :user_badges
   has_many :badges, through: :user_badges
+  # Ensure attribute exists during early migrations when DB column may not yet be present
+  attribute :role, :integer, default: 0
   enum role: { user: 0, moderator: 1, admin: 2 }
 
   attr_accessor :remove_profile_image
@@ -200,6 +202,7 @@ class User < ApplicationRecord
   end
 
   def create_user_directory
+    return if Rails.env.test?
     s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
     bucket = s3.bucket(ENV['AWS_BUCKET'])
     user_folder_name = email.split('@').first

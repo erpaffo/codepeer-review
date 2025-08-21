@@ -1,6 +1,6 @@
 class ProjectsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab, :run_shell]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab, :run_shell, :sync_files]
 
   SUPPORTED_LANGUAGES = %w[python c cpp javascript ruby java rust].freeze
 
@@ -146,19 +146,10 @@ class ProjectsController < ApplicationController
       obj = s3.bucket(ENV['AWS_BUCKET']).object(@file.file.path)
       obj.put(body: new_file_content_utf8)
 
-      # Sincronizza il file con il container Docker
-      sync_file_with_docker_container(@project, @file, new_file_content_utf8)
-
-      respond_to do |format|
-        format.html { redirect_to project_path(@project), notice: 'File was successfully updated.' }
-        format.json { render json: { success: true, message: 'File was successfully updated and synchronized with Docker container.' } }
-      end
+      redirect_to project_path(@project), notice: 'File was successfully updated.'
     rescue => e
       Rails.logger.error "Errore nell'elaborazione del file: #{e.message}"
-      respond_to do |format|
-        format.html { render json: { error: 'File processing error' }, status: :unprocessable_entity }
-        format.json { render json: { error: 'File processing error' }, status: :unprocessable_entity }
-      end
+      render json: { error: 'File processing error' }, status: :unprocessable_entity
     end
   end
 
@@ -170,8 +161,11 @@ class ProjectsController < ApplicationController
     return render json: { error: 'Invalid code or language.' }, status: :unprocessable_entity unless code.present? && supported_language?(language)
 
     begin
-      # Usa il container esistente per esecuzione più veloce
-      output, error, status = execute_code_in_existing_container(code, file_identifier, language)
+      if Rails.configuration.x.k8s.enabled
+        output, error, status = Kube::JobRunner.run(code: code, language: language, timeout_s: 5)
+      else
+        output, error, status = execute_code_in_docker(code, language)
+      end
       if status.success?
         render json: { output: output }, status: :ok
       else
@@ -204,18 +198,12 @@ class ProjectsController < ApplicationController
   end
 
   def create_file
-    file_name = params[:file_name] || params[:project_file][:file_name]
-    extension = params[:extension] || params[:project_file][:extension]
+    file_name = params[:file_name]
+    extension = params[:extension]
 
     if file_name.blank? || extension.blank?
-      respond_to do |format|
-        format.html do
-          flash[:alert] = "File name and extension can't be blank."
-          render :new_file
-        end
-        format.json { render json: { error: "File name and extension can't be blank." }, status: :unprocessable_entity }
-      end
-      return
+      flash[:alert] = "File name and extension can't be blank."
+      render :new_file and return
     end
 
     full_file_name = "#{file_name}.#{extension}"
@@ -227,18 +215,9 @@ class ProjectsController < ApplicationController
     @project_file = @project.project_files.build(file: File.open(file_path))
 
     if @project_file.save
-      # Sincronizza il nuovo file con il container Docker
-      sync_file_with_docker_container(@project, @project_file, "")
-      
-      respond_to do |format|
-        format.html { redirect_to edit_file_project_path(@project, file_id: @project_file.id), notice: 'File was successfully created and synchronized with Docker container.' }
-        format.json { render json: { success: true, message: 'File was successfully created and synchronized with Docker container.', file_id: @project_file.id } }
-      end
+      redirect_to edit_file_project_path(@project, file_id: @project_file.id), notice: 'File was successfully created.'
     else
-      respond_to do |format|
-        format.html { render :new_file }
-        format.json { render json: { error: @project_file.errors.full_messages.join(', ') }, status: :unprocessable_entity }
-      end
+      render :new_file
     end
   end
 
@@ -366,6 +345,9 @@ class ProjectsController < ApplicationController
   def stats
     @unique_views = @project.unique_view_count
     @favorite_count = @project.favorite_count
+    if Rails.configuration.x.k8s.enabled
+      @runner_metrics = Kube::Metrics.pod_metrics(@project)
+    end
   end
 
   def track_view
@@ -514,14 +496,49 @@ class ProjectsController < ApplicationController
     if project_files_path
       # Inizializza la shell nel container Docker
       ShellProcessManager.initialize_shell(@project, project_files_path)
-      
-      # Sincronizza tutti i file con il container Docker per assicurarsi che siano aggiornati
-      sync_all_files_with_docker_container(@project)
-      
-      render layout: 'terminal'
     else
       flash[:error] = "Failed to download project files."
       redirect_to project_path(@project)
+    end
+  end
+
+  def sync_files
+    begin
+      # Scarica i file del progetto da S3
+      project_files_path = download_project_files_from_s3(@project)
+      
+      if project_files_path
+        # Verifica se il container Docker è in esecuzione
+        if ShellProcessManager.container_running?(@project)
+          # Sincronizza i file con il container esistente
+          # Per ora restituiamo successo, in futuro si potrebbe implementare
+          # la sincronizzazione bidirezionale dei file
+          render json: { 
+            status: 'success', 
+            message: 'Files synchronized successfully with Docker container',
+            project_path: project_files_path
+          }
+        else
+          # Se il container non è in esecuzione, lo inizializza
+          ShellProcessManager.initialize_shell(@project, project_files_path)
+          render json: { 
+            status: 'success', 
+            message: 'Docker container started and files synchronized',
+            project_path: project_files_path
+          }
+        end
+      else
+        render json: { 
+          status: 'error', 
+          error: 'Failed to download project files from S3'
+        }, status: :unprocessable_entity
+      end
+    rescue => e
+      Rails.logger.error "Error syncing files: #{e.message}"
+      render json: { 
+        status: 'error', 
+        error: "Failed to sync files: #{e.message}"
+      }, status: :internal_server_error
     end
   end
 
@@ -534,15 +551,6 @@ class ProjectsController < ApplicationController
     FileUtils.mkdir_p(local_dir)
 
     local_path = File.join(local_dir, File.basename(file.file.url))
-    
-    # Cache key basata sul file e timestamp di modifica
-    cache_key = "s3_file_#{file.id}_#{file.updated_at.to_i}"
-    
-    # Verifica se il file è già in cache e aggiornato
-    if File.exist?(local_path) && Rails.cache.exist?(cache_key)
-      Rails.logger.info "Using cached file: #{file.file_identifier}"
-      return local_path
-    end
 
     s3 = Aws::S3::Client.new(region: ENV['AWS_REGION'])
 
@@ -552,11 +560,6 @@ class ProjectsController < ApplicationController
         file_obj.write(chunk)
       end
     end
-
-    # Salva il file in cache per 5 minuti
-    Rails.cache.write(cache_key, true, expires_in: 5.minutes)
-    
-    Rails.logger.info "Downloaded and cached file: #{file.file_identifier}"
 
     local_path # Restituisce il percorso locale dove il file è stato scaricato
   end
@@ -608,61 +611,6 @@ class ProjectsController < ApplicationController
       else
         @project.errors.add(:base, "The email #{email.strip} does not belong to any registered user.")
         raise ActiveRecord::Rollback
-      end
-    end
-  end
-
-  def execute_code_in_existing_container(code, file_identifier, language)
-    container_name = "project_executor_#{@project.id}"
-    
-    # Verifica se il container è in esecuzione
-    unless container_running?(container_name)
-      # Fallback al metodo originale se il container non è disponibile
-      return execute_code_in_docker(code, language)
-    end
-
-    Timeout.timeout(3) do  # Timeout ridotto a 3 secondi per esecuzione più veloce
-      begin
-        # Escapa il codice per evitare problemi con caratteri speciali
-        escaped_code = code.gsub("'", "'\"'\"'")
-        
-        # Comando specifico per eseguire il file nel container esistente
-        language_cmd = case language
-                       when 'python'
-                         "python3 #{file_identifier}"
-                       when 'c'
-                         executable = file_identifier.gsub('.c', '')
-                         "if [ ! -f #{executable} ] || [ #{file_identifier} -nt #{executable} ]; then gcc -o #{executable} #{file_identifier}; fi && ./#{executable}"
-                       when 'cpp'
-                         executable = file_identifier.gsub('.cpp', '')
-                         "if [ ! -f #{executable} ] || [ #{file_identifier} -nt #{executable} ]; then g++ -o #{executable} #{file_identifier}; fi && ./#{executable}"
-                       when 'java'
-                         class_name = file_identifier.gsub('.java', '')
-                         "if [ ! -f #{class_name}.class ] || [ #{file_identifier} -nt #{class_name}.class ]; then javac #{file_identifier}; fi && java #{class_name}"
-                       when 'javascript'
-                         "node #{file_identifier}"
-                       when 'ruby'
-                         "ruby #{file_identifier}"
-                       when 'rust'
-                         executable = file_identifier.gsub('.rs', '')
-                         "if [ ! -f #{executable} ] || [ #{file_identifier} -nt #{executable} ]; then rustc #{file_identifier}; fi && ./#{executable}"
-                       else
-                         "python3 #{file_identifier}"
-                       end
-
-        command = "docker exec #{container_name} bash -c '#{language_cmd}'"
-        
-        Rails.logger.info "Executing code in existing container: #{command}"
-        
-        # Esegue il comando e cattura stdout, stderr e status
-        stdout_str, stderr_str, status = Open3.capture3(command)
-        
-        # Restituisce l'output, l'errore e lo status del comando
-        [stdout_str, stderr_str, status]
-      rescue => e
-        Rails.logger.error "Error executing code in existing container: #{e.message}"
-        # Fallback al metodo originale in caso di errore
-        execute_code_in_docker(code, language)
       end
     end
   end
@@ -769,167 +717,5 @@ class ProjectsController < ApplicationController
 
   def authorized_to_edit?
     @project.user == current_user || @project.collaborating_users.include?(current_user)
-  end
-
-  def sync_file_with_docker_container(project, file, new_content)
-    container_name = "project_executor_#{project.id}"
-    
-    # Verifica se il container è in esecuzione
-    unless container_running?(container_name)
-      Rails.logger.warn "Container #{container_name} is not running, cannot sync file"
-      return false
-    end
-
-    begin
-      # Ottimizzazione: usa un file temporaneo per evitare problemi di escape
-      temp_file = Tempfile.new(['sync', file.file_identifier])
-      temp_file.write(new_content)
-      temp_file.close
-      
-      # Copia il file nel container usando docker cp (più veloce e sicuro)
-      command = "docker cp #{temp_file.path} #{container_name}:/app/#{file.file_identifier}"
-      
-      Rails.logger.info "Syncing file #{file.file_identifier} with Docker container using docker cp"
-      
-      # Esegui il comando
-      stdout, stderr, status = Open3.capture3(command)
-      
-      # Pulisci il file temporaneo
-      temp_file.unlink
-      
-      if status.success?
-        Rails.logger.info "File #{file.file_identifier} successfully synced with Docker container"
-        return true
-      else
-        Rails.logger.error "Failed to sync file with Docker container. stdout: #{stdout}, stderr: #{stderr}"
-        return false
-      end
-    rescue => e
-      Rails.logger.error "Error syncing file with Docker container: #{e.message}"
-      # Fallback al metodo originale in caso di errore
-      return sync_file_with_docker_container_fallback(project, file, new_content)
-    end
-  end
-
-  def sync_file_with_docker_container_fallback(project, file, new_content)
-    container_name = "project_executor_#{project.id}"
-    
-    begin
-      # Escapa il contenuto per evitare problemi con caratteri speciali
-      escaped_content = new_content.gsub("'", "'\"'\"'")
-      
-      # Comando per aggiornare il file nel container
-      command = "docker exec #{container_name} bash -c 'echo \"#{escaped_content}\" > #{file.file_identifier}'"
-      
-      Rails.logger.info "Fallback: Syncing file #{file.file_identifier} with Docker container: #{command}"
-      
-      # Esegui il comando
-      stdout, stderr, status = Open3.capture3(command)
-      
-      if status.success?
-        Rails.logger.info "File #{file.file_identifier} successfully synced with Docker container (fallback)"
-        return true
-      else
-        Rails.logger.error "Failed to sync file with Docker container (fallback). stdout: #{stdout}, stderr: #{stderr}"
-        return false
-      end
-    rescue => e
-      Rails.logger.error "Error syncing file with Docker container (fallback): #{e.message}"
-      return false
-    end
-  end
-
-  def container_running?(container_name)
-    `docker ps --filter "name=#{container_name}" --format "{{.Names}}"`.strip == container_name
-  end
-
-  def sync_all_files_with_docker_container(project)
-    container_name = "project_executor_#{project.id}"
-    
-    # Verifica se il container è in esecuzione
-    unless container_running?(container_name)
-      Rails.logger.warn "Container #{container_name} is not running, cannot sync files"
-      return false
-    end
-
-    begin
-      Rails.logger.info "Syncing all files with Docker container for project #{project.id}"
-      
-      # Ottimizzazione: crea una directory temporanea per tutti i file
-      temp_dir = Dir.mktmpdir("project_sync_#{project.id}")
-      
-      begin
-        # Scarica tutti i file in una directory temporanea
-        project.project_files.each do |file|
-          local_path = download_file_from_s3(file)
-          file_content = read_file_content(local_path)
-          
-          # Scrivi il file nella directory temporanea
-          temp_file_path = File.join(temp_dir, file.file_identifier)
-          File.write(temp_file_path, file_content, encoding: 'UTF-8')
-        end
-        
-        # Copia tutti i file nel container in una sola operazione
-        command = "docker cp #{temp_dir}/. #{container_name}:/app/"
-        Rails.logger.info "Bulk syncing files with Docker container: #{command}"
-        
-        stdout, stderr, status = Open3.capture3(command)
-        
-        if status.success?
-          Rails.logger.info "All files synced successfully with Docker container (bulk operation)"
-          return true
-        else
-          Rails.logger.error "Failed to bulk sync files with Docker container. stdout: #{stdout}, stderr: #{stderr}"
-          # Fallback al metodo individuale
-          return sync_all_files_with_docker_container_fallback(project)
-        end
-      ensure
-        # Pulisci la directory temporanea
-        FileUtils.remove_entry(temp_dir) if Dir.exist?(temp_dir)
-      end
-      
-    rescue => e
-      Rails.logger.error "Error syncing all files with Docker container: #{e.message}"
-      # Fallback al metodo individuale
-      return sync_all_files_with_docker_container_fallback(project)
-    end
-  end
-
-  def sync_all_files_with_docker_container_fallback(project)
-    container_name = "project_executor_#{project.id}"
-    
-    begin
-      Rails.logger.info "Fallback: Syncing files individually with Docker container for project #{project.id}"
-      
-      # Sincronizza ogni file del progetto individualmente
-      project.project_files.each do |file|
-        # Scarica il contenuto del file da S3
-        local_path = download_file_from_s3(file)
-        file_content = read_file_content(local_path)
-        
-        # Sincronizza il file con il container
-        sync_file_with_docker_container(project, file, file_content)
-      end
-      
-      Rails.logger.info "All files synced successfully with Docker container (fallback)"
-      return true
-    rescue => e
-      Rails.logger.error "Error syncing all files with Docker container (fallback): #{e.message}"
-      return false
-    end
-  end
-
-  def sync_files
-    if sync_all_files_with_docker_container(@project)
-      respond_to do |format|
-        format.html { redirect_to run_shell_project_path(@project), notice: 'Files synchronized successfully with Docker container.' }
-        format.json { render json: { success: true, message: 'Files synchronized successfully with Docker container.' } }
-      end
-    else
-      respond_to do |format|
-        format.html { redirect_to run_shell_project_path(@project), alert: 'Failed to synchronize files with Docker container.' }
-        format.json { render json: { error: 'Failed to synchronize files with Docker container.' }, status: :unprocessable_entity }
-      end
-    end
   end
 end

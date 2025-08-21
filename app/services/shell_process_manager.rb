@@ -1,5 +1,8 @@
 class ShellProcessManager
   def self.initialize_shell(project, project_files_path)
+    if Rails.configuration.x.k8s.enabled
+      return Kube::ShellManager.initialize_shell(project, project_files_path)
+    end
     container_name = "project_executor_#{project.id}"
     env_vars = "PROJECT_ID=#{project.id} PROJECT_FILES_PATH=#{project_files_path}"
 
@@ -20,8 +23,8 @@ class ShellProcessManager
     cleanup_existing_container(container_name)
 
     # Avvia il container Docker con i file del progetto
-    # Usa 'up' invece di 'run' per mantenere il container in esecuzione
-    command = "#{env_vars} docker-compose -f docker-images/docker-compose.yml up -d --no-deps project_executor"
+    # Usa docker run diretto invece di docker-compose per evitare problemi di network
+    command = "docker run -d --name #{container_name} -v #{project_files_path}:/app -w /app code-executor/ubuntu:latest bash -c 'while true; do sleep 3600; done'"
     Rails.logger.info("Starting Docker container: #{command}")
     
     # Esegui il comando e cattura l'output
@@ -43,6 +46,9 @@ class ShellProcessManager
   end
 
     def self.send_input(project, input)
+    if Rails.configuration.x.k8s.enabled
+      return Kube::ShellManager.send_input(project, input)
+    end
     container_name = "project_executor_#{project.id}"
 
     # Se il container non è in esecuzione, prova a riavviarlo
@@ -96,6 +102,9 @@ class ShellProcessManager
   end
 
   def self.terminate_shell(project)
+    if Rails.configuration.x.k8s.enabled
+      return Kube::ShellManager.terminate_shell(project)
+    end
     container_name = "project_executor_#{project.id}"
     if container_running?(container_name)
       command = "docker stop #{container_name}"
@@ -107,7 +116,14 @@ class ShellProcessManager
   end
 
   def self.container_running?(container_name)
-    `docker ps --filter "name=#{container_name}" --format "{{.Names}}"`.strip == container_name
+    if Rails.configuration.x.k8s.enabled
+      project_id = container_name.to_s.sub('project_executor_', '')
+      project = Project.find_by(id: project_id)
+      return false unless project
+      return Kube::ShellManager.container_running?(project)
+    else
+      `docker ps --filter "name=#{container_name}" --format "{{.Names}}"`.strip == container_name
+    end
   end
 
   private

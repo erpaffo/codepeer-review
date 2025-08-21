@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: codepeer-limits
+  namespace: codepeer
+spec:
+  limits:
+    - type: Container
+      default:
+        cpu: 500m
+        memory: 256Mi
+      defaultRequest:
+        cpu: 100m
+        memory: 128Mi
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: codepeer-quota
+  namespace: codepeer
+spec:
+  hard:
+    pods: "100"
+    requests.cpu: "10"
+    requests.memory: 10Gi
+    limits.cpu: "40"
+    limits.memory: 40Gi
+

@@ -1,5 +1,9 @@
 class FileUploader < CarrierWave::Uploader::Base
-  storage :fog
+  if Rails.env.test?
+    storage :file
+  else
+    storage :fog
+  end
 
   def store_dir
     user_folder_name = model.project.user.email.split('@').first
