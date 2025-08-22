@@ -1,0 +1,21 @@
+<% content_for :title, "Import from GitHub" %>
+
+<div class="form-container" style="max-width: 720px; margin: 2rem auto;">
+  <h1 class="page-title">Import repository from GitHub</h1>
+  <p class="text-gray-300" style="margin-bottom: 1rem;">Paste a repository URL (HTTPS or SSH). Example: https://github.com/user/repo.git</p>
+
+  <%= form_with url: perform_import_from_github_project_path(@project), method: :post, local: true do |f| %>
+    <div class="field-group">
+      <%= label_tag :repo_url, 'Repository URL', class: 'form-label' %>
+      <%= text_field_tag :repo_url, nil, placeholder: 'https://github.com/user/repo.git', class: 'form-input' %>
+    </div>
+
+    <div class="actions">
+      <%= submit_tag 'Import', class: 'btn btn-primary' %>
+      <%= link_to 'Cancel', project_path(@project), class: 'btn btn-secondary', style: 'margin-left: 10px;' %>
+    </div>
+  <% end %>
+</div>
+
+
+

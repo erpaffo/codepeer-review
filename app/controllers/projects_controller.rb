@@ -1,6 +1,8 @@
 class ProjectsController < ApplicationController
+  require 'fileutils'
+  require 'shellwords'
   before_action :authenticate_user!
-  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab, :run_shell, :sync_files]
+  before_action :set_project, only: [:show, :edit, :update, :destroy, :show_file, :edit_file, :update_file, :new_file, :upload_files, :create_file, :commit_logs, :toggle_favorite, :stats, :update_permissions, :upload, :upload_to_google_drive, :upload_to_github, :upload_to_gitlab, :run_shell, :sync_files, :import_from_github, :perform_import_from_github]
 
   SUPPORTED_LANGUAGES = %w[python c cpp javascript ruby java rust].freeze
 
@@ -219,6 +221,70 @@ class ProjectsController < ApplicationController
     else
       render :new_file
     end
+  end
+
+  # GET /projects/:id/import_from_github
+  def import_from_github
+    # simple form rendered to input repository URL
+  end
+
+  # POST /projects/:id/perform_import_from_github
+  def perform_import_from_github
+    repo_url = params[:repo_url].to_s.strip
+    if repo_url.blank?
+      redirect_to import_from_github_project_path(@project), alert: 'Repository URL is required.' and return
+    end
+
+    GithubImportJob.perform_later(
+      repo_url: repo_url,
+      project_id: @project.id
+    )
+
+    redirect_to project_path(@project), notice: 'Import started. You will see files appear shortly.'
+  rescue => e
+    Rails.logger.error("GitHub import failed: #{e.message}")
+    redirect_to import_from_github_project_path(@project), alert: 'An error occurred while enqueueing the import.'
+  end
+
+  # GET /projects/import_from_github (for new projects)
+  def new_import_from_github
+    # simple form rendered to input repository URL and project details
+  end
+
+  # POST /projects/perform_import_from_github (for new projects)
+  def perform_new_import_from_github
+    repo_url = params[:repo_url].to_s.strip
+    project_name = params[:project_name].to_s.strip
+    project_description = params[:project_description].to_s.strip
+
+    if repo_url.blank? || project_name.blank?
+      redirect_to new_import_from_github_projects_path, alert: 'Repository URL and project name are required.' and return
+    end
+
+    # Create the project first
+    @project = current_user.projects.build(
+      title: project_name,
+      description: project_description,
+      visibility: params[:visibility] || 'private'
+    )
+
+    if @project.save
+      GithubImportJob.perform_later(
+        repo_url: repo_url,
+        user_id: current_user.id,
+        title: @project.title,
+        description: @project.description,
+        visibility: @project.visibility,
+        project_id: @project.id
+      )
+
+      redirect_to project_path(@project), notice: 'Project created. Import started and will complete shortly.'
+    else
+      redirect_to new_import_from_github_projects_path, alert: 'Failed to create project.'
+    end
+  rescue => e
+    Rails.logger.error("GitHub import failed: #{e.message}")
+    redirect_to new_import_from_github_projects_path, alert: 'An error occurred while enqueueing the import.'
   end
 
   def public_view
