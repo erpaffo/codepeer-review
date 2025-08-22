@@ -127,6 +127,12 @@ Rails.application.routes.draw do
         get 'import_from_github', to: 'projects#import_from_github', as: 'import_from_github'
         post 'perform_import_from_github', to: 'projects#perform_import_from_github', as: 'perform_import_from_github'
       end
+      
+      resources :session_snapshots, only: [:index, :show, :new, :create, :destroy] do
+        member do
+          post :restore
+        end
+      end
     end
 
     resources :snippets do

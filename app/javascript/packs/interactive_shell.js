@@ -99,6 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Funzione per aggiornare la directory corrente
+  function updateCurrentPWD(path) {
+    const pwdElement = document.getElementById('current-pwd');
+    if (pwdElement) {
+      pwdElement.textContent = path;
+    }
+  }
+
   // Avvia l'inizializzazione del terminale
   initializeTerminal();
 
@@ -354,6 +362,14 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Received data from ShellChannel:', data);
         
         if (data.output) {
+          // Controlla se l'output contiene un comando cd
+          const output = data.output.trim();
+          if (output && !output.includes('\n') && !output.includes('Error') && !output.includes('⚠️') && !output.includes('💡')) {
+            // Potrebbe essere il risultato di un cd
+            if (output.startsWith('/') || output.includes('/app')) {
+              updateCurrentPWD(output);
+            }
+          }
           writeColoredOutput(data.output);
         }
         if (data.error) {

@@ -45,7 +45,7 @@ class ShellProcessManager
     end
   end
 
-    def self.send_input(project, input)
+  def self.send_input(project, input, current_dir: '/app')
     if Rails.configuration.x.k8s.enabled
       return Kube::ShellManager.send_input(project, input)
     end
@@ -71,9 +71,16 @@ class ShellProcessManager
     interactive_commands = ['nano', 'vim', 'vi', 'emacs', 'pico']
     is_interactive = interactive_commands.any? { |cmd| input.strip.start_with?(cmd) }
 
+    # Attiva venv se presente e prefissa con cd
+    venv_prefix = ". /app/.venv/bin/activate 2>/dev/null || true;"
+    escaped_dir = input.include?("cd ") ? '/app' : current_dir
+    prefixed = "cd #{escaped_dir} && #{venv_prefix} #{input}"
+    # Escape sicuro per singoli apici all'interno della stringa che verrà racchiusa tra apici singoli
+    safe_prefixed = prefixed.gsub("'", %q('"'"'))
+
     if is_interactive
       # Per comandi interattivi, usa docker exec con -it per TTY
-      command = "docker exec -it #{container_name} bash -c '#{input.gsub("'", "'\"'\"'")}'"
+      command = "docker exec -it #{container_name} bash -lc '#{safe_prefixed}'"
       Rails.logger.info("Executing interactive command in Docker container: #{command}")
       
       # Per comandi interattivi, invia un messaggio informativo
@@ -84,7 +91,7 @@ class ShellProcessManager
       ShellChannel.broadcast_to(project, { output: "   Per modificare file: sed -i 's/old/new/g' filename.txt\r\n" })
     else
       # Per comandi non interattivi, usa il metodo normale
-      command = "docker exec #{container_name} bash -c '#{input.gsub("'", "'\"'\"'")}'"
+      command = "docker exec #{container_name} bash -lc '#{safe_prefixed}'"
       Rails.logger.info("Executing command in Docker container: #{command}")
 
       # Cattura l'output del comando

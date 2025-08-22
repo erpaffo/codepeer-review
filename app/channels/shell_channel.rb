@@ -11,6 +11,9 @@ class ShellChannel < ApplicationCable::Channel
         # Inizializza la shell nel container Docker con i file del progetto
         ShellProcessManager.initialize_shell(@project, project_files_path)
 
+        # Imposta directory corrente di sessione
+        set_current_dir('/app')
+
         Rails.logger.info "Subscribed to ShellChannel for Project ID: #{@project.id}"
       else
         reject
@@ -31,15 +34,22 @@ class ShellChannel < ApplicationCable::Channel
 
   def send_input(data)
     if @project
-      input = data['input']
-      
+      input = (data['input'] || '').to_s
+      return if input.strip.empty?
+
       # Gestisci comandi speciali della shell
       if handle_special_commands(input)
         return
       end
-      
+
+      # Gestione 'cd' con persistenza directory
+      if input.strip.start_with?('cd')
+        handle_cd_command(input)
+        return
+      end
+
       if allowed_command?(input)
-        ShellProcessManager.send_input(@project, input)
+        ShellProcessManager.send_input(@project, input, current_dir: get_current_dir)
         Rails.logger.info "Received input for Project ID: #{@project.id}: #{input}"
       else
         transmit({ error: "Command not allowed." })
@@ -55,91 +65,149 @@ class ShellChannel < ApplicationCable::Channel
   def handle_special_commands(input)
     case input.strip
     when 'history'
-      # Mostra la cronologia dei comandi (gestita lato client)
       transmit({ output: "History command - use Ctrl+R to search in history\r\n" })
       return true
     when 'docker-status'
-      # Mostra lo stato dei container Docker
       show_docker_status
       return true
     when /^create-file\s+(\S+)$/
-      # Crea un nuovo file vuoto
       filename = $1
-      create_empty_file(filename)
+      create_empty_file(filename_in_pwd(filename))
       return true
     when /^edit-file\s+(\S+)\s+(.+)$/
-      # Modifica un file con contenuto specifico
       filename = $1
       content = $2
-      edit_file_content(filename, content)
+      edit_file_content(filename_in_pwd(filename), content)
       return true
     when /^append-file\s+(\S+)\s+(.+)$/
-      # Aggiunge contenuto a un file
       filename = $1
       content = $2
-      append_to_file(filename, content)
+      append_to_file(filename_in_pwd(filename), content)
       return true
     when /^alias\s+(\w+)=(.+)$/
-      # Gestisci alias
       alias_name = $1
       alias_value = $2.strip
       store_alias(alias_name, alias_value)
       transmit({ output: "Alias '#{alias_name}' created\r\n" })
       return true
     when /^unalias\s+(\w+)$/
-      # Rimuovi alias
       alias_name = $1
       remove_alias(alias_name)
       transmit({ output: "Alias '#{alias_name}' removed\r\n" })
       return true
     when 'alias'
-      # Mostra tutti gli alias
       show_aliases
       return true
     when /^export\s+(\w+)=(.+)$/
-      # Gestisci variabili d'ambiente
       var_name = $1
       var_value = $2.strip
       store_environment_variable(var_name, var_value)
       transmit({ output: "Environment variable '#{var_name}' set\r\n" })
       return true
     when 'env'
-      # Mostra variabili d'ambiente
       show_environment_variables
       return true
     when 'help'
-      # Mostra aiuto
       show_help
+      return true
+    when /^python-venv$/
+      create_python_venv
+      return true
+    when /^pip-install\s+(.+)$/
+      install_pip_packages($1)
+      return true
+    when /^pip-freeze$/
+      freeze_pip_packages
       return true
     end
     false
   end
 
+  def handle_cd_command(input)
+    parts = input.strip.split(/\s+/, 2)
+    target = parts.length > 1 ? parts.last.strip : ''
+
+    new_dir = resolve_target_dir(target)
+
+    # Verifica esistenza directory nel container
+    container_name = "project_executor_#{@project.id}"
+    check_cmd = "docker exec #{container_name} bash -lc 'test -d #{escape_single_quotes(new_dir)}'"
+    if system(check_cmd)
+      set_current_dir(new_dir)
+      transmit({ output: "#{new_dir}\r\n" })
+    else
+      transmit({ output: "cd: no such file or directory: #{target}\r\n" })
+    end
+  end
+
+  def resolve_target_dir(target)
+    base = get_current_dir || '/app'
+    candidate = if target.nil? || target.empty? || target == '~'
+      '/app'
+    elsif target == '-'
+      base # per semplicità, niente directory precedente
+    elsif target.start_with?('/')
+      target
+    else
+      "#{base}/#{target}"
+    end
+
+    # Normalizza path e confinalo sotto /app
+    normalized = candidate.split('/').reject { |p| p.nil? || p.empty? || p == '.' }.inject([]) do |stack, part|
+      if part == '..'
+        stack.pop
+      else
+        stack << part
+      end
+      stack
+    end
+    normalized_path = '/' + normalized.join('/')
+
+    unless normalized_path.start_with?('/app')
+      '/app'
+    else
+      normalized_path
+    end
+  end
+
+  def filename_in_pwd(name)
+    dir = get_current_dir || '/app'
+    resolve_target_dir(File.join(dir, name))
+  end
+
+  def get_current_dir
+    Rails.cache.read(current_dir_cache_key) || '/app'
+  end
+
+  def set_current_dir(path)
+    Rails.cache.write(current_dir_cache_key, path, expires_in: 2.hours)
+  end
+
+  def current_dir_cache_key
+    user_id = (respond_to?(:current_user) && current_user ? current_user.id : 'anon')
+    "shell_current_dir_#{@project.id}_#{user_id}"
+  end
+
+  def escape_single_quotes(str)
+    str.to_s.gsub("'", %q('"'"'))
+  end
+
   def show_docker_status
     container_name = "project_executor_#{@project.id}"
-    
-    # Verifica se Docker è disponibile
     unless system("docker --version > /dev/null 2>&1")
       transmit({ output: "Docker is not installed or not available\r\n" })
       return
     end
-    
-    # Mostra solo i container rilevanti per questo progetto
     project_containers = `docker ps --filter "name=project_executor_#{@project.id}" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"`.strip
-    
     if project_containers.include?("NAMES")
       transmit({ output: "Project containers:\r\n#{project_containers}\r\n\r\n" })
     else
       transmit({ output: "No project containers found.\r\n\r\n" })
     end
-    
-    # Verifica se il container specifico è in esecuzione
     if ShellProcessManager.container_running?(container_name)
       transmit({ output: "✅ Container #{container_name} is running\r\n" })
     else
       transmit({ output: "❌ Container #{container_name} is not running\r\n" })
-      
-      # Mostra container fermati
       stopped_containers = `docker ps -a --filter "name=#{container_name}" --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"`.strip
       if stopped_containers.include?(container_name)
         transmit({ output: "Stopped containers:\r\n#{stopped_containers}\r\n" })
@@ -148,7 +216,6 @@ class ShellChannel < ApplicationCable::Channel
   end
 
   def store_alias(name, value)
-    # Salva l'alias nel database o in memoria
     Rails.cache.write("shell_alias_#{@project.id}_#{name}", value, expires_in: 1.hour)
   end
 
@@ -161,14 +228,14 @@ class ShellChannel < ApplicationCable::Channel
   end
 
   def show_aliases
-    # Recupera tutti gli alias per questo progetto
     aliases = []
-    Rails.cache.redis.keys("shell_alias_#{@project.id}_*").each do |key|
-      name = key.split('_').last
-      value = Rails.cache.read(key)
-      aliases << "#{name}='#{value}'"
+    if Rails.cache.respond_to?(:redis)
+      Rails.cache.redis.keys("shell_alias_#{@project.id}_*").each do |key|
+        name = key.split('_').last
+        value = Rails.cache.read(key)
+        aliases << "#{name}='#{value}'"
+      end
     end
-    
     if aliases.empty?
       transmit({ output: "No aliases defined\r\n" })
     else
@@ -186,25 +253,23 @@ class ShellChannel < ApplicationCable::Channel
 
   def show_environment_variables
     env_vars = []
-    Rails.cache.redis.keys("shell_env_#{@project.id}_*").each do |key|
-      name = key.split('_').last
-      value = Rails.cache.read(key)
-      env_vars << "#{name}=#{value}"
+    if Rails.cache.respond_to?(:redis)
+      Rails.cache.redis.keys("shell_env_#{@project.id}_*").each do |key|
+        name = key.split('_').last
+        value = Rails.cache.read(key)
+        env_vars << "#{name}=#{value}"
+      end
     end
-    
-    # Aggiungi variabili di sistema
-    env_vars << "PWD=/app"
+    env_vars << "PWD=#{get_current_dir}"
     env_vars << "USER=root"
     env_vars << "HOME=/root"
     env_vars << "SHELL=/bin/bash"
-    
     transmit({ output: env_vars.join("\r\n") + "\r\n" })
   end
 
   def create_empty_file(filename)
     container_name = "project_executor_#{@project.id}"
-    command = "docker exec #{container_name} touch #{filename}"
-    
+    command = "docker exec #{container_name} touch #{escape_single_quotes(filename)}"
     if system(command)
       transmit({ output: "✅ File '#{filename}' created successfully\r\n" })
     else
@@ -214,10 +279,8 @@ class ShellChannel < ApplicationCable::Channel
 
   def edit_file_content(filename, content)
     container_name = "project_executor_#{@project.id}"
-    # Escapa il contenuto per evitare problemi con caratteri speciali
     escaped_content = content.gsub("'", "'\"'\"'")
-    command = "docker exec #{container_name} bash -c 'echo \"#{escaped_content}\" > #{filename}'"
-    
+    command = "docker exec #{container_name} bash -c 'cd #{escape_single_quotes(get_current_dir)} && echo \"#{escaped_content}\" > #{escape_single_quotes(filename)}'"
     if system(command)
       transmit({ output: "✅ File '#{filename}' updated successfully\r\n" })
     else
@@ -227,10 +290,8 @@ class ShellChannel < ApplicationCable::Channel
 
   def append_to_file(filename, content)
     container_name = "project_executor_#{@project.id}"
-    # Escapa il contenuto per evitare problemi con caratteri speciali
     escaped_content = content.gsub("'", "'\"'\"'")
-    command = "docker exec #{container_name} bash -c 'echo \"#{escaped_content}\" >> #{filename}'"
-    
+    command = "docker exec #{container_name} bash -c 'cd #{escape_single_quotes(get_current_dir)} && echo \"#{escaped_content}\" >> #{escape_single_quotes(filename)}'"
     if system(command)
       transmit({ output: "✅ Content appended to '#{filename}' successfully\r\n" })
     else
@@ -243,46 +304,19 @@ class ShellChannel < ApplicationCable::Channel
       Available commands:
       - ls, cd, pwd, cat, cp, mv, rm, mkdir, rmdir, touch
       - grep, find, chmod, chown, ps, top, kill
-      - python3, python, node, npm
+      - python3, python, node, npm, pip-install, pip-freeze, python-venv
       - git, gcc, g++, make, echo, export, source
       - alias, unalias, history, clear, env, help
-      
-      File management commands:
-      - create-file filename: Create empty file
-      - edit-file filename content: Create/overwrite file with content
-      - append-file filename content: Append content to file
-      - echo "content" > filename: Create file with content
-      - echo "content" >> filename: Append to file
-      - cat filename: View file content
-      
-      Note: Interactive editors (nano, vim) are not supported in this terminal.
-      Use the Monaco Editor in the left panel for interactive file editing.
-      
-      Keyboard shortcuts:
-      - Tab: Auto-completion
-      - Ctrl+R: Search in history
-      - Ctrl+C: Interrupt command
-      - Ctrl+L: Clear screen
-      - Ctrl+W: Delete word
-      - Ctrl+U: Delete line before cursor
-      - Ctrl+A: Go to beginning of line
-      - Ctrl+E: Go to end of line
-      - Arrow keys: Navigate command history and cursor
-      
-      Special commands:
-      - alias name='command': Create alias
-      - unalias name: Remove alias
-      - export VAR=value: Set environment variable
-      - env: Show environment variables
-      - help: Show this help
+
+      Notes:
+      - cd persists in this session. PWD: #{get_current_dir}
+      - python-venv creates /app/.venv and enables pip-install
     HELP
     transmit({ output: help_text })
   end
 
   def allowed_command?(input)
-    # Espandi alias prima di controllare
     expanded_input = expand_aliases(input)
-    
     allowed_commands = %w[
       gcc g++ python3 python java javac node bash ls pwd echo rustc
       make mvn yarn pip bundler mkdir touch rm rmdir cat cp mv cd
@@ -292,10 +326,8 @@ class ShellChannel < ApplicationCable::Channel
       whoami id groups sudo su
       date cal uptime free df du
       ping traceroute netstat ss
-      systemctl service 
+      systemctl service pip-install pip-freeze python-venv
     ]
-
-    # Verifica se il comando è un eseguibile locale (inizia con ./) o è nella lista dei comandi consentiti
     first_word = expanded_input.strip.split.first
     allowed_commands.include?(first_word) || expanded_input.strip.start_with?('./')
   end
@@ -303,17 +335,39 @@ class ShellChannel < ApplicationCable::Channel
   def expand_aliases(input)
     words = input.strip.split
     return input if words.empty?
-    
     first_word = words.first
     alias_value = get_alias(first_word)
-    
     if alias_value
-      # Sostituisci il primo comando con l'alias
       words[0] = alias_value
       return words.join(' ')
     end
-    
     input
+  end
+
+  # Python helpers
+  def create_python_venv
+    container_name = "project_executor_#{@project.id}"
+    cmd = "docker exec #{container_name} bash -lc 'cd #{escape_single_quotes(get_current_dir)} && if command -v python3 >/dev/null 2>&1; then python3 -m venv /app/.venv && . /app/.venv/bin/activate && pip install --upgrade pip; else echo \"python3 not found\"; fi'"
+    stdout, stderr, status = Open3.capture3(cmd)
+    out = stdout.empty? ? stderr : stdout
+    transmit({ output: out })
+  end
+
+  def install_pip_packages(packages)
+    container_name = "project_executor_#{@project.id}"
+    pkgs = packages.to_s.gsub(/[^\w\-\._\s\=\<\>\,\[\]\:]/, '')
+    cmd = "docker exec #{container_name} bash -lc 'if [ ! -d /app/.venv ]; then python3 -m venv /app/.venv; fi; . /app/.venv/bin/activate && pip install #{pkgs}'"
+    stdout, stderr, status = Open3.capture3(cmd)
+    out = stdout.empty? ? stderr : stdout
+    transmit({ output: out })
+  end
+
+  def freeze_pip_packages
+    container_name = "project_executor_#{@project.id}"
+    cmd = "docker exec #{container_name} bash -lc 'if [ -d /app/.venv ]; then . /app/.venv/bin/activate && pip freeze; else echo \"No venv at /app/.venv\"; fi'"
+    stdout, stderr, status = Open3.capture3(cmd)
+    out = stdout.empty? ? stderr : stdout
+    transmit({ output: out })
   end
 
   # Funzione per scaricare i file da S3
@@ -330,7 +384,6 @@ class ShellChannel < ApplicationCable::Channel
       s3_file_path = "uploads/#{user_folder_name}/#{project_folder_name}/#{file.file_identifier}"
       local_file_path = File.join(local_dir, file.file_identifier)
 
-      # Scarica il file da S3 e salva nel percorso locale
       File.open(local_file_path, 'wb') do |local_file|
         s3.get_object(bucket: ENV['AWS_BUCKET'], key: s3_file_path) do |chunk|
           local_file.write(chunk)
@@ -338,6 +391,6 @@ class ShellChannel < ApplicationCable::Channel
       end
     end
 
-    local_dir # Restituisce il percorso locale dove i file sono stati scaricati
+    local_dir
   end
 end

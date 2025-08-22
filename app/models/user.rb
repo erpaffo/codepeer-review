@@ -24,6 +24,7 @@ class User < ApplicationRecord
   attribute :profile_image_url, :string
   has_many :favorites, dependent: :destroy
   has_many :favorite_projects, through: :favorites, source: :project
+  has_many :session_snapshots, dependent: :destroy
   has_many :user_badges
   has_many :badges, through: :user_badges
   # Ensure attribute exists during early migrations when DB column may not yet be present

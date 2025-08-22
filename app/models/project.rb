@@ -8,6 +8,7 @@ class Project < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :favorited_by_users, through: :favorites, source: :user
   has_many :project_views, dependent: :destroy
+  has_many :session_snapshots, dependent: :destroy
 
   after_create :award_badges
   after_save :detect_languages, if: :project_files_changed?
