@@ -11,8 +11,11 @@ class ShellChannel < ApplicationCable::Channel
         # Inizializza la shell nel container Docker con i file del progetto
         ShellProcessManager.initialize_shell(@project, project_files_path)
 
-        # Imposta directory corrente di sessione
-        set_current_dir('/app')
+        # Imposta directory corrente di sessione solo se non è già stata impostata
+        cache_key = current_dir_cache_key
+        unless Rails.cache.exist?(cache_key)
+          set_current_dir('/app')
+        end
 
         Rails.logger.info "Subscribed to ShellChannel for Project ID: #{@project.id}"
       else
@@ -49,7 +52,9 @@ class ShellChannel < ApplicationCable::Channel
       end
 
       if allowed_command?(input)
-        ShellProcessManager.send_input(@project, input, current_dir: get_current_dir)
+        current_dir = get_current_dir
+        Rails.logger.info "ShellChannel: Sending input '#{input}' with current_dir '#{current_dir}' to ShellProcessManager"
+        ShellProcessManager.send_input(@project, input, current_dir: current_dir)
         Rails.logger.info "Received input for Project ID: #{@project.id}: #{input}"
       else
         transmit({ error: "Command not allowed." })
@@ -176,15 +181,20 @@ class ShellChannel < ApplicationCable::Channel
   end
 
   def get_current_dir
-    Rails.cache.read(current_dir_cache_key) || '/app'
+    key = current_dir_cache_key
+    value = Rails.cache.read(key)
+    Rails.logger.info "ShellChannel: Reading current_dir from cache key '#{key}' = '#{value}'"
+    value || '/app'
   end
 
   def set_current_dir(path)
-    Rails.cache.write(current_dir_cache_key, path, expires_in: 2.hours)
+    key = current_dir_cache_key
+    Rails.logger.info "ShellChannel: Setting current_dir in cache key '#{key}' = '#{path}'"
+    Rails.cache.write(key, path, expires_in: 2.hours)
   end
 
   def current_dir_cache_key
-    user_id = (respond_to?(:current_user) && current_user ? current_user.id : 'anon')
+    user_id = connection.current_user&.id || 'anon'
     "shell_current_dir_#{@project.id}_#{user_id}"
   end
 

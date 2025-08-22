@@ -46,6 +46,7 @@ class ShellProcessManager
   end
 
   def self.send_input(project, input, current_dir: '/app')
+    Rails.logger.info "ShellProcessManager: Received input '#{input}' with current_dir '#{current_dir}' for project #{project.id}"
     if Rails.configuration.x.k8s.enabled
       return Kube::ShellManager.send_input(project, input)
     end
@@ -73,8 +74,10 @@ class ShellProcessManager
 
     # Attiva venv se presente e prefissa con cd
     venv_prefix = ". /app/.venv/bin/activate 2>/dev/null || true;"
-    escaped_dir = input.include?("cd ") ? '/app' : current_dir
+    # Usa sempre la directory corrente, non importa se l'input contiene 'cd'
+    escaped_dir = current_dir
     prefixed = "cd #{escaped_dir} && #{venv_prefix} #{input}"
+    Rails.logger.info "ShellProcessManager: Generated command: '#{prefixed}'"
     # Escape sicuro per singoli apici all'interno della stringa che verrà racchiusa tra apici singoli
     safe_prefixed = prefixed.gsub("'", %q('"'"'))
 
