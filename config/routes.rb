@@ -94,6 +94,8 @@ Rails.application.routes.draw do
       collection do
         get 'my_projects'
         get 'favorite_projects', to: 'projects#favorite_projects'
+        get 'import_from_github', to: 'projects#new_import_from_github', as: 'new_import_from_github'
+        post 'perform_import_from_github', to: 'projects#perform_new_import_from_github', as: 'perform_new_import_from_github'
       end
 
       member do
@@ -121,6 +123,15 @@ Rails.application.routes.draw do
         get 'run_shell', to: 'projects#run_shell', as: 'run_shell'
 
         post 'run_code', to: 'projects#run_code', as: 'run_code_project'
+        post 'sync_files', to: 'projects#sync_files', as: 'sync_files'
+        get 'import_from_github', to: 'projects#import_from_github', as: 'import_from_github'
+        post 'perform_import_from_github', to: 'projects#perform_import_from_github', as: 'perform_import_from_github'
+      end
+      
+      resources :session_snapshots, only: [:index, :show, :new, :create, :destroy] do
+        member do
+          post :restore
+        end
       end
     end
 

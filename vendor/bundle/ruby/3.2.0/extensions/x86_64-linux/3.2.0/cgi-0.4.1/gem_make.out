@@ -1,0 +1,18 @@
+current directory: /home/erpaffo/Scrivania/codepeer-review/vendor/bundle/ruby/3.2.0/gems/cgi-0.4.1/ext/cgi/escape
+/usr/share/rvm/rubies/ruby-3.2.2/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/erpaffo/Scrivania/codepeer-review/vendor/bundle/ruby/3.2.0/gems/cgi-0.4.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20250820-123677-nr9sm5 sitelibdir\=./.gem.20250820-123677-nr9sm5 clean
+
+current directory: /home/erpaffo/Scrivania/codepeer-review/vendor/bundle/ruby/3.2.0/gems/cgi-0.4.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20250820-123677-nr9sm5 sitelibdir\=./.gem.20250820-123677-nr9sm5
+compiling escape.c
+linking shared-object cgi/escape.so
+
+current directory: /home/erpaffo/Scrivania/codepeer-review/vendor/bundle/ruby/3.2.0/gems/cgi-0.4.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20250820-123677-nr9sm5 sitelibdir\=./.gem.20250820-123677-nr9sm5 install
+/usr/bin/install -c -m 0755 escape.so ./.gem.20250820-123677-nr9sm5/cgi
+
+current directory: /home/erpaffo/Scrivania/codepeer-review/vendor/bundle/ruby/3.2.0/gems/cgi-0.4.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20250820-123677-nr9sm5 sitelibdir\=./.gem.20250820-123677-nr9sm5 clean

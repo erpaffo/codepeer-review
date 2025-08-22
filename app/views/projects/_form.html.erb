@@ -37,5 +37,6 @@
 
   <div class="actions">
     <%= f.submit "Create Project", class: 'btn btn-primary' %>
+    <%= link_to "Import from GitHub", new_import_from_github_projects_path, class: 'btn btn-secondary', style: 'margin-left: 10px;', data: { turbo: false } %>
   </div>
 <% end %>

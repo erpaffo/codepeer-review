@@ -136,4 +136,46 @@ RSpec.describe ProjectsController, type: :controller do
       expect(user.favorite_projects).not_to include(project)
     end
   end
+
+  # 9. Esecuzione codice (K8s feature-flag)
+  describe "POST #run_code" do
+    let(:success_status) { Struct.new(:success?).new(true) }
+
+    context "quando K8S_ENABLED=true" do
+      before do
+        allow(Rails.configuration.x.k8s).to receive(:enabled).and_return(true)
+      end
+
+      it "usa Kube::JobRunner e restituisce l'output" do
+        expect(Kube::JobRunner).to receive(:run)
+          .with(code: "print('hi')", language: 'python', timeout_s: 5)
+          .and_return(["hi\n", '', success_status])
+
+        post :run_code, params: { id: project.id, code: "print('hi')", file_identifier: 'main.py' }
+
+        expect(response).to have_http_status(:ok)
+        body = JSON.parse(response.body)
+        expect(body['output']).to eq("hi\n")
+      end
+    end
+
+    context "quando K8S_ENABLED=false" do
+      before do
+        allow(Rails.configuration.x.k8s).to receive(:enabled).and_return(false)
+      end
+
+      it "usa il fallback Docker" do
+        expect(Kube::JobRunner).not_to receive(:run)
+        allow_any_instance_of(ProjectsController).to receive(:execute_code_in_docker)
+          .with("puts 'ok'", 'ruby')
+          .and_return(["ok\n", '', success_status])
+
+        post :run_code, params: { id: project.id, code: "puts 'ok'", file_identifier: 'main.rb' }
+
+        expect(response).to have_http_status(:ok)
+        body = JSON.parse(response.body)
+        expect(body['output']).to eq("ok\n")
+      end
+    end
+  end
 end

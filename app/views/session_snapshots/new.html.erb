@@ -1,0 +1,74 @@
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-900">Create Session Snapshot</h1>
+    <p class="text-gray-600 mt-2">Save your current workspace state to restore it later.</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+    <%= form_with model: [@project, @snapshot], local: true, class: "space-y-6" do |f| %>
+      <% if @snapshot.errors.any? %>
+        <div class="bg-red-50 border border-red-200 rounded-md p-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-red-400"></i>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">
+                <%= pluralize(@snapshot.errors.count, "error") %> prohibited this snapshot from being saved:
+              </h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="list-disc pl-5 space-y-1">
+                  <% @snapshot.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div>
+        <%= f.label :name, "Snapshot Name", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :name, 
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+            placeholder: "e.g., Working version with tests" %>
+        <p class="mt-1 text-sm text-gray-500">Give your snapshot a descriptive name to easily identify it later.</p>
+      </div>
+
+      <div>
+        <%= f.label :description, "Description (Optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_area :description, rows: 3,
+            class: "w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500",
+            placeholder: "Describe what this snapshot contains or why you're saving it..." %>
+      </div>
+
+      <div class="bg-blue-50 border border-blue-200 rounded-md p-4">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-info-circle text-blue-400"></i>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-blue-800">What will be saved?</h3>
+            <div class="mt-2 text-sm text-blue-700">
+              <p>Your snapshot will include all files in your workspace, excluding:</p>
+              <ul class="list-disc pl-5 mt-1 space-y-1">
+                <li>Build artifacts (node_modules, dist, build, etc.)</li>
+                <li>Cache files (.cache, __pycache__, etc.)</li>
+                <li>Version control (.git)</li>
+                <li>Temporary files (.tmp, .log)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 pt-4">
+        <%= link_to "Cancel", project_session_snapshots_path(@project), 
+            class: "bg-gray-300 hover:bg-gray-400 text-gray-800 font-medium py-2 px-4 rounded-md transition duration-200" %>
+        <%= f.submit "Create Snapshot", 
+            class: "bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200" %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<% content_for :title, "Import from GitHub" %>
+
+<div class="form-container" style="max-width: 720px; margin: 2rem auto;">
+  <h1 class="page-title">Import repository from GitHub</h1>
+  <p class="text-gray-300" style="margin-bottom: 1rem;">Paste a repository URL and provide project details. Example: https://github.com/user/repo.git</p>
+
+  <%= form_with url: perform_new_import_from_github_projects_path, method: :post, local: true do |f| %>
+    <div class="field-group">
+      <%= label_tag :repo_url, 'Repository URL', class: 'form-label' %>
+      <%= text_field_tag :repo_url, nil, placeholder: 'https://github.com/user/repo.git', class: 'form-input' %>
+    </div>
+
+    <div class="field-group">
+      <%= label_tag :project_name, 'Project Name', class: 'form-label' %>
+      <%= text_field_tag :project_name, nil, placeholder: 'My Project', class: 'form-input' %>
+    </div>
+
+    <div class="field-group">
+      <%= label_tag :project_description, 'Description', class: 'form-label' %>
+      <%= text_area_tag :project_description, nil, placeholder: 'Project description...', class: 'form-input', rows: 3 %>
+    </div>
+
+    <div class="field-group">
+      <%= label_tag :visibility, 'Visibility', class: 'form-label' %>
+      <%= select_tag :visibility, options_for_select([['Private', 'private'], ['Public', 'public']]), class: 'form-input' %>
+    </div>
+
+    <div class="actions">
+      <%= submit_tag 'Create Project & Import', class: 'btn btn-primary' %>
+      <%= link_to 'Cancel', new_project_path, class: 'btn btn-secondary', style: 'margin-left: 10px;' %>
+    </div>
+  <% end %>
+</div>
+

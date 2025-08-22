@@ -9,3 +9,5 @@ services:
       - ../tmp/projects/${PROJECT_ID}_files:/app/  # Usa un percorso corretto per la cartella dei file del progetto
     stdin_open: true  # Per eseguire comandi interattivi
     tty: true
+    command: ["tail", "-f", "/dev/null"]  # Mantiene il container in esecuzione
+    restart: unless-stopped  # Riavvia automaticamente se si ferma

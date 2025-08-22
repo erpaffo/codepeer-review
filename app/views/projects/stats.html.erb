@@ -5,6 +5,25 @@
     <div class="text-gray-400 mb-6">
       <p class="mb-2"><strong>Unique Views:</strong> <span class="text-teal-400"><%= @unique_views %></span></p>
       <p class="mb-2"><strong>Favorites:</strong> <span class="text-teal-400"><%= @favorite_count %></span></p>
+      <% if defined?(@runner_metrics) && @runner_metrics.present? %>
+        <div class="mt-4">
+          <h2 class="text-2xl font-semibold text-white mb-2">Runner (Kubernetes Pod) Metrics</h2>
+          <% if @runner_metrics[:available] %>
+            <ul class="list-disc list-inside text-gray-300">
+              <li>CPU: <span class="text-teal-400"><%= (@runner_metrics[:cpu_millicores] || 0) %> m</span></li>
+              <li>Memory: <span class="text-teal-400"><%= ((@runner_metrics[:memory_bytes] || 0) / (1024*1024)) %> MiB</span></li>
+              <% if @runner_metrics[:gpu] && @runner_metrics[:gpu][:available] %>
+                <li>GPU Utilization: <span class="text-teal-400"><%= @runner_metrics[:gpu][:utilization_percent] %>%</span></li>
+                <li>GPU Memory Used: <span class="text-teal-400"><%= @runner_metrics[:gpu][:memory_megabytes] %> MiB</span></li>
+              <% else %>
+                <li>GPU: <span class="text-teal-400">not available</span></li>
+              <% end %>
+            </ul>
+          <% else %>
+            <p class="text-red-400">Runner metrics not available (<%= @runner_metrics[:reason] %>).</p>
+          <% end %>
+        </div>
+      <% end %>
     </div>
 
     <%= link_to 'Back to Project', project_path(@project), class: "bg-teal-600 text-white py-2 px-4 rounded-lg hover:bg-teal-500 transition ease-in-out duration-300" %>

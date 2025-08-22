@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal - <%= content_for?(:title) ? yield(:title) : "CodePeer Review" %></title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  
+  <!-- Solo le risorse essenziali per il terminale -->
+  <%= stylesheet_link_tag 'tailwind', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'project_editor', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- xterm.js e addon -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
+  <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.4.0/lib/xterm-addon-fit.js"></script>
+  
+  <!-- Monaco Editor -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
+</head>
+
+<body class="font-Inter bg-gray-900 text-gray-300">
+  <div class="min-h-screen flex flex-col">
+    <%= render 'layouts/navbar' %>
+    
+    <!-- Flash messages -->
+    <%= render 'layouts/flash' %>
+    
+    <%= yield %>
+  </div>
+  
+  <%= render 'layouts/footer' %>
+  
+  <!-- Script essenziali -->
+  <script>
+    document.getElementById('menu-toggle').addEventListener('click', function() {
+      var menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    });
+  </script>
+</body>
+</html> 

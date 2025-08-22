@@ -17,6 +17,17 @@
   --color-red-500: #e53e3e; /* Rosso per pulsanti di avviso */
 }
 
+/* xterm helper should remain invisible */
+.xterm-helper-textarea {
+  position: absolute !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
 body {
   background-color: var(--color-bg-dark);
   color: var(--color-text-light);
@@ -456,6 +467,16 @@ textarea {
   align-items: center;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+/* Hide scrollbars inside xterm viewport (keep scroll by wheel/keyboard) */
+#terminal .xterm-viewport {
+  scrollbar-width: none;       /* Firefox */
+  -ms-overflow-style: none;    /* IE/Edge */
+}
+#terminal .xterm-viewport::-webkit-scrollbar { /* Chrome/Safari */
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .oauth-btn {

@@ -10,14 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2024_09_16_020843) do
-
+ActiveRecord::Schema[7.1].define(version: 2025_08_22_080806) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
     t.bigint "record_id", null: false
     t.bigint "blob_id", null: false
-    t.datetime "created_at", precision: 6, null: false
+    t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
@@ -30,7 +29,7 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.string "service_name", null: false
     t.bigint "byte_size", null: false
     t.string "checksum"
-    t.datetime "created_at", precision: 6, null: false
+    t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
@@ -45,8 +44,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.text "description"
     t.string "icon"
     t.json "criteria", default: "{}"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "icon_url"
   end
 
@@ -56,8 +55,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.string "email", null: false
     t.string "token", null: false
     t.boolean "accepted", default: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["project_id"], name: "index_collaborator_invitations_on_project_id"
     t.index ["token"], name: "index_collaborator_invitations_on_token", unique: true
     t.index ["user_id"], name: "index_collaborator_invitations_on_user_id"
@@ -66,8 +65,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "collaborators", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "permissions", default: "partial"
     t.index ["project_id"], name: "index_collaborators_on_project_id"
     t.index ["user_id", "project_id"], name: "index_collaborators_on_user_id_and_project_id", unique: true
@@ -79,8 +78,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.integer "file_id", null: false
     t.text "description"
     t.text "diff"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "message"
     t.integer "user_id", null: false
     t.index ["file_id"], name: "index_commit_logs_on_file_id"
@@ -91,8 +90,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "conversations", force: :cascade do |t|
     t.integer "sender_id", null: false
     t.integer "recipient_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["recipient_id"], name: "index_conversations_on_recipient_id"
     t.index ["sender_id"], name: "index_conversations_on_sender_id"
   end
@@ -100,8 +99,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "favorites", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "project_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["project_id"], name: "index_favorites_on_project_id"
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
@@ -111,8 +110,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.integer "user_id", null: false
     t.integer "snippet_id"
     t.integer "user_profile_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["snippet_id"], name: "index_feedbacks_on_snippet_id"
     t.index ["user_id"], name: "index_feedbacks_on_user_id"
     t.index ["user_profile_id"], name: "index_feedbacks_on_user_profile_id"
@@ -121,8 +120,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "follows", force: :cascade do |t|
     t.integer "follower_id", null: false
     t.integer "followed_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["followed_id"], name: "index_follows_on_followed_id"
     t.index ["follower_id", "followed_id"], name: "index_follows_on_follower_id_and_followed_id", unique: true
     t.index ["follower_id"], name: "index_follows_on_follower_id"
@@ -133,8 +132,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.string "field"
     t.string "old_value"
     t.string "new_value"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "modified_by"
     t.index ["snippet_id"], name: "index_history_records_on_snippet_id"
   end
@@ -143,8 +142,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.integer "user_id", null: false
     t.integer "conversation_id", null: false
     t.text "body"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["user_id"], name: "index_messages_on_user_id"
   end
@@ -153,9 +152,9 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.integer "user_id", null: false
     t.integer "notifier_id", null: false
     t.string "message"
-    t.datetime "read_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "read_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "read"
     t.integer "badge_id"
     t.index ["badge_id"], name: "index_notifications_on_badge_id"
@@ -166,16 +165,16 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "project_files", force: :cascade do |t|
     t.integer "project_id", null: false
     t.string "file"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["project_id"], name: "index_project_files_on_project_id"
   end
 
   create_table "project_views", force: :cascade do |t|
     t.integer "project_id", null: false
     t.integer "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["project_id"], name: "index_project_views_on_project_id"
     t.index ["user_id"], name: "index_project_views_on_user_id"
   end
@@ -184,8 +183,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.string "title"
     t.text "description"
     t.integer "user_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "public"
     t.string "visibility", default: "private"
     t.boolean "favorite"
@@ -195,11 +194,26 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
+  create_table "session_snapshots", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "project_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.integer "file_count", default: 0
+    t.bigint "archive_size", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id", "created_at"], name: "index_session_snapshots_on_project_id_and_created_at"
+    t.index ["project_id"], name: "index_session_snapshots_on_project_id"
+    t.index ["user_id", "project_id"], name: "index_session_snapshots_on_user_id_and_project_id"
+    t.index ["user_id"], name: "index_session_snapshots_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
@@ -210,8 +224,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
     t.text "comment"
     t.integer "user_id", null: false
     t.integer "project_file_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.boolean "favorite"
     t.string "language"
     t.boolean "draft", default: false
@@ -221,33 +235,33 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   create_table "user_badges", force: :cascade do |t|
     t.integer "user_id", null: false
     t.integer "badge_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.index ["badge_id"], name: "index_user_badges_on_badge_id"
     t.index ["user_id"], name: "index_user_badges_on_user_id"
   end
 
   create_table "user_sessions", force: :cascade do |t|
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
+    t.datetime "reset_password_sent_at", precision: nil
+    t.datetime "remember_created_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.string "provider"
     t.string "uid"
     t.string "first_name"
     t.string "last_name"
     t.string "nickname"
     t.string "confirmation_token"
-    t.datetime "confirmed_at"
-    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at", precision: nil
+    t.datetime "confirmation_sent_at", precision: nil
     t.string "unconfirmed_email"
     t.string "phone_number"
     t.boolean "otp_enabled", default: false
@@ -289,6 +303,8 @@ ActiveRecord::Schema.define(version: 2024_09_16_020843) do
   add_foreign_key "project_views", "projects"
   add_foreign_key "project_views", "users"
   add_foreign_key "projects", "users"
+  add_foreign_key "session_snapshots", "projects"
+  add_foreign_key "session_snapshots", "users"
   add_foreign_key "snippets", "project_files"
   add_foreign_key "snippets", "users"
   add_foreign_key "user_badges", "badges"

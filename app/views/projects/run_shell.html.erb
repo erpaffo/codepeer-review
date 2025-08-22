@@ -1,25 +1,127 @@
+<% content_for :title, @project.title %>
 <% if @project %>
-  <div class="p-6">
-    <h1 class="text-2xl font-semibold mb-4">Interactive Shell for <%= @project.title %></h1>
+  <div id="run-shell-root" class="bg-gray-900 select-none" data-turbo-cache="false" style="display: flex; flex-direction: row; flex-wrap: nowrap; width: 100%; height: auto; flex: 1 1 auto; min-height: 0; overflow: hidden;">
+    <div id="left-panel" class="flex flex-col bg-gray-800 border-r border-gray-700" style="flex: 1 1 60%; overflow: hidden; min-height: 0;">
+      <div class="p-4 bg-gray-700 border-b border-gray-600">
+        <h1 class="text-xl font-semibold text-white mb-2"><%= @project.title %></h1>
+        <p class="text-gray-300 text-sm"><%= @project.description %></p>
+      </div>
 
-    <!-- Campo di Input per i Comandi -->
-    <div class="mb-4">
-      <label for="command-input" class="block text-white mb-2">Enter Command:</label>
-      <input type="text" id="command-input" class="form-control w-full p-2 rounded bg-gray-700 text-white" placeholder="e.g., gcc main.c -o main" />
-      <button id="execute-command" class="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Execute</button>
+      <div class="max-h-72 overflow-y-auto border-b border-gray-600" id="file-explorer">
+        <div class="p-4 flex items-center justify-between">
+          <h2 class="text-lg font-semibold text-white">Project Files</h2>
+          <button id="toggle-file-tree" class="text-sm text-gray-300 hover:text-white">Toggle</button>
+        </div>
+        <div id="file-tree" class="px-4 pb-2" data-files='<%= @project.project_files.map { |f| {id: f.id, path: f.file_identifier} }.to_json %>'></div>
+      </div>
+
+      <div id="editor-area" class="flex-1 flex flex-col" style="min-height: 0;">
+          <div class="p-4 border-b border-gray-600">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-lg font-semibold text-white">Code Editor</h3>
+              <div class="flex space-x-2">
+                <select id="theme-select" class="bg-gray-700 text-gray-300 text-sm rounded px-2 py-1 border border-gray-600">
+                  <option value="vs-dark">Dark Theme</option>
+                  <option value="vs-light">Light Theme</option>
+                  <option value="hc-black">High Contrast</option>
+                </select>
+                <input type="number" id="font-size" value="14" min="8" max="24" class="bg-gray-700 text-gray-300 text-sm rounded px-2 py-1 border border-gray-600 w-16">
+              </div>
+            </div>
+            <div class="flex space-x-2">
+              <button id="save-file" class="bg-teal-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-teal-500 transition-colors duration-200">Save File</button>
+              <button id="run-code" class="bg-blue-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-blue-500 transition-colors duration-200">Run Code</button>
+              <button id="new-file" class="bg-purple-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-purple-500 transition-colors duration-200">New File</button>
+              <button id="sync-files" class="bg-orange-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-orange-500 transition-colors duration-200">Sync Files</button>
+              <%= link_to "Save Session", new_project_session_snapshot_path(@project), 
+                  class: "bg-indigo-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-indigo-500 transition-colors duration-200" %>
+              <%= link_to "Snapshots", project_session_snapshots_path(@project), 
+                  class: "bg-gray-600 text-white py-2 px-4 rounded-lg text-sm hover:bg-gray-500 transition-colors duration-200" %>
+            </div>
+          </div>
+          
+          <div id="code-editor-wrapper" style="flex: 1 1 auto; height: auto; min-height: 200px; overflow: auto;">
+            <div id="code-editor" class="bg-gray-900" style="height: 100%;"></div>
+          </div>
+
+          <div id="h-divider" class="bg-gray-700 hover:bg-blue-600 cursor-row-resize" style="height: 6px;"></div>
+
+          <div id="code-output" class="bg-gray-800 border-t border-gray-600 p-3 hidden" style="min-height: 140px; flex: 0 0 auto;">
+            <div class="flex items-center justify-between mb-2">
+              <h4 class="text-sm font-semibold text-white">Code Output</h4>
+              <button id="clear-output" class="text-gray-400 hover:text-white text-sm">Clear</button>
+            </div>
+            <div id="output-content" class="text-gray-300 text-sm font-mono overflow-y-auto h-full"></div>
+          </div>
+        </div>
     </div>
 
-    <!-- Terminal Container -->
-    <div id="terminal" data-project-id="<%= @project.id %>" class="bg-gray-800 text-white p-4 rounded-lg" style="height: 500px;"></div>
+    <div id="drag-divider" class="bg-gray-700 hover:bg-blue-600 cursor-col-resize" style="width: 6px; flex: 0 0 6px;"></div>
+
+    <div id="right-panel" class="flex flex-col bg-gray-900" style="flex: 1 1 40%; overflow: hidden; min-height: 0;">
+      <div class="p-4 bg-gray-800 border-b border-gray-700">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-lg font-semibold text-white">Interactive Terminal</h2>
+          <div class="flex items-center">
+            <span class="status-indicator connecting" id="terminal-status"></span>
+            <span class="text-gray-300 text-sm" id="terminal-status-text">Connecting...</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between">
+          <p class="text-gray-300 text-sm">Execute commands and run your project files</p>
+          <div class="text-gray-400 text-sm">
+            <span class="font-mono" id="current-pwd">/app</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="terminal-loading" class="flex items-center justify-center bg-gray-800 text-white p-4 flex-1">
+        <svg class="animate-spin h-8 w-8 text-blue-400 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <span>Loading terminal...</span>
+      </div>
+
+      <div id="terminal" data-project-id="<%= @project.id %>" class="flex-1 bg-gray-800 text-white p-4" style="display: none; min-height: 0;"></div>
+    </div>
   </div>
 
-  <!-- Includi xterm.js e gli addon -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.19.0/css/xterm.css" />
-  <script src="https://cdn.jsdelivr.net/npm/xterm@4.19.0/lib/xterm.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.4.0/lib/xterm-addon-fit.js"></script>
+  <div id="new-file-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <div class="bg-gray-800 rounded-lg p-6 w-full max-w-md">
+        <h3 class="text-xl font-semibold text-white mb-4">Create New File</h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-gray-300 text-sm mb-2">File Name</label>
+            <input type="text" id="new-file-name" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-gray-300 text-sm mb-2">Extension</label>
+            <select id="new-file-extension" class="w-full bg-gray-700 text-white p-2 rounded border border-gray-600 focus:border-blue-500">
+              <option value="py">.py (Python)</option>
+              <option value="js">.js (JavaScript)</option>
+              <option value="rb">.rb (Ruby)</option>
+              <option value="c">.c (C)</option>
+              <option value="cpp">.cpp (C++)</option>
+              <option value="java">.java (Java)</option>
+              <option value="rs">.rs (Rust)</option>
+              <option value="txt">.txt (Text)</option>
+            </select>
+          </div>
+        </div>
+        <div class="flex space-x-3 mt-6">
+          <button id="create-file-btn" class="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-500 transition-colors duration-200">Create</button>
+          <button id="cancel-new-file" class="bg-gray-600 text-white py-2 px-4 rounded hover:bg-gray-500 transition-colors duration-200">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!-- Includi il Pacchetto JavaScript per la Shell Interattiva -->
+  <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.30.0/min/vs/loader.js"></script>
   <%= javascript_pack_tag 'interactive_shell' %>
+  <%= javascript_pack_tag 'project_editor' %>
+  <%= javascript_pack_tag 'split_pane' %>
 <% else %>
   <div class="p-6">
     <p>Project not found.</p>

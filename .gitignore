@@ -44,3 +44,5 @@ yarn-debug.log*
 
 
 db/development.sqlite3
+
+SHELL_FEATURES.md

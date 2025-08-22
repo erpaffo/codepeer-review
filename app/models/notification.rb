@@ -27,4 +27,16 @@ class Notification < ApplicationRecord
     message = "Congratulazioni! Hai ottenuto il badge '#{badge.name}' per aver completato una specifica azione."
     Notification.create(user: user, notifier: notifier, badge: badge, message: message)
   end
+  
+  # Metodo per creare una notifica quando una snapshot viene completata
+  def self.create_snapshot_completed_notification(snapshot)
+    message = "Your session snapshot '#{snapshot.name}' has been created successfully with #{snapshot.file_count} files."
+    Notification.create(user: snapshot.user, notifier: snapshot.user, message: message)
+  end
+  
+  # Metodo per creare una notifica quando una snapshot viene ripristinata
+  def self.create_snapshot_restored_notification(snapshot)
+    message = "Your session snapshot '#{snapshot.name}' has been restored successfully."
+    Notification.create(user: snapshot.user, notifier: snapshot.user, message: message)
+  end
 end
